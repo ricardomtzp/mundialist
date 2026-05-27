@@ -634,6 +634,39 @@ const R32_TO_R16 = [
   [0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15]
 ];
 
+
+
+const ROUND_INDICES = [[0,1],[2,3],[4,5]];
+
+
+// ── Simulation with style bias ─────────────────────────────────────────────
+function rndGoalsStyled(strong,style){
+  const upsetChance=style==="maverick"?0.35:style==="bold"?0.22:style==="balanced"?0.12:0.05;
+  if(strong&&Math.random()<upsetChance) strong=false;
+  const r=Math.random();
+  if(r<0.15)return 0;if(r<0.40)return 1;if(r<0.65)return 2;
+  if(r<0.82)return strong?3:2;if(r<0.93)return strong?4:3;
+  return style==="maverick"||style==="bold"?5:3;
+}
+
+function simulateAllMatches(style="balanced"){
+  const all={};
+  Object.entries(GROUPS).forEach(([g,teams])=>{
+    all[g]=[
+      {home:teams[0],away:teams[1]},{home:teams[2],away:teams[3]},
+      {home:teams[0],away:teams[2]},{home:teams[1],away:teams[3]},
+      {home:teams[0],away:teams[3]},{home:teams[1],away:teams[2]},
+    ].map(m=>({...m,
+      homeScore:String(rndGoalsStyled(STRONG.has(m.home),style)),
+      awayScore:String(rndGoalsStyled(STRONG.has(m.away),style)),
+    }));
+  });
+  return all;
+}
+
+function generateGroupMatches(teams){
+  return [
+    {home:teams[0],away:teams[1],homeScore:"",awayScore:""},
     {home:teams[2],away:teams[3],homeScore:"",awayScore:""},
     {home:teams[0],away:teams[2],homeScore:"",awayScore:""},
     {home:teams[1],away:teams[3],homeScore:"",awayScore:""},
