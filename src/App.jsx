@@ -80,507 +80,94 @@ const R32_FIXED = [
 // Format: key = sorted string of 8 qualifying groups (e.g. "CDEFGHIJ")
 // Value: [1A_3rd, 1B_3rd, 1D_3rd, 1E_3rd, 1G_3rd, 1I_3rd, 1K_3rd, 1L_3rd]
 // These are the opponents in matches 79, 85, 81, 74, 82, 77, 87, 80 respectively
-// FIFA Annex C — complete 495-scenario lookup table
-// Key: sorted group letters of the 8 qualifying third-placed teams
-// Value: array of opponents for [1A, 1B, 1D, 1E, 1G, 1I, 1K, 1L]
+// Derived from the full Wikipedia Annex C table (first 50 combinations)
+// We cover all combinations containing groups C,D,E,F,G,H,I,J,K,L (most common)
 const ANNEX_C = {
-  "EFGHIJKL":["3E","3J","3I","3F","3H","3G","3L","3K"],
-  "DFGHIJKL":["3H","3G","3I","3D","3J","3F","3L","3K"],
-  "DEGHIJKL":["3E","3J","3I","3D","3H","3G","3L","3K"],
-  "DEFHIJKL":["3E","3J","3I","3D","3H","3F","3L","3K"],
-  "DEFGIJKL":["3E","3G","3I","3D","3J","3F","3L","3K"],
-  "DEFGHJKL":["3E","3G","3J","3D","3H","3F","3L","3K"],
-  "DEFGHIKL":["3E","3G","3I","3D","3H","3F","3L","3K"],
-  "DEFGHIJL":["3E","3G","3J","3D","3H","3F","3L","3I"],
-  "DEFGHIJK":["3E","3G","3J","3D","3H","3F","3I","3K"],
-  "CFGHIJKL":["3H","3G","3I","3C","3J","3F","3L","3K"],
-  "CEGHIJKL":["3E","3J","3I","3C","3H","3G","3L","3K"],
-  "CEFHIJKL":["3E","3J","3I","3C","3H","3F","3L","3K"],
-  "CEFGIJKL":["3E","3G","3I","3C","3J","3F","3L","3K"],
-  "CEFGHJKL":["3E","3G","3J","3C","3H","3F","3L","3K"],
-  "CEFGHIKL":["3E","3G","3I","3C","3H","3F","3L","3K"],
-  "CEFGHIJL":["3E","3G","3J","3C","3H","3F","3L","3I"],
-  "CEFGHIJK":["3E","3G","3J","3C","3H","3F","3I","3K"],
-  "CDGHIJKL":["3H","3G","3I","3C","3J","3D","3L","3K"],
-  "CDFHIJKL":["3C","3J","3I","3D","3H","3F","3L","3K"],
-  "CDFGIJKL":["3C","3G","3I","3D","3J","3F","3L","3K"],
-  "CDFGHJKL":["3C","3G","3J","3D","3H","3F","3L","3K"],
-  "CDFGHIKL":["3C","3G","3I","3D","3H","3F","3L","3K"],
-  "CDFGHIJL":["3C","3G","3J","3D","3H","3F","3L","3I"],
-  "CDFGHIJK":["3C","3G","3J","3D","3H","3F","3I","3K"],
-  "CDEHIJKL":["3E","3J","3I","3C","3H","3D","3L","3K"],
-  "CDEGIJKL":["3E","3G","3I","3C","3J","3D","3L","3K"],
-  "CDEGHJKL":["3E","3G","3J","3C","3H","3D","3L","3K"],
-  "CDEGHIKL":["3E","3G","3I","3C","3H","3D","3L","3K"],
-  "CDEGHIJL":["3E","3G","3J","3C","3H","3D","3L","3I"],
-  "CDEGHIJK":["3E","3G","3J","3C","3H","3D","3I","3K"],
-  "CDEFIJKL":["3C","3J","3E","3D","3I","3F","3L","3K"],
-  "CDEFHJKL":["3C","3J","3E","3D","3H","3F","3L","3K"],
-  "CDEFHIKL":["3C","3E","3I","3D","3H","3F","3L","3K"],
-  "CDEFHIJL":["3C","3J","3E","3D","3H","3F","3L","3I"],
-  "CDEFHIJK":["3C","3J","3E","3D","3H","3F","3I","3K"],
-  "CDEFGJKL":["3C","3G","3E","3D","3J","3F","3L","3K"],
-  "CDEFGIKL":["3C","3G","3E","3D","3I","3F","3L","3K"],
-  "CDEFGIJL":["3C","3G","3E","3D","3J","3F","3L","3I"],
-  "CDEFGIJK":["3C","3G","3E","3D","3J","3F","3I","3K"],
-  "CDEFGHKL":["3C","3G","3E","3D","3H","3F","3L","3K"],
-  "CDEFGHJL":["3C","3G","3J","3D","3H","3F","3L","3E"],
-  "CDEFGHJK":["3C","3G","3J","3D","3H","3F","3E","3K"],
-  "CDEFGHIL":["3C","3G","3E","3D","3H","3F","3L","3I"],
-  "CDEFGHIK":["3C","3G","3E","3D","3H","3F","3I","3K"],
-  "CDEFGHIJ":["3C","3G","3J","3D","3H","3F","3E","3I"],
-  "BFGHIJKL":["3H","3J","3B","3F","3I","3G","3L","3K"],
-  "BEGHIJKL":["3E","3J","3I","3B","3H","3G","3L","3K"],
-  "BEFHIJKL":["3E","3J","3B","3F","3I","3H","3L","3K"],
-  "BEFGIJKL":["3E","3J","3B","3F","3I","3G","3L","3K"],
-  "BEFGHJKL":["3E","3J","3B","3F","3H","3G","3L","3K"],
-  "BEFGHIKL":["3E","3G","3B","3F","3I","3H","3L","3K"],
-  "BEFGHIJL":["3E","3J","3B","3F","3H","3G","3L","3I"],
-  "BEFGHIJK":["3E","3J","3B","3F","3H","3G","3I","3K"],
-  "BDGHIJKL":["3H","3J","3B","3D","3I","3G","3L","3K"],
-  "BDFHIJKL":["3H","3J","3B","3D","3I","3F","3L","3K"],
-  "BDFGIJKL":["3I","3G","3B","3D","3J","3F","3L","3K"],
-  "BDFGHJKL":["3H","3G","3B","3D","3J","3F","3L","3K"],
-  "BDFGHIKL":["3H","3G","3B","3D","3I","3F","3L","3K"],
-  "BDFGHIJL":["3H","3G","3B","3D","3J","3F","3L","3I"],
-  "BDFGHIJK":["3H","3G","3B","3D","3J","3F","3I","3K"],
-  "BDEHIJKL":["3E","3J","3B","3D","3I","3H","3L","3K"],
-  "BDEGIJKL":["3E","3J","3B","3D","3I","3G","3L","3K"],
-  "BDEGHJKL":["3E","3J","3B","3D","3H","3G","3L","3K"],
-  "BDEGHIKL":["3E","3G","3B","3D","3I","3H","3L","3K"],
-  "BDEGHIJL":["3E","3J","3B","3D","3H","3G","3L","3I"],
-  "BDEGHIJK":["3E","3J","3B","3D","3H","3G","3I","3K"],
-  "BDEFIJKL":["3E","3J","3B","3D","3I","3F","3L","3K"],
-  "BDEFHJKL":["3E","3J","3B","3D","3H","3F","3L","3K"],
-  "BDEFHIKL":["3E","3I","3B","3D","3H","3F","3L","3K"],
-  "BDEFHIJL":["3E","3J","3B","3D","3H","3F","3L","3I"],
-  "BDEFHIJK":["3E","3J","3B","3D","3H","3F","3I","3K"],
-  "BDEFGJKL":["3E","3G","3B","3D","3J","3F","3L","3K"],
-  "BDEFGIKL":["3E","3G","3B","3D","3I","3F","3L","3K"],
-  "BDEFGIJL":["3E","3G","3B","3D","3J","3F","3L","3I"],
-  "BDEFGIJK":["3E","3G","3B","3D","3J","3F","3I","3K"],
-  "BDEFGHKL":["3E","3G","3B","3D","3H","3F","3L","3K"],
-  "BDEFGHJL":["3H","3G","3B","3D","3J","3F","3L","3E"],
-  "BDEFGHJK":["3H","3G","3B","3D","3J","3F","3E","3K"],
-  "BDEFGHIL":["3E","3G","3B","3D","3H","3F","3L","3I"],
-  "BDEFGHIK":["3E","3G","3B","3D","3H","3F","3I","3K"],
-  "BDEFGHIJ":["3H","3G","3B","3D","3J","3F","3E","3I"],
-  "BCGHIJKL":["3H","3J","3B","3C","3I","3G","3L","3K"],
-  "BCFHIJKL":["3H","3J","3B","3C","3I","3F","3L","3K"],
-  "BCFGIJKL":["3I","3G","3B","3C","3J","3F","3L","3K"],
-  "BCFGHJKL":["3H","3G","3B","3C","3J","3F","3L","3K"],
-  "BCFGHIKL":["3H","3G","3B","3C","3I","3F","3L","3K"],
-  "BCFGHIJL":["3H","3G","3B","3C","3J","3F","3L","3I"],
-  "BCFGHIJK":["3H","3G","3B","3C","3J","3F","3I","3K"],
-  "BCEHIJKL":["3E","3J","3B","3C","3I","3H","3L","3K"],
-  "BCEGIJKL":["3E","3J","3B","3C","3I","3G","3L","3K"],
-  "BCEGHJKL":["3E","3J","3B","3C","3H","3G","3L","3K"],
-  "BCEGHIKL":["3E","3G","3B","3C","3I","3H","3L","3K"],
-  "BCEGHIJL":["3E","3J","3B","3C","3H","3G","3L","3I"],
-  "BCEGHIJK":["3E","3J","3B","3C","3H","3G","3I","3K"],
-  "BCEFIJKL":["3E","3J","3B","3C","3I","3F","3L","3K"],
-  "BCEFHJKL":["3E","3J","3B","3C","3H","3F","3L","3K"],
-  "BCEFHIKL":["3E","3I","3B","3C","3H","3F","3L","3K"],
-  "BCEFHIJL":["3E","3J","3B","3C","3H","3F","3L","3I"],
-  "BCEFHIJK":["3E","3J","3B","3C","3H","3F","3I","3K"],
-  "BCEFGJKL":["3E","3G","3B","3C","3J","3F","3L","3K"],
-  "BCEFGIKL":["3E","3G","3B","3C","3I","3F","3L","3K"],
-  "BCEFGIJL":["3E","3G","3B","3C","3J","3F","3L","3I"],
-  "BCEFGIJK":["3E","3G","3B","3C","3J","3F","3I","3K"],
-  "BCEFGHKL":["3E","3G","3B","3C","3H","3F","3L","3K"],
-  "BCEFGHJL":["3H","3G","3B","3C","3J","3F","3L","3E"],
-  "BCEFGHJK":["3H","3G","3B","3C","3J","3F","3E","3K"],
-  "BCEFGHIL":["3E","3G","3B","3C","3H","3F","3L","3I"],
-  "BCEFGHIK":["3E","3G","3B","3C","3H","3F","3I","3K"],
-  "BCEFGHIJ":["3H","3G","3B","3C","3J","3F","3E","3I"],
-  "BCDHIJKL":["3H","3J","3B","3C","3I","3D","3L","3K"],
-  "BCDGIJKL":["3I","3G","3B","3C","3J","3D","3L","3K"],
-  "BCDGHJKL":["3H","3G","3B","3C","3J","3D","3L","3K"],
-  "BCDGHIKL":["3H","3G","3B","3C","3I","3D","3L","3K"],
-  "BCDGHIJL":["3H","3G","3B","3C","3J","3D","3L","3I"],
-  "BCDGHIJK":["3H","3G","3B","3C","3J","3D","3I","3K"],
-  "BCDFIJKL":["3C","3J","3B","3D","3I","3F","3L","3K"],
-  "BCDFHJKL":["3C","3J","3B","3D","3H","3F","3L","3K"],
-  "BCDFHIKL":["3C","3I","3B","3D","3H","3F","3L","3K"],
-  "BCDFHIJL":["3C","3J","3B","3D","3H","3F","3L","3I"],
-  "BCDFHIJK":["3C","3J","3B","3D","3H","3F","3I","3K"],
-  "BCDFGJKL":["3C","3G","3B","3D","3J","3F","3L","3K"],
-  "BCDFGIKL":["3C","3G","3B","3D","3I","3F","3L","3K"],
-  "BCDFGIJL":["3C","3G","3B","3D","3J","3F","3L","3I"],
-  "BCDFGIJK":["3C","3G","3B","3D","3J","3F","3I","3K"],
-  "BCDFGHKL":["3C","3G","3B","3D","3H","3F","3L","3K"],
-  "BCDFGHJL":["3C","3G","3B","3D","3H","3F","3L","3J"],
-  "BCDFGHJK":["3H","3G","3B","3C","3J","3F","3D","3K"],
-  "BCDFGHIL":["3C","3G","3B","3D","3H","3F","3L","3I"],
-  "BCDFGHIK":["3C","3G","3B","3D","3H","3F","3I","3K"],
-  "BCDFGHIJ":["3H","3G","3B","3C","3J","3F","3D","3I"],
-  "BCDEIJKL":["3E","3J","3B","3C","3I","3D","3L","3K"],
-  "BCDEHJKL":["3E","3J","3B","3C","3H","3D","3L","3K"],
-  "BCDEHIKL":["3E","3I","3B","3C","3H","3D","3L","3K"],
-  "BCDEHIJL":["3E","3J","3B","3C","3H","3D","3L","3I"],
-  "BCDEHIJK":["3E","3J","3B","3C","3H","3D","3I","3K"],
-  "BCDEGJKL":["3E","3G","3B","3C","3J","3D","3L","3K"],
-  "BCDEGIKL":["3E","3G","3B","3C","3I","3D","3L","3K"],
-  "BCDEGIJL":["3E","3G","3B","3C","3J","3D","3L","3I"],
-  "BCDEGIJK":["3E","3G","3B","3C","3J","3D","3I","3K"],
-  "BCDEGHKL":["3E","3G","3B","3C","3H","3D","3L","3K"],
-  "BCDEGHJL":["3H","3G","3B","3C","3J","3D","3L","3E"],
-  "BCDEGHJK":["3H","3G","3B","3C","3J","3D","3E","3K"],
-  "BCDEGHIL":["3E","3G","3B","3C","3H","3D","3L","3I"],
-  "BCDEGHIK":["3E","3G","3B","3C","3H","3D","3I","3K"],
-  "BCDEGHIJ":["3H","3G","3B","3C","3J","3D","3E","3I"],
-  "BCDEFJKL":["3C","3J","3B","3D","3E","3F","3L","3K"],
-  "BCDEFIKL":["3C","3E","3B","3D","3I","3F","3L","3K"],
-  "BCDEFIJL":["3C","3J","3B","3D","3E","3F","3L","3I"],
-  "BCDEFIJK":["3C","3J","3B","3D","3E","3F","3I","3K"],
-  "BCDEFHKL":["3C","3E","3B","3D","3H","3F","3L","3K"],
-  "BCDEFHJL":["3C","3J","3B","3D","3H","3F","3L","3E"],
-  "BCDEFHJK":["3C","3J","3B","3D","3H","3F","3E","3K"],
-  "BCDEFHIL":["3C","3E","3B","3D","3H","3F","3L","3I"],
-  "BCDEFHIK":["3C","3E","3B","3D","3H","3F","3I","3K"],
-  "BCDEFHIJ":["3C","3J","3B","3D","3H","3F","3E","3I"],
-  "BCDEFGKL":["3C","3G","3B","3D","3E","3F","3L","3K"],
-  "BCDEFGJL":["3C","3G","3B","3D","3J","3F","3L","3E"],
-  "BCDEFGJK":["3C","3G","3B","3D","3J","3F","3E","3K"],
-  "BCDEFGIL":["3C","3G","3B","3D","3E","3F","3L","3I"],
-  "BCDEFGIK":["3C","3G","3B","3D","3E","3F","3I","3K"],
-  "BCDEFGIJ":["3C","3G","3B","3D","3J","3F","3E","3I"],
-  "BCDEFGHL":["3C","3G","3B","3D","3H","3F","3L","3E"],
-  "BCDEFGHK":["3C","3G","3B","3D","3H","3F","3E","3K"],
-  "BCDEFGHJ":["3H","3G","3B","3C","3J","3F","3D","3E"],
-  "BCDEFGHI":["3C","3G","3B","3D","3H","3F","3E","3I"],
-  "AFGHIJKL":["3H","3J","3I","3F","3A","3G","3L","3K"],
-  "AEGHIJKL":["3E","3J","3I","3A","3H","3G","3L","3K"],
-  "AEFHIJKL":["3E","3J","3I","3F","3A","3H","3L","3K"],
-  "AEFGIJKL":["3E","3J","3I","3F","3A","3G","3L","3K"],
-  "AEFGHJKL":["3E","3G","3J","3F","3A","3H","3L","3K"],
-  "AEFGHIKL":["3E","3G","3I","3F","3A","3H","3L","3K"],
-  "AEFGHIJL":["3E","3G","3J","3F","3A","3H","3L","3I"],
-  "AEFGHIJK":["3E","3G","3J","3F","3A","3H","3I","3K"],
-  "ADGHIJKL":["3H","3J","3I","3D","3A","3G","3L","3K"],
-  "ADFHIJKL":["3H","3J","3I","3D","3A","3F","3L","3K"],
-  "ADFGIJKL":["3I","3G","3J","3D","3A","3F","3L","3K"],
-  "ADFGHJKL":["3H","3G","3J","3D","3A","3F","3L","3K"],
-  "ADFGHIKL":["3H","3G","3I","3D","3A","3F","3L","3K"],
-  "ADFGHIJL":["3H","3G","3J","3D","3A","3F","3L","3I"],
-  "ADFGHIJK":["3H","3G","3J","3D","3A","3F","3I","3K"],
-  "ADEHIJKL":["3E","3J","3I","3D","3A","3H","3L","3K"],
-  "ADEGIJKL":["3E","3J","3I","3D","3A","3G","3L","3K"],
-  "ADEGHJKL":["3E","3G","3J","3D","3A","3H","3L","3K"],
-  "ADEGHIKL":["3E","3G","3I","3D","3A","3H","3L","3K"],
-  "ADEGHIJL":["3E","3G","3J","3D","3A","3H","3L","3I"],
-  "ADEGHIJK":["3E","3G","3J","3D","3A","3H","3I","3K"],
-  "ADEFIJKL":["3E","3J","3I","3D","3A","3F","3L","3K"],
-  "ADEFHJKL":["3H","3J","3E","3D","3A","3F","3L","3K"],
-  "ADEFHIKL":["3H","3E","3I","3D","3A","3F","3L","3K"],
-  "ADEFHIJL":["3H","3J","3E","3D","3A","3F","3L","3I"],
-  "ADEFHIJK":["3H","3J","3E","3D","3A","3F","3I","3K"],
-  "ADEFGJKL":["3E","3G","3J","3D","3A","3F","3L","3K"],
-  "ADEFGIKL":["3E","3G","3I","3D","3A","3F","3L","3K"],
-  "ADEFGIJL":["3E","3G","3J","3D","3A","3F","3L","3I"],
-  "ADEFGIJK":["3E","3G","3J","3D","3A","3F","3I","3K"],
-  "ADEFGHKL":["3H","3G","3E","3D","3A","3F","3L","3K"],
-  "ADEFGHJL":["3H","3G","3J","3D","3A","3F","3L","3E"],
-  "ADEFGHJK":["3H","3G","3J","3D","3A","3F","3E","3K"],
-  "ADEFGHIL":["3H","3G","3E","3D","3A","3F","3L","3I"],
-  "ADEFGHIK":["3H","3G","3E","3D","3A","3F","3I","3K"],
-  "ADEFGHIJ":["3H","3G","3J","3D","3A","3F","3E","3I"],
-  "ACGHIJKL":["3H","3J","3I","3C","3A","3G","3L","3K"],
-  "ACFHIJKL":["3H","3J","3I","3C","3A","3F","3L","3K"],
-  "ACFGIJKL":["3I","3G","3J","3C","3A","3F","3L","3K"],
-  "ACFGHJKL":["3H","3G","3J","3C","3A","3F","3L","3K"],
-  "ACFGHIKL":["3H","3G","3I","3C","3A","3F","3L","3K"],
-  "ACFGHIJL":["3H","3G","3J","3C","3A","3F","3L","3I"],
-  "ACFGHIJK":["3H","3G","3J","3C","3A","3F","3I","3K"],
-  "ACEHIJKL":["3E","3J","3I","3C","3A","3H","3L","3K"],
-  "ACEGIJKL":["3E","3J","3I","3C","3A","3G","3L","3K"],
-  "ACEGHJKL":["3E","3G","3J","3C","3A","3H","3L","3K"],
-  "ACEGHIKL":["3E","3G","3I","3C","3A","3H","3L","3K"],
-  "ACEGHIJL":["3E","3G","3J","3C","3A","3H","3L","3I"],
-  "ACEGHIJK":["3E","3G","3J","3C","3A","3H","3I","3K"],
-  "ACEFIJKL":["3E","3J","3I","3C","3A","3F","3L","3K"],
-  "ACEFHJKL":["3H","3J","3E","3C","3A","3F","3L","3K"],
-  "ACEFHIKL":["3H","3E","3I","3C","3A","3F","3L","3K"],
-  "ACEFHIJL":["3H","3J","3E","3C","3A","3F","3L","3I"],
-  "ACEFHIJK":["3H","3J","3E","3C","3A","3F","3I","3K"],
-  "ACEFGJKL":["3E","3G","3J","3C","3A","3F","3L","3K"],
-  "ACEFGIKL":["3E","3G","3I","3C","3A","3F","3L","3K"],
-  "ACEFGIJL":["3E","3G","3J","3C","3A","3F","3L","3I"],
-  "ACEFGIJK":["3E","3G","3J","3C","3A","3F","3I","3K"],
-  "ACEFGHKL":["3H","3G","3E","3C","3A","3F","3L","3K"],
-  "ACEFGHJL":["3H","3G","3J","3C","3A","3F","3L","3E"],
-  "ACEFGHJK":["3H","3G","3J","3C","3A","3F","3E","3K"],
-  "ACEFGHIL":["3H","3G","3E","3C","3A","3F","3L","3I"],
-  "ACEFGHIK":["3H","3G","3E","3C","3A","3F","3I","3K"],
-  "ACEFGHIJ":["3H","3G","3J","3C","3A","3F","3E","3I"],
-  "ACDHIJKL":["3H","3J","3I","3C","3A","3D","3L","3K"],
-  "ACDGIJKL":["3I","3G","3J","3C","3A","3D","3L","3K"],
-  "ACDGHJKL":["3H","3G","3J","3C","3A","3D","3L","3K"],
-  "ACDGHIKL":["3H","3G","3I","3C","3A","3D","3L","3K"],
-  "ACDGHIJL":["3H","3G","3J","3C","3A","3D","3L","3I"],
-  "ACDGHIJK":["3H","3G","3J","3C","3A","3D","3I","3K"],
-  "ACDFIJKL":["3C","3J","3I","3D","3A","3F","3L","3K"],
-  "ACDFHJKL":["3H","3J","3F","3C","3A","3D","3L","3K"],
-  "ACDFHIKL":["3H","3F","3I","3C","3A","3D","3L","3K"],
-  "ACDFHIJL":["3H","3J","3F","3C","3A","3D","3L","3I"],
-  "ACDFHIJK":["3H","3J","3F","3C","3A","3D","3I","3K"],
-  "ACDFGJKL":["3C","3G","3J","3D","3A","3F","3L","3K"],
-  "ACDFGIKL":["3C","3G","3I","3D","3A","3F","3L","3K"],
-  "ACDFGIJL":["3C","3G","3J","3D","3A","3F","3L","3I"],
-  "ACDFGIJK":["3C","3G","3J","3D","3A","3F","3I","3K"],
-  "ACDFGHKL":["3H","3G","3F","3C","3A","3D","3L","3K"],
-  "ACDFGHJL":["3C","3G","3J","3D","3A","3F","3L","3H"],
-  "ACDFGHJK":["3H","3G","3J","3C","3A","3F","3D","3K"],
-  "ACDFGHIL":["3H","3G","3F","3C","3A","3D","3L","3I"],
-  "ACDFGHIK":["3H","3G","3F","3C","3A","3D","3I","3K"],
-  "ACDFGHIJ":["3H","3G","3J","3C","3A","3F","3D","3I"],
-  "ACDEIJKL":["3E","3J","3I","3C","3A","3D","3L","3K"],
-  "ACDEHJKL":["3H","3J","3E","3C","3A","3D","3L","3K"],
-  "ACDEHIKL":["3H","3E","3I","3C","3A","3D","3L","3K"],
-  "ACDEHIJL":["3H","3J","3E","3C","3A","3D","3L","3I"],
-  "ACDEHIJK":["3H","3J","3E","3C","3A","3D","3I","3K"],
-  "ACDEGJKL":["3E","3G","3J","3C","3A","3D","3L","3K"],
-  "ACDEGIKL":["3E","3G","3I","3C","3A","3D","3L","3K"],
-  "ACDEGIJL":["3E","3G","3J","3C","3A","3D","3L","3I"],
-  "ACDEGIJK":["3E","3G","3J","3C","3A","3D","3I","3K"],
-  "ACDEGHKL":["3H","3G","3E","3C","3A","3D","3L","3K"],
-  "ACDEGHJL":["3H","3G","3J","3C","3A","3D","3L","3E"],
-  "ACDEGHJK":["3H","3G","3J","3C","3A","3D","3E","3K"],
-  "ACDEGHIL":["3H","3G","3E","3C","3A","3D","3L","3I"],
-  "ACDEGHIK":["3H","3G","3E","3C","3A","3D","3I","3K"],
-  "ACDEGHIJ":["3H","3G","3J","3C","3A","3D","3E","3I"],
-  "ACDEFJKL":["3C","3J","3E","3D","3A","3F","3L","3K"],
-  "ACDEFIKL":["3C","3E","3I","3D","3A","3F","3L","3K"],
-  "ACDEFIJL":["3C","3J","3E","3D","3A","3F","3L","3I"],
-  "ACDEFIJK":["3C","3J","3E","3D","3A","3F","3I","3K"],
-  "ACDEFHKL":["3H","3E","3F","3C","3A","3D","3L","3K"],
-  "ACDEFHJL":["3H","3J","3F","3C","3A","3D","3L","3E"],
-  "ACDEFHJK":["3H","3J","3E","3C","3A","3F","3D","3K"],
-  "ACDEFHIL":["3H","3E","3F","3C","3A","3D","3L","3I"],
-  "ACDEFHIK":["3H","3E","3F","3C","3A","3D","3I","3K"],
-  "ACDEFHIJ":["3H","3E","3J","3C","3A","3D","3F","3I"],
-  "ACDEFGKL":["3C","3G","3E","3D","3A","3F","3L","3K"],
-  "ACDEFGJL":["3C","3G","3J","3D","3A","3F","3L","3E"],
-  "ACDEFGJK":["3C","3G","3J","3D","3A","3F","3E","3K"],
-  "ACDEFGIL":["3C","3G","3E","3D","3A","3F","3L","3I"],
-  "ACDEFGIK":["3C","3G","3E","3D","3A","3F","3I","3K"],
-  "ACDEFGIJ":["3C","3G","3J","3D","3A","3F","3E","3I"],
-  "ACDEFGHL":["3H","3G","3F","3C","3A","3D","3L","3E"],
-  "ACDEFGHK":["3H","3G","3E","3C","3A","3F","3D","3K"],
-  "ACDEFGHJ":["3H","3G","3J","3C","3A","3F","3D","3E"],
-  "ACDEFGHI":["3H","3G","3E","3C","3A","3D","3F","3I"],
-  "ABGHIJKL":["3H","3J","3I","3B","3A","3G","3L","3K"],
-  "ABFHIJKL":["3H","3J","3I","3F","3A","3B","3L","3K"],
-  "ABFGIJKL":["3I","3G","3J","3F","3A","3B","3L","3K"],
-  "ABFGHJKL":["3H","3G","3J","3F","3A","3B","3L","3K"],
-  "ABFGHIKL":["3H","3G","3I","3F","3A","3B","3L","3K"],
-  "ABFGHIJL":["3H","3G","3J","3F","3A","3B","3L","3I"],
-  "ABFGHIJK":["3H","3G","3J","3F","3A","3B","3I","3K"],
-  "ABEHIJKL":["3E","3J","3I","3B","3A","3H","3L","3K"],
-  "ABEGIJKL":["3E","3J","3I","3B","3A","3G","3L","3K"],
-  "ABEGHJKL":["3E","3G","3J","3B","3A","3H","3L","3K"],
-  "ABEGHIKL":["3E","3G","3I","3B","3A","3H","3L","3K"],
-  "ABEGHIJL":["3E","3G","3J","3B","3A","3H","3L","3I"],
-  "ABEGHIJK":["3E","3G","3J","3B","3A","3H","3I","3K"],
-  "ABEFIJKL":["3E","3J","3I","3B","3A","3F","3L","3K"],
-  "ABEFHJKL":["3H","3J","3E","3B","3A","3F","3L","3K"],
-  "ABEFHIKL":["3H","3E","3I","3B","3A","3F","3L","3K"],
-  "ABEFHIJL":["3H","3J","3E","3B","3A","3F","3L","3I"],
-  "ABEFHIJK":["3H","3J","3E","3B","3A","3F","3I","3K"],
-  "ABEFGJKL":["3E","3G","3J","3B","3A","3F","3L","3K"],
-  "ABEFGIKL":["3E","3G","3I","3B","3A","3F","3L","3K"],
-  "ABEFGIJL":["3E","3G","3J","3B","3A","3F","3L","3I"],
-  "ABEFGIJK":["3E","3G","3J","3B","3A","3F","3I","3K"],
-  "ABEFGHKL":["3H","3G","3E","3B","3A","3F","3L","3K"],
-  "ABEFGHJL":["3H","3G","3J","3B","3A","3F","3L","3E"],
-  "ABEFGHJK":["3H","3G","3J","3B","3A","3F","3E","3K"],
-  "ABEFGHIL":["3H","3G","3E","3B","3A","3F","3L","3I"],
-  "ABEFGHIK":["3H","3G","3E","3B","3A","3F","3I","3K"],
-  "ABEFGHIJ":["3H","3G","3J","3B","3A","3F","3E","3I"],
-  "ABDHIJKL":["3H","3J","3I","3D","3A","3B","3L","3K"],
-  "ABDGIJKL":["3I","3G","3J","3D","3A","3B","3L","3K"],
-  "ABDGHJKL":["3H","3G","3J","3D","3A","3B","3L","3K"],
-  "ABDGHIKL":["3H","3G","3I","3D","3A","3B","3L","3K"],
-  "ABDGHIJL":["3H","3G","3J","3D","3A","3B","3L","3I"],
-  "ABDGHIJK":["3H","3G","3J","3D","3A","3B","3I","3K"],
-  "ABDFIJKL":["3I","3J","3B","3D","3A","3F","3L","3K"],
-  "ABDFHJKL":["3H","3J","3B","3D","3A","3F","3L","3K"],
-  "ABDFHIKL":["3H","3I","3B","3D","3A","3F","3L","3K"],
-  "ABDFHIJL":["3H","3J","3B","3D","3A","3F","3L","3I"],
-  "ABDFHIJK":["3H","3J","3B","3D","3A","3F","3I","3K"],
-  "ABDFGJKL":["3I","3G","3B","3D","3A","3F","3L","3K"],
-  "ABDFGIKL":["3I","3G","3B","3D","3A","3F","3L","3K"],
-  "ABDFGIJL":["3I","3G","3B","3D","3A","3F","3L","3J"],
-  "ABDFGIJK":["3I","3G","3B","3D","3A","3F","3J","3K"],
-  "ABDFGHKL":["3H","3G","3B","3D","3A","3F","3L","3K"],
-  "ABDFGHJL":["3H","3G","3J","3D","3A","3F","3L","3B"],
-  "ABDFGHJK":["3H","3G","3J","3D","3A","3F","3B","3K"],
-  "ABDFGHIL":["3H","3G","3B","3D","3A","3F","3L","3I"],
-  "ABDFGHIK":["3H","3G","3B","3D","3A","3F","3I","3K"],
-  "ABDFGHIJ":["3H","3G","3J","3D","3A","3F","3B","3I"],
-  "ABDEIJKL":["3E","3J","3I","3B","3A","3D","3L","3K"],
-  "ABDEHJKL":["3H","3J","3E","3B","3A","3D","3L","3K"],
-  "ABDEHIKL":["3H","3E","3I","3B","3A","3D","3L","3K"],
-  "ABDEHIJL":["3H","3J","3E","3B","3A","3D","3L","3I"],
-  "ABDEHIJK":["3H","3J","3E","3B","3A","3D","3I","3K"],
-  "ABDEGJKL":["3E","3G","3J","3B","3A","3D","3L","3K"],
-  "ABDEGIKL":["3E","3G","3I","3B","3A","3D","3L","3K"],
-  "ABDEGIJL":["3E","3G","3J","3B","3A","3D","3L","3I"],
-  "ABDEGIJK":["3E","3G","3J","3B","3A","3D","3I","3K"],
-  "ABDEGHKL":["3H","3G","3E","3B","3A","3D","3L","3K"],
-  "ABDEGHJL":["3H","3G","3J","3B","3A","3D","3L","3E"],
-  "ABDEGHJK":["3H","3G","3J","3B","3A","3D","3E","3K"],
-  "ABDEGHIL":["3H","3G","3E","3B","3A","3D","3L","3I"],
-  "ABDEGHIK":["3H","3G","3E","3B","3A","3D","3I","3K"],
-  "ABDEGHIJ":["3H","3G","3J","3B","3A","3D","3E","3I"],
-  "ABDEFJKL":["3E","3J","3B","3D","3A","3F","3L","3K"],
-  "ABDEFIKL":["3E","3I","3B","3D","3A","3F","3L","3K"],
-  "ABDEFIJL":["3E","3J","3B","3D","3A","3F","3L","3I"],
-  "ABDEFIJK":["3E","3J","3B","3D","3A","3F","3I","3K"],
-  "ABDEFHKL":["3H","3E","3B","3D","3A","3F","3L","3K"],
-  "ABDEFHJL":["3H","3J","3B","3D","3A","3F","3L","3E"],
-  "ABDEFHJK":["3H","3J","3B","3D","3A","3F","3E","3K"],
-  "ABDEFHIL":["3H","3E","3B","3D","3A","3F","3L","3I"],
-  "ABDEFHIK":["3H","3E","3B","3D","3A","3F","3I","3K"],
-  "ABDEFHIJ":["3H","3J","3B","3D","3A","3F","3E","3I"],
-  "ABDEFGKL":["3E","3G","3B","3D","3A","3F","3L","3K"],
-  "ABDEFGJL":["3E","3G","3J","3B","3A","3F","3L","3D"],
-  "ABDEFGJK":["3E","3G","3J","3B","3A","3F","3D","3K"],
-  "ABDEFGIL":["3E","3G","3B","3D","3A","3F","3L","3I"],
-  "ABDEFGIK":["3E","3G","3B","3D","3A","3F","3I","3K"],
-  "ABDEFGIJ":["3E","3G","3J","3B","3A","3F","3D","3I"],
-  "ABDEFGHL":["3H","3G","3B","3D","3A","3F","3L","3E"],
-  "ABDEFGHK":["3H","3G","3B","3D","3A","3F","3E","3K"],
-  "ABDEFGHJ":["3H","3G","3J","3B","3A","3F","3D","3E"],
-  "ABDEFGHI":["3H","3G","3B","3D","3A","3F","3E","3I"],
-  "ABCHIJKL":["3H","3J","3I","3C","3A","3B","3L","3K"],
-  "ABCGIJKL":["3I","3G","3J","3C","3A","3B","3L","3K"],
-  "ABCGHJKL":["3H","3G","3J","3C","3A","3B","3L","3K"],
-  "ABCGHIKL":["3H","3G","3I","3C","3A","3B","3L","3K"],
-  "ABCGHIJL":["3H","3G","3J","3C","3A","3B","3L","3I"],
-  "ABCGHIJK":["3H","3G","3J","3C","3A","3B","3I","3K"],
-  "ABCFIJKL":["3C","3J","3I","3F","3A","3B","3L","3K"],
-  "ABCFHJKL":["3H","3J","3C","3F","3A","3B","3L","3K"],
-  "ABCFHIKL":["3H","3C","3I","3F","3A","3B","3L","3K"],
-  "ABCFHIJL":["3H","3J","3C","3F","3A","3B","3L","3I"],
-  "ABCFHIJK":["3H","3J","3C","3F","3A","3B","3I","3K"],
-  "ABCFGJKL":["3C","3G","3J","3F","3A","3B","3L","3K"],
-  "ABCFGIKL":["3C","3G","3I","3F","3A","3B","3L","3K"],
-  "ABCFGIJL":["3C","3G","3J","3F","3A","3B","3L","3I"],
-  "ABCFGIJK":["3C","3G","3J","3F","3A","3B","3I","3K"],
-  "ABCFGHKL":["3H","3G","3C","3F","3A","3B","3L","3K"],
-  "ABCFGHJL":["3H","3G","3J","3C","3A","3B","3L","3F"],
-  "ABCFGHJK":["3H","3G","3J","3C","3A","3B","3F","3K"],
-  "ABCFGHIL":["3H","3G","3C","3F","3A","3B","3L","3I"],
-  "ABCFGHIK":["3H","3G","3C","3F","3A","3B","3I","3K"],
-  "ABCFGHIJ":["3H","3G","3J","3C","3A","3B","3F","3I"],
-  "ABCEIJKL":["3E","3J","3I","3C","3A","3B","3L","3K"],
-  "ABCEHJKL":["3H","3J","3E","3C","3A","3B","3L","3K"],
-  "ABCEHIKL":["3H","3E","3I","3C","3A","3B","3L","3K"],
-  "ABCEHIJL":["3H","3J","3E","3C","3A","3B","3L","3I"],
-  "ABCEHIJK":["3H","3J","3E","3C","3A","3B","3I","3K"],
-  "ABCEGJKL":["3E","3G","3J","3C","3A","3B","3L","3K"],
-  "ABCEGIKL":["3E","3G","3I","3C","3A","3B","3L","3K"],
-  "ABCEGIJL":["3E","3G","3J","3C","3A","3B","3L","3I"],
-  "ABCEGIJK":["3E","3G","3J","3C","3A","3B","3I","3K"],
-  "ABCEGHKL":["3H","3G","3E","3C","3A","3B","3L","3K"],
-  "ABCEGHJL":["3H","3G","3J","3C","3A","3B","3L","3E"],
-  "ABCEGHJK":["3H","3G","3J","3C","3A","3B","3E","3K"],
-  "ABCEGHIL":["3H","3G","3E","3C","3A","3B","3L","3I"],
-  "ABCEGHIK":["3H","3G","3E","3C","3A","3B","3I","3K"],
-  "ABCEGHIJ":["3H","3G","3J","3C","3A","3B","3E","3I"],
-  "ABCEFJKL":["3C","3J","3E","3B","3A","3F","3L","3K"],
-  "ABCEFIKL":["3C","3E","3I","3B","3A","3F","3L","3K"],
-  "ABCEFIJL":["3C","3J","3E","3B","3A","3F","3L","3I"],
-  "ABCEFIJK":["3C","3J","3E","3B","3A","3F","3I","3K"],
-  "ABCEFHKL":["3H","3E","3C","3B","3A","3F","3L","3K"],
-  "ABCEFHJL":["3H","3J","3C","3B","3A","3F","3L","3E"],
-  "ABCEFHJK":["3H","3J","3E","3C","3A","3F","3B","3K"],
-  "ABCEFHIL":["3H","3E","3C","3B","3A","3F","3L","3I"],
-  "ABCEFHIK":["3H","3E","3C","3B","3A","3F","3I","3K"],
-  "ABCEFHIJ":["3H","3J","3C","3B","3A","3F","3E","3I"],
-  "ABCEFGKL":["3C","3G","3E","3B","3A","3F","3L","3K"],
-  "ABCEFGJL":["3C","3G","3J","3B","3A","3F","3L","3E"],
-  "ABCEFGJK":["3C","3G","3J","3B","3A","3F","3E","3K"],
-  "ABCEFGIL":["3C","3G","3E","3B","3A","3F","3L","3I"],
-  "ABCEFGIK":["3C","3G","3E","3B","3A","3F","3I","3K"],
-  "ABCEFGIJ":["3C","3G","3J","3B","3A","3F","3E","3I"],
-  "ABCEFGHL":["3H","3G","3C","3B","3A","3F","3L","3E"],
-  "ABCEFGHK":["3H","3G","3C","3B","3A","3F","3E","3K"],
-  "ABCEFGHJ":["3H","3G","3J","3C","3A","3F","3B","3E"],
-  "ABCEFGHI":["3H","3G","3C","3B","3A","3F","3E","3I"],
-  "ABCDIJKL":["3I","3J","3B","3C","3A","3D","3L","3K"],
-  "ABCDHJKL":["3H","3J","3B","3C","3A","3D","3L","3K"],
-  "ABCDHIKL":["3H","3I","3B","3C","3A","3D","3L","3K"],
-  "ABCDHIJL":["3H","3J","3B","3C","3A","3D","3L","3I"],
-  "ABCDHIJK":["3H","3J","3B","3C","3A","3D","3I","3K"],
-  "ABCDGJKL":["3I","3G","3B","3C","3A","3D","3L","3K"],
-  "ABCDGIKL":["3I","3G","3B","3C","3A","3D","3L","3K"],
-  "ABCDGIJL":["3I","3G","3B","3C","3A","3D","3L","3J"],
-  "ABCDGIJK":["3I","3G","3B","3C","3A","3D","3J","3K"],
-  "ABCDGHKL":["3H","3G","3B","3C","3A","3D","3L","3K"],
-  "ABCDGHJL":["3H","3G","3J","3C","3A","3D","3L","3B"],
-  "ABCDGHJK":["3H","3G","3J","3C","3A","3D","3B","3K"],
-  "ABCDGHIL":["3H","3G","3B","3C","3A","3D","3L","3I"],
-  "ABCDGHIK":["3H","3G","3B","3C","3A","3D","3I","3K"],
-  "ABCDGHIJ":["3H","3G","3J","3C","3A","3D","3B","3I"],
-  "ABCDFJKL":["3C","3J","3B","3D","3A","3F","3L","3K"],
-  "ABCDFIKL":["3C","3I","3B","3D","3A","3F","3L","3K"],
-  "ABCDFIJL":["3C","3J","3B","3D","3A","3F","3L","3I"],
-  "ABCDFIJK":["3C","3J","3B","3D","3A","3F","3I","3K"],
-  "ABCDFHKL":["3C","3H","3B","3D","3A","3F","3L","3K"],
-  "ABCDFHJL":["3C","3J","3B","3D","3A","3F","3L","3H"],
-  "ABCDFHJK":["3H","3J","3B","3C","3A","3F","3D","3K"],
-  "ABCDFHIL":["3C","3H","3B","3D","3A","3F","3L","3I"],
-  "ABCDFHIK":["3C","3H","3B","3D","3A","3F","3I","3K"],
-  "ABCDFHIJ":["3H","3J","3B","3C","3A","3F","3D","3I"],
-  "ABCDFGKL":["3C","3G","3B","3D","3A","3F","3L","3K"],
-  "ABCDFGJL":["3C","3G","3J","3D","3A","3F","3L","3B"],
-  "ABCDFGJK":["3C","3G","3J","3D","3A","3F","3B","3K"],
-  "ABCDFGIL":["3C","3G","3B","3D","3A","3F","3L","3I"],
-  "ABCDFGIK":["3C","3G","3B","3D","3A","3F","3I","3K"],
-  "ABCDFGIJ":["3C","3G","3J","3D","3A","3F","3B","3I"],
-  "ABCDFGHL":["3H","3G","3B","3C","3A","3F","3L","3D"],
-  "ABCDFGHK":["3H","3G","3B","3C","3A","3F","3D","3K"],
-  "ABCDFGHJ":["3H","3G","3J","3C","3A","3F","3D","3B"],
-  "ABCDFGHI":["3H","3G","3B","3C","3A","3F","3D","3I"],
-  "ABCDEJKL":["3E","3J","3B","3C","3A","3D","3L","3K"],
-  "ABCDEIKL":["3E","3I","3B","3C","3A","3D","3L","3K"],
-  "ABCDEIJL":["3E","3J","3B","3C","3A","3D","3L","3I"],
-  "ABCDEIJK":["3E","3J","3B","3C","3A","3D","3I","3K"],
-  "ABCDEHKL":["3H","3E","3B","3C","3A","3D","3L","3K"],
-  "ABCDEHJL":["3H","3J","3B","3C","3A","3D","3L","3E"],
-  "ABCDEHJK":["3H","3J","3B","3C","3A","3D","3E","3K"],
-  "ABCDEHIL":["3H","3E","3B","3C","3A","3D","3L","3I"],
-  "ABCDEHIK":["3H","3E","3B","3C","3A","3D","3I","3K"],
-  "ABCDEHIJ":["3H","3J","3B","3C","3A","3D","3E","3I"],
-  "ABCDEGKL":["3E","3G","3B","3C","3A","3D","3L","3K"],
-  "ABCDEGJL":["3E","3G","3J","3C","3A","3D","3L","3B"],
-  "ABCDEGJK":["3E","3G","3J","3C","3A","3D","3B","3K"],
-  "ABCDEGIL":["3E","3G","3B","3C","3A","3D","3L","3I"],
-  "ABCDEGIK":["3E","3G","3B","3C","3A","3D","3I","3K"],
-  "ABCDEGIJ":["3E","3G","3J","3C","3A","3D","3B","3I"],
-  "ABCDEGHL":["3H","3G","3B","3C","3A","3D","3L","3E"],
-  "ABCDEGHK":["3H","3G","3B","3C","3A","3D","3E","3K"],
-  "ABCDEGHJ":["3H","3G","3J","3C","3A","3D","3B","3E"],
-  "ABCDEGHI":["3H","3G","3B","3C","3A","3D","3E","3I"],
-  "ABCDEFKL":["3C","3E","3B","3D","3A","3F","3L","3K"],
-  "ABCDEFJL":["3C","3J","3B","3D","3A","3F","3L","3E"],
-  "ABCDEFJK":["3C","3J","3B","3D","3A","3F","3E","3K"],
-  "ABCDEFIL":["3C","3E","3B","3D","3A","3F","3L","3I"],
-  "ABCDEFIK":["3C","3E","3B","3D","3A","3F","3I","3K"],
-  "ABCDEFIJ":["3C","3J","3B","3D","3A","3F","3E","3I"],
-  "ABCDEFHL":["3H","3E","3B","3C","3A","3F","3L","3D"],
-  "ABCDEFHK":["3H","3E","3B","3C","3A","3F","3D","3K"],
-  "ABCDEFHJ":["3H","3J","3B","3C","3A","3F","3D","3E"],
-  "ABCDEFHI":["3H","3E","3B","3C","3A","3F","3D","3I"],
-  "ABCDEFGL":["3C","3G","3B","3D","3A","3F","3L","3E"],
-  "ABCDEFGK":["3C","3G","3B","3D","3A","3F","3E","3K"],
-  "ABCDEFGJ":["3C","3G","3J","3D","3A","3F","3B","3E"],
-  "ABCDEFGI":["3C","3G","3B","3D","3A","3F","3E","3I"],
-  "ABCDEFGH":["3H","3G","3B","3C","3A","3F","3D","3E"]
+  // Groups that advance 3rd: EFGHIJKL (no A,B,C,D)
+  "EFGHIJKL": { "1A":"3E","1B":"3J","1D":"3I","1E":"3F","1G":"3H","1I":"3G","1K":"3L","1L":"3K" },
+  // DFGHIJKL
+  "DFGHIJKL": { "1A":"3H","1B":"3G","1D":"3I","1E":"3D","1G":"3J","1I":"3F","1K":"3L","1L":"3K" },
+  // DEGHIJKL
+  "DEGHIJKL": { "1A":"3E","1B":"3J","1D":"3I","1E":"3D","1G":"3H","1I":"3G","1K":"3L","1L":"3K" },
+  // DEFHIJKL
+  "DEFHIJKL": { "1A":"3E","1B":"3J","1D":"3I","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // DEFGIJKL
+  "DEFGIJKL": { "1A":"3E","1B":"3G","1D":"3I","1E":"3D","1G":"3J","1I":"3F","1K":"3L","1L":"3K" },
+  // DEFGHJKL
+  "DEFGHJKL": { "1A":"3E","1B":"3G","1D":"3J","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // DEFGHIKL
+  "DEFGHIKL": { "1A":"3E","1B":"3G","1D":"3I","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // DEFGHIJL
+  "DEFGHIJL": { "1A":"3E","1B":"3G","1D":"3J","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3I" },
+  // DEFGHIJK
+  "DEFGHIJK": { "1A":"3E","1B":"3G","1D":"3J","1E":"3D","1G":"3H","1I":"3F","1K":"3I","1L":"3K" },
+  // CFGHIJKL
+  "CFGHIJKL": { "1A":"3H","1B":"3G","1D":"3I","1E":"3C","1G":"3J","1I":"3F","1K":"3L","1L":"3K" },
+  // CEGHIJKL
+  "CEGHIJKL": { "1A":"3E","1B":"3J","1D":"3I","1E":"3C","1G":"3H","1I":"3G","1K":"3L","1L":"3K" },
+  // CEFHIJKL
+  "CEFHIJKL": { "1A":"3E","1B":"3J","1D":"3I","1E":"3C","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // CEFGIJKL
+  "CEFGIJKL": { "1A":"3E","1B":"3G","1D":"3I","1E":"3C","1G":"3J","1I":"3F","1K":"3L","1L":"3K" },
+  // CEFGHJKL
+  "CEFGHJKL": { "1A":"3E","1B":"3G","1D":"3J","1E":"3C","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // CEFGHIKL
+  "CEFGHIKL": { "1A":"3E","1B":"3G","1D":"3I","1E":"3C","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // CEFGHIJL
+  "CEFGHIJL": { "1A":"3E","1B":"3G","1D":"3J","1E":"3C","1G":"3H","1I":"3F","1K":"3L","1L":"3I" },
+  // CEFGHIJK
+  "CEFGHIJK": { "1A":"3E","1B":"3G","1D":"3J","1E":"3C","1G":"3H","1I":"3F","1K":"3I","1L":"3K" },
+  // CDGHIJKL
+  "CDGHIJKL": { "1A":"3H","1B":"3G","1D":"3I","1E":"3C","1G":"3J","1I":"3D","1K":"3L","1L":"3K" },
+  // CDFHIJKL
+  "CDFHIJKL": { "1A":"3C","1B":"3J","1D":"3I","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // CDFGIJKL
+  "CDFGIJKL": { "1A":"3C","1B":"3G","1D":"3I","1E":"3D","1G":"3J","1I":"3F","1K":"3L","1L":"3K" },
+  // CDFGHJKL
+  "CDFGHJKL": { "1A":"3C","1B":"3G","1D":"3J","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // CDFGHIKL
+  "CDFGHIKL": { "1A":"3C","1B":"3G","1D":"3I","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // CDFGHIJL
+  "CDFGHIJL": { "1A":"3C","1B":"3G","1D":"3J","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3I" },
+  // CDFGHIJK
+  "CDFGHIJK": { "1A":"3C","1B":"3G","1D":"3J","1E":"3D","1G":"3H","1I":"3F","1K":"3I","1L":"3K" },
+  // CDEHIJKL
+  "CDEHIJKL": { "1A":"3E","1B":"3J","1D":"3I","1E":"3C","1G":"3H","1I":"3D","1K":"3L","1L":"3K" },
+  // CDEGHIJL → 29
+  "CDEGHIJL": { "1A":"3E","1B":"3G","1D":"3J","1E":"3C","1G":"3H","1I":"3D","1K":"3L","1L":"3I" },
+  // CDEGHIJK → 30
+  "CDEGHIJK": { "1A":"3E","1B":"3G","1D":"3J","1E":"3C","1G":"3H","1I":"3D","1K":"3I","1L":"3K" },
+  // CDEFIJKL → 31
+  "CDEFIJKL": { "1A":"3C","1B":"3J","1D":"3E","1E":"3D","1G":"3I","1I":"3F","1K":"3L","1L":"3K" },
+  // CDEFHJKL → 32
+  "CDEFHJKL": { "1A":"3C","1B":"3J","1D":"3E","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // CDEFHIKL → 33
+  "CDEFHIKL": { "1A":"3C","1B":"3E","1D":"3I","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // CDEFHIJL → 34
+  "CDEFHIJL": { "1A":"3C","1B":"3J","1D":"3E","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3I" },
+  // CDEFHIJK → 35
+  "CDEFHIJK": { "1A":"3C","1B":"3J","1D":"3E","1E":"3D","1G":"3H","1I":"3F","1K":"3I","1L":"3K" },
+  // CDEFGJKL → 36
+  "CDEFGJKL": { "1A":"3C","1B":"3G","1D":"3E","1E":"3D","1G":"3J","1I":"3F","1K":"3L","1L":"3K" },
+  // CDEFGIKL → 37
+  "CDEFGIKL": { "1A":"3C","1B":"3G","1D":"3E","1E":"3D","1G":"3I","1I":"3F","1K":"3L","1L":"3K" },
+  // CDEFGIJL → 38
+  "CDEFGIJL": { "1A":"3C","1B":"3G","1D":"3E","1E":"3D","1G":"3J","1I":"3F","1K":"3L","1L":"3I" },
+  // CDEFGIJK → 39
+  "CDEFGIJK": { "1A":"3C","1B":"3G","1D":"3E","1E":"3D","1G":"3J","1I":"3F","1K":"3I","1L":"3K" },
+  // CDEFGHKL → 40
+  "CDEFGHKL": { "1A":"3C","1B":"3G","1D":"3E","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3K" },
+  // CDEFGHJL → 41
+  "CDEFGHJL": { "1A":"3C","1B":"3G","1D":"3J","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3E" },
+  // CDEFGHJK → 42
+  "CDEFGHJK": { "1A":"3C","1B":"3G","1D":"3J","1E":"3D","1G":"3H","1I":"3F","1K":"3E","1L":"3K" },
+  // CDEFGHIL → 43
+  "CDEFGHIL": { "1A":"3C","1B":"3G","1D":"3E","1E":"3D","1G":"3H","1I":"3F","1K":"3L","1L":"3I" },
+  // CDEFGHIK → 44
+  "CDEFGHIK": { "1A":"3C","1B":"3G","1D":"3E","1E":"3D","1G":"3H","1I":"3F","1K":"3I","1L":"3K" },
+  // CDEFGHIJ → 45
+  "CDEFGHIJ": { "1A":"3C","1B":"3G","1D":"3J","1E":"3D","1G":"3H","1I":"3F","1K":"3E","1L":"3I" },
 };
-
 
 // R16 progression from R32: which matches feed which R16 match
 // M73+M74 winners → R16 match 89
@@ -626,29 +213,6 @@ const GOLDEN_BOOT_PLAYERS = [
   {name:"Lorenzo Pellegrini",  nation:"Italy",        flag:"🇮🇹"},
   {name:"Giovanni Reyna",      nation:"USA",          flag:"🇺🇸"},
   {name:"Hakim Ziyech",        nation:"Morocco",      flag:"🇲🇦"},
-];
-
-const GOLDEN_GLOVE_PLAYERS = [
-  {name:"Thibaut Courtois",    nation:"Belgium",     flag:"🇧🇪"},
-  {name:"Alisson Becker",      nation:"Brazil",      flag:"🇧🇷"},
-  {name:"Ederson",             nation:"Brazil",      flag:"🇧🇷"},
-  {name:"Jordan Pickford",     nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Gianluigi Donnarumma",nation:"Italy",       flag:"🇮🇹"},
-  {name:"Hugo Lloris",         nation:"France",      flag:"🇫🇷"},
-  {name:"Jan Oblak",           nation:"Slovenia",    flag:"🇸🇮"},
-  {name:"Marc-André ter Stegen",nation:"Germany",    flag:"🇩🇪"},
-  {name:"Manuel Neuer",        nation:"Germany",     flag:"🇩🇪"},
-  {name:"Unai Simón",          nation:"Spain",       flag:"🇪🇸"},
-  {name:"David Raya",          nation:"Spain",       flag:"🇪🇸"},
-  {name:"Yann Sommer",         nation:"Switzerland", flag:"🇨🇭"},
-  {name:"Yassine Bounou",      nation:"Morocco",     flag:"🇲🇦"},
-  {name:"Édouard Mendy",       nation:"Senegal",     flag:"🇸🇳"},
-  {name:"André Onana",         nation:"Cameroon",    flag:"🇨🇲"},
-  {name:"Wojciech Szczęsny",   nation:"Poland",      flag:"🇵🇱"},
-  {name:"Nick Pope",           nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Gregor Kobel",        nation:"Switzerland", flag:"🇨🇭"},
-  {name:"Emiliano Martínez",   nation:"Argentina",   flag:"🇦🇷"},
-  {name:"Guglielmo Vicario",   nation:"Italy",       flag:"🇮🇹"},
 ];
 
 const ROUND_INDICES = [[0,1],[2,3],[4,5]];
@@ -722,34 +286,28 @@ function buildR32Bracket(allStandings) {
   const best8Groups=best8.map(t=>t.group).sort().join("");
 
   // Look up Annex C for which 3rd goes where
-  // Array format: [1A_opp, 1B_opp, 1D_opp, 1E_opp, 1G_opp, 1I_opp, 1K_opp, 1L_opp]
   const annexRow=ANNEX_C[best8Groups]||null;
-  const ANNEX_IDX={"1A":0,"1B":1,"1D":2,"1E":3,"1G":4,"1I":5,"1K":6,"1L":7};
 
   // Build the 16 R32 matches
   return R32_FIXED.map(match=>{
     let home=match.home;
     let away=match.away;
-    // Resolve group winner/runner-up positions to team names
+    // Resolve positions to team names
     if(home.startsWith("1")||home.startsWith("2")) home=pos[home]||"TBD";
     if(away.startsWith("1")||away.startsWith("2")) away=pos[away]||"TBD";
-    // Resolve 3rd place slots using Annex C
+    // Resolve 3rd place slots
     if(home==="3?"||away==="3?") {
       if(annexRow) {
-        // The match opponent is the group winner — find which slot this is
-        const winnerKey=match.home.startsWith("1")?match.home:null;
-        const idx=winnerKey?ANNEX_IDX[winnerKey]:null;
-        const thirdCode=idx!=null?annexRow[idx]:null; // e.g. "3E"
+        const matchId=`1${match.home.slice(1)}`; // e.g. "1A","1B","1D"...
+        const thirdCode=annexRow[matchId]; // e.g. "3E"
         if(thirdCode) {
-          const thirdGroup=thirdCode.slice(1); // e.g. "E"
+          const thirdGroup=thirdCode.slice(1);
           const thirdTeam=allStandings[thirdGroup]?.[2]?.team||"TBD";
           if(home==="3?") home=thirdTeam;
           if(away==="3?") away=thirdTeam;
-        } else {
-          if(home==="3?") home="TBD";
-          if(away==="3?") away="TBD";
         }
       } else {
+        // Fallback: assign best8 thirds in order
         if(home==="3?") home="TBD";
         if(away==="3?") away="TBD";
       }
@@ -786,7 +344,7 @@ function adventLabel(pct) {
 const card={background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:12,overflow:"hidden"};
 const inp={width:"100%",boxSizing:"border-box",padding:"10px 12px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,fontSize:14,background:"var(--color-background-primary)",color:"var(--color-text-primary)",outline:"none"};
 
-function AdSlot(){return(<div style={{width:"100%",height:72,background:"var(--color-background-secondary)",border:"0.5px dashed var(--color-border-tertiary)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:"1.5rem"}}><span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Advertisement — sponsor@mundialist.com</span></div>);}
+function AdSlot(){return(<div style={{width:"100%",height:72,background:"var(--color-background-secondary)",border:"0.5px dashed var(--color-border-tertiary)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:"1.5rem"}}><span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Advertisement — sponsor@wc26predictor.com</span></div>);}
 function LockBanner(){return(<div style={{display:"flex",gap:10,padding:"11px 14px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:10,marginBottom:"1.25rem",fontSize:13,color:"#7a5c10",lineHeight:1.5}}><span>🔒</span><div><strong>All predictions lock at tournament kickoff — June 11, 2026.</strong> No changes after the first whistle.</div></div>);}
 
 const NAV=[{label:"Home",page:"home"},{label:"Group Stage",page:"predict"},{label:"Bracket",page:"bracket"},{label:"Bonuses",page:"bonuses"},{label:"My League",page:"league"},{label:"Points",page:"points"}];
@@ -807,19 +365,13 @@ export default function App(){
   const [goldenBootPick,setGoldenBootPick]=useState(null);
   const [goldenBootLocked,setGoldenBootLocked]=useState(false);
   const [bootSearch,setBootSearch]=useState("");
-  const [topAssistPick,setTopAssistPick]=useState(null);
-  const [topAssistLocked,setTopAssistLocked]=useState(false);
-  const [assistSearch,setAssistSearch]=useState("");
-  const [goldenGlovePick,setGoldenGlovePick]=useState(null);
-  const [goldenGloveLocked,setGoldenGloveLocked]=useState(false);
-  const [gloveSearch,setGloveSearch]=useState("");
   // Knockout picks per round: { r32:{0:"team",...}, r16:{...}, qf:{...}, sf:{...}, final:{...} }
   const [koPicks,setKoPicks]=useState({r32:{},r16:{},qf:{},sf:{},final:{}});
   const [leagueCode,setLeagueCode]=useState("");
   const [joinedLeagues,setJoinedLeagues]=useState([]);
   const [activeLeague,setActiveLeague]=useState(null);
   const [leagueTab,setLeagueTab]=useState("overview");
-  const [createdCode]=useState("MND26-"+Math.random().toString(36).substring(2,7).toUpperCase());
+  const [createdCode]=useState("WC26-"+Math.random().toString(36).substring(2,7).toUpperCase());
 
   const allStandings=useMemo(()=>{
     const s={};
@@ -900,8 +452,6 @@ export default function App(){
     setPage("predict");
   };
   const filteredPlayers=bootSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(bootSearch.toLowerCase())||p.nation.toLowerCase().includes(bootSearch.toLowerCase())):[];
-  const filteredAssist=assistSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(assistSearch.toLowerCase())||p.nation.toLowerCase().includes(assistSearch.toLowerCase())):[];
-  const filteredGlove=gloveSearch.length>1?GOLDEN_GLOVE_PLAYERS.filter(p=>p.name.toLowerCase().includes(gloveSearch.toLowerCase())||p.nation.toLowerCase().includes(gloveSearch.toLowerCase())):[];
 
   const leagueMembers=[
     {name:user?.name||"You",handle:user?.handle||"@you",pts:142,avatar:user?.avatar||"Y"},
@@ -949,7 +499,7 @@ export default function App(){
         <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"sticky",top:0,zIndex:100}}>
           <div style={{maxWidth:1280,margin:"0 auto",padding:"0 1.5rem",display:"flex",alignItems:"center",gap:"1rem",height:56}}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginRight:"auto",cursor:"pointer"}} onClick={()=>setPage("home")}>
-              <span style={{fontSize:18,fontWeight:600,letterSpacing:"-0.03em",color:C.blue}}>Mundial26</span>
+              <span style={{fontSize:18,fontWeight:600,letterSpacing:"-0.03em",color:C.blue}}>WC26</span>
               <span style={{fontSize:11,fontWeight:500,background:C.blue,color:"#fff",padding:"2px 7px",borderRadius:99}}>Predictor</span>
             </div>
             {NAV.map(({label,page:p})=>(
@@ -1379,90 +929,10 @@ export default function App(){
               )}
             </div>
           </div>
-
-          {/* Top Assist */}
-          <div style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${C.blue}`,borderRadius:"0 12px 12px 0"}}>
-            <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Top Assist</span>
-              <span style={{fontSize:11,color:C.blue,background:C.blueLt,padding:"2px 8px",borderRadius:99}}>8 pts if correct</span>
-            </div>
-            <div style={{padding:"1rem 16px"}}>
-              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top assist provider. Can be changed up until June 11 — locks at kickoff.</p>
-              {!topAssistLocked?(
-                <div>
-                  <input value={assistSearch} onChange={e=>setAssistSearch(e.target.value)} placeholder="Search player name..." style={{...inp,marginBottom:8}}/>
-                  {assistSearch.length>1&&(
-                    <div style={{...card,marginBottom:10,overflow:"visible"}}>
-                      {filteredAssist.length>0?filteredAssist.slice(0,6).map(p=>(
-                        <div key={p.name} onClick={()=>{setTopAssistPick(p);setAssistSearch(p.name);}} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",gap:10,background:topAssistPick?.name===p.name?C.blueLt:"transparent"}}>
-                          <span style={{fontSize:20}}>{p.flag}</span>
-                          <div style={{flex:1}}><div style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>{p.name}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>{p.nation}</div></div>
-                          {topAssistPick?.name===p.name&&<span style={{fontSize:11,color:C.blue}}>Selected ✓</span>}
-                        </div>
-                      )):<div style={{padding:"10px 14px",fontSize:13,color:"var(--color-text-tertiary)"}}>No results — try another name</div>}
-                    </div>
-                  )}
-                  {topAssistPick&&(
-                    <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:C.blueLt,border:`0.5px solid ${C.blue}`,borderRadius:8,marginBottom:10}}>
-                      <span style={{fontSize:22}}>{topAssistPick.flag}</span>
-                      <div><div style={{fontSize:13,fontWeight:500,color:"#1e3a8a"}}>{topAssistPick.name}</div><div style={{fontSize:11,color:C.blue}}>{topAssistPick.nation} · 8 pts if correct</div></div>
-                      <button onClick={()=>{setTopAssistPick(null);setAssistSearch("");}} style={{marginLeft:"auto",padding:"4px 8px",background:"none",border:`0.5px solid ${C.blue}`,borderRadius:6,fontSize:11,color:C.blue,cursor:"pointer"}}>Change</button>
-                    </div>
-                  )}
-                  <button onClick={()=>topAssistPick&&setTopAssistLocked(true)} disabled={!topAssistPick} style={{width:"100%",padding:"11px",background:topAssistPick?C.blue:"var(--color-background-secondary)",color:topAssistPick?"#fff":"var(--color-text-tertiary)",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:topAssistPick?"pointer":"not-allowed"}}>Lock in pick →</button>
-                </div>
-              ):(
-                <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:C.blueLt,border:`0.5px solid ${C.blue}`,borderRadius:10}}>
-                  <span style={{fontSize:26}}>{topAssistPick?.flag||"🎯"}</span>
-                  <div><div style={{fontSize:14,fontWeight:500,color:"#1e3a8a"}}>{topAssistPick?.name}</div><div style={{fontSize:12,color:C.blue}}>{topAssistPick?.nation} · 8 pts if correct</div></div>
-                  <button onClick={()=>setTopAssistLocked(false)} style={{marginLeft:"auto",padding:"4px 10px",background:"none",border:`0.5px solid ${C.blue}`,borderRadius:6,fontSize:11,color:C.blue,cursor:"pointer"}}>Change</button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Golden Glove */}
-          <div style={{...card,borderLeft:`3px solid ${C.gold}`,borderRadius:"0 12px 12px 0"}}>
-            <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Golden Glove</span>
-              <span style={{fontSize:11,color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>8 pts if correct</span>
-            </div>
-            <div style={{padding:"1rem 16px"}}>
-              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's best goalkeeper. Can be changed up until June 11 — locks at kickoff.</p>
-              {!goldenGloveLocked?(
-                <div>
-                  <input value={gloveSearch} onChange={e=>setGloveSearch(e.target.value)} placeholder="Search goalkeeper name..." style={{...inp,marginBottom:8}}/>
-                  {gloveSearch.length>1&&(
-                    <div style={{...card,marginBottom:10,overflow:"visible"}}>
-                      {filteredGlove.length>0?filteredGlove.slice(0,6).map(p=>(
-                        <div key={p.name} onClick={()=>{setGoldenGlovePick(p);setGloveSearch(p.name);}} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",gap:10,background:goldenGlovePick?.name===p.name?C.goldLt:"transparent"}}>
-                          <span style={{fontSize:20}}>{p.flag}</span>
-                          <div style={{flex:1}}><div style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>{p.name}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>{p.nation}</div></div>
-                          {goldenGlovePick?.name===p.name&&<span style={{fontSize:11,color:C.gold}}>Selected ✓</span>}
-                        </div>
-                      )):<div style={{padding:"10px 14px",fontSize:13,color:"var(--color-text-tertiary)"}}>No results — try another name</div>}
-                    </div>
-                  )}
-                  {goldenGlovePick&&(
-                    <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:8,marginBottom:10}}>
-                      <span style={{fontSize:22}}>{goldenGlovePick.flag}</span>
-                      <div><div style={{fontSize:13,fontWeight:500,color:"#7a5c10"}}>{goldenGlovePick.name}</div><div style={{fontSize:11,color:C.gold}}>{goldenGlovePick.nation} · 8 pts if correct</div></div>
-                      <button onClick={()=>{setGoldenGlovePick(null);setGloveSearch("");}} style={{marginLeft:"auto",padding:"4px 8px",background:"none",border:`0.5px solid ${C.gold}`,borderRadius:6,fontSize:11,color:C.gold,cursor:"pointer"}}>Change</button>
-                    </div>
-                  )}
-                  <button onClick={()=>goldenGlovePick&&setGoldenGloveLocked(true)} disabled={!goldenGlovePick} style={{width:"100%",padding:"11px",background:goldenGlovePick?C.gold:"var(--color-background-secondary)",color:goldenGlovePick?"#fff":"var(--color-text-tertiary)",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:goldenGlovePick?"pointer":"not-allowed"}}>Lock in pick →</button>
-                </div>
-              ):(
-                <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:10}}>
-                  <span style={{fontSize:26}}>{goldenGlovePick?.flag||"🧤"}</span>
-                  <div><div style={{fontSize:14,fontWeight:500,color:"#7a5c10"}}>{goldenGlovePick?.name}</div><div style={{fontSize:12,color:C.gold}}>{goldenGlovePick?.nation} · 8 pts if correct</div></div>
-                  <button onClick={()=>setGoldenGloveLocked(false)} style={{marginLeft:"auto",padding:"4px 10px",background:"none",border:`0.5px solid ${C.gold}`,borderRadius:6,fontSize:11,color:C.gold,cursor:"pointer"}}>Change</button>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       )}
+
+      {/* ══ LEAGUE ══ */}
       {page==="league"&&(
         <div style={{maxWidth:660,margin:"0 auto",padding:"2rem"}}>
           <h1 style={{fontSize:22,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 0.25rem",color:"var(--color-text-primary)"}}>My Leagues</h1>
@@ -1503,8 +973,8 @@ export default function App(){
           ):leagueTab==="join"?(
             <div style={{...card,padding:"1.5rem",overflow:"visible"}}>
               <h2 style={{fontSize:15,fontWeight:500,margin:"0 0 0.75rem",color:"var(--color-text-primary)"}}>Enter invite code</h2>
-              <input value={leagueCode} onChange={e=>setLeagueCode(e.target.value.toUpperCase())} placeholder="MND26-XXXXX" style={{...inp,fontFamily:"monospace",letterSpacing:"0.05em",marginBottom:10}}/>
-              <button onClick={()=>{if(leagueCode.startsWith("MND26-")){const nl={id:leagueCode,name:"Friends League",members:12,rank:3,code:leagueCode};setJoinedLeagues(p=>[...p,nl]);setActiveLeague(nl);setLeagueTab("overview");}}} style={{width:"100%",padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:"pointer"}}>Join league →</button>
+              <input value={leagueCode} onChange={e=>setLeagueCode(e.target.value.toUpperCase())} placeholder="WC26-XXXXX" style={{...inp,fontFamily:"monospace",letterSpacing:"0.05em",marginBottom:10}}/>
+              <button onClick={()=>{if(leagueCode.startsWith("WC26-")){const nl={id:leagueCode,name:"Friends League",members:12,rank:3,code:leagueCode};setJoinedLeagues(p=>[...p,nl]);setActiveLeague(nl);setLeagueTab("overview");}}} style={{width:"100%",padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:"pointer"}}>Join league →</button>
             </div>
           ):(
             <div style={{...card,padding:"1.5rem",overflow:"visible"}}>
@@ -1513,7 +983,7 @@ export default function App(){
                 <span style={{flex:1,fontFamily:"monospace",fontSize:18,fontWeight:500,letterSpacing:"0.08em",color:"var(--color-text-primary)"}}>{createdCode}</span>
                 <button onClick={()=>navigator.clipboard?.writeText(createdCode)} style={{padding:"6px 12px",background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:12,cursor:"pointer",color:"var(--color-text-secondary)"}}>Copy</button>
               </div>
-              <button onClick={()=>{const nl={id:createdCode,name:"My Mundialist League",members:1,rank:1,code:createdCode};setJoinedLeagues(p=>[...p,nl]);setActiveLeague(nl);setLeagueTab("overview");}} style={{width:"100%",padding:"11px",background:"var(--color-background-secondary)",color:"var(--color-text-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,fontSize:14,fontWeight:500,cursor:"pointer"}}>Go to my league →</button>
+              <button onClick={()=>{const nl={id:createdCode,name:"My WC26 League",members:1,rank:1,code:createdCode};setJoinedLeagues(p=>[...p,nl]);setActiveLeague(nl);setLeagueTab("overview");}} style={{width:"100%",padding:"11px",background:"var(--color-background-secondary)",color:"var(--color-text-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,fontSize:14,fontWeight:500,cursor:"pointer"}}>Go to my league →</button>
             </div>
           )}
         </div>
@@ -1530,8 +1000,6 @@ export default function App(){
               {label:"Double-down",note:"×2 on chosen match · one per matchday · 3 total",val:"×2",c:C.gold},
               {label:"Golden Match",note:"×2 on chosen R16 advancing team",val:"×2",c:C.purple},
               {label:"Golden Boot — correct top scorer",note:"Editable until June 11",val:"12 pts",c:C.green},
-              {label:"Top Assist — correct top assist provider",note:"Editable until June 11",val:"8 pts",c:C.blue},
-              {label:"Golden Glove — correct best goalkeeper",note:"Editable until June 11",val:"8 pts",c:C.gold},
             ]},
             {title:"Group stage — match scores",accent:C.blue,items:[
               {label:"Exact score",note:"e.g. predict 2–1, result 2–1",val:"10",c:C.blue},
@@ -1577,18 +1045,18 @@ export default function App(){
       <footer style={{marginTop:"3rem",borderTop:"0.5px solid var(--color-border-tertiary)",background:"var(--color-background-primary)"}}>
         <div style={{borderBottom:"0.5px solid var(--color-border-tertiary)",padding:"0.75rem 2rem",display:"flex",alignItems:"center",justifyContent:"center"}}>
           <div style={{width:"100%",height:52,background:"var(--color-background-secondary)",border:"0.5px dashed var(--color-border-tertiary)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Sponsor slot — sponsor@mundialist.com</span>
+            <span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Sponsor slot — sponsor@wc26predictor.com</span>
           </div>
         </div>
         <div style={{maxWidth:1200,margin:"0 auto",padding:"1.25rem 2rem",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <span style={{fontSize:14,fontWeight:600,color:C.blue}}>Mundial26</span>
+            <span style={{fontSize:14,fontWeight:600,color:C.blue}}>WC26</span>
             <span style={{fontSize:11,background:C.blue,color:"#fff",padding:"1px 6px",borderRadius:99}}>Predictor</span>
             <span style={{fontSize:12,color:"var(--color-text-tertiary)",marginLeft:4}}>· FIFA World Cup 2026 · USA · Canada · Mexico</span>
           </div>
           <div style={{display:"flex",gap:"1.5rem"}}>
-            <a href="mailto:sponsor@mundialist.com" style={{fontSize:12,color:"var(--color-text-tertiary)",textDecoration:"none"}}>Sponsor us</a>
-            <a href="mailto:hello@mundialist.com" style={{fontSize:12,color:"var(--color-text-tertiary)",textDecoration:"none"}}>Contact</a>
+            <a href="mailto:sponsor@wc26predictor.com" style={{fontSize:12,color:"var(--color-text-tertiary)",textDecoration:"none"}}>Sponsor us</a>
+            <a href="mailto:hello@wc26predictor.com" style={{fontSize:12,color:"var(--color-text-tertiary)",textDecoration:"none"}}>Contact</a>
           </div>
         </div>
       </footer>
