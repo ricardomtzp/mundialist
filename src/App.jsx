@@ -634,61 +634,7 @@ const R32_TO_R16 = [
   [0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15]
 ];
 
-const GOLDEN_BOOT_PLAYERS = [
-  {name:"Kylian Mbappé",       nation:"France",       flag:"🇫🇷"},
-  {name:"Erling Haaland",      nation:"Norway",       flag:"🇳🇴"},
-  {name:"Vinicius Jr",         nation:"Brazil",       flag:"🇧🇷"},
-  {name:"Harry Kane",          nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Lionel Messi",        nation:"Argentina",    flag:"🇦🇷"},
-  {name:"Cristiano Ronaldo",   nation:"Portugal",     flag:"🇵🇹"},
-  {name:"Lautaro Martínez",    nation:"Argentina",    flag:"🇦🇷"},
-  {name:"Bukayo Saka",         nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Jude Bellingham",     nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Phil Foden",          nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Pedri",               nation:"Spain",        flag:"🇪🇸"},
-  {name:"Florian Wirtz",       nation:"Germany",      flag:"🇩🇪"},
-  {name:"Jamal Musiala",       nation:"Germany",      flag:"🇩🇪"},
-  {name:"Federico Valverde",   nation:"Uruguay",      flag:"🇺🇾"},
-  {name:"Rafael Leão",         nation:"Portugal",     flag:"🇵🇹"},
-  {name:"Achraf Hakimi",       nation:"Morocco",      flag:"🇲🇦"},
-  {name:"Sadio Mané",          nation:"Senegal",      flag:"🇸🇳"},
-  {name:"Victor Osimhen",      nation:"Nigeria",      flag:"🇳🇬"},
-  {name:"Christian Pulisic",   nation:"USA",          flag:"🇺🇸"},
-  {name:"Antoine Griezmann",   nation:"France",       flag:"🇫🇷"},
-  {name:"Son Heung-min",       nation:"South Korea",  flag:"🇰🇷"},
-  {name:"Romelu Lukaku",       nation:"Belgium",      flag:"🇧🇪"},
-  {name:"Robert Lewandowski",  nation:"Poland",       flag:"🇵🇱"},
-  {name:"Darwin Núñez",        nation:"Uruguay",      flag:"🇺🇾"},
-  {name:"Richarlison",         nation:"Brazil",       flag:"🇧🇷"},
-  {name:"Gavi",                nation:"Spain",        flag:"🇪🇸"},
-  {name:"Memphis Depay",       nation:"Netherlands",  flag:"🇳🇱"},
-  {name:"Lorenzo Pellegrini",  nation:"Italy",        flag:"🇮🇹"},
-  {name:"Giovanni Reyna",      nation:"USA",          flag:"🇺🇸"},
-  {name:"Hakim Ziyech",        nation:"Morocco",      flag:"🇲🇦"},
-];
 
-const GOLDEN_GLOVE_PLAYERS = [
-  {name:"Thibaut Courtois",    nation:"Belgium",     flag:"🇧🇪"},
-  {name:"Alisson Becker",      nation:"Brazil",      flag:"🇧🇷"},
-  {name:"Ederson",             nation:"Brazil",      flag:"🇧🇷"},
-  {name:"Jordan Pickford",     nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Gianluigi Donnarumma",nation:"Italy",       flag:"🇮🇹"},
-  {name:"Hugo Lloris",         nation:"France",      flag:"🇫🇷"},
-  {name:"Jan Oblak",           nation:"Slovenia",    flag:"🇸🇮"},
-  {name:"Marc-André ter Stegen",nation:"Germany",    flag:"🇩🇪"},
-  {name:"Manuel Neuer",        nation:"Germany",     flag:"🇩🇪"},
-  {name:"Unai Simón",          nation:"Spain",       flag:"🇪🇸"},
-  {name:"David Raya",          nation:"Spain",       flag:"🇪🇸"},
-  {name:"Yann Sommer",         nation:"Switzerland", flag:"🇨🇭"},
-  {name:"Yassine Bounou",      nation:"Morocco",     flag:"🇲🇦"},
-  {name:"Édouard Mendy",       nation:"Senegal",     flag:"🇸🇳"},
-  {name:"André Onana",         nation:"Cameroon",    flag:"🇨🇲"},
-  {name:"Wojciech Szczęsny",   nation:"Poland",      flag:"🇵🇱"},
-  {name:"Nick Pope",           nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Gregor Kobel",        nation:"Switzerland", flag:"🇨🇭"},
-  {name:"Emiliano Martínez",   nation:"Argentina",   flag:"🇦🇷"},
-  {name:"Guglielmo Vicario",   nation:"Italy",       flag:"🇮🇹"},
-];
 
 const ROUND_INDICES = [[0,1],[2,3],[4,5]];
 
