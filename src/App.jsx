@@ -891,7 +891,7 @@ export default function App(){
 
   const totalPredicted=Object.values(groupMatches).flat().filter(m=>m.homeScore!==""&&m.awayScore!=="").length;
   const doublesSelected=Object.values(doubleDown).filter(Boolean).length;
-  const koPicked=Object.values(koPicks).reduce((s,r)=>s+(r===null?0:typeof r==='string'?1:Object.keys(r).length),0);
+  const koPicked=Object.values(koPicks).reduce((s,r)=>s+(typeof r==='string'?1:Object.keys(r).length),0);
   const adventScore=useMemo(()=>calcAdventurousness(groupMatches,allStandings),[groupMatches,allStandings]);
   const adventInfo=adventLabel(adventScore);
 
@@ -900,7 +900,7 @@ export default function App(){
     setGroupMatches(prev=>{const u=[...prev[group]];u[idx]={...u[idx],[side]:val};return{...prev,[group]:u};});
   };
   const setDouble=(rk,gk,idx)=>{const id=`${gk}-${idx}`;setDoubleDown(prev=>({...prev,[rk]:prev[rk]===id?null:id}));};
-  const simulateAll=()=>{setGroupMatches(simulateAllMatches(simulateStyle));setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{}});};
+  const simulateAll=()=>{setGroupMatches(simulateAllMatches(simulateStyle));setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});};
   const clearAll=()=>{
     const all={};Object.entries(GROUPS).forEach(([g,teams])=>{all[g]=generateGroupMatches(teams);});
     setGroupMatches(all);setDoubleDown({r1:null,r2:null,r3:null});setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{}});
@@ -1695,8 +1695,8 @@ export default function App(){
               {label:"R16 correct advancing team",val:"14",c:C.green},
               {label:"QF correct advancing team",val:"16",c:C.green},
               {label:"SF correct advancing team",val:"18",c:C.green},
-              {label:"Tournament champion",val:"25",c:C.gold},
               {label:"Runner-up",val:"20",c:C.green},
+              {label:"Tournament champion",val:"25",c:C.gold},
               {label:"Third place match",val:"12",c:C.green},
             ]},
             {title:"Dark horse bonus",accent:C.red,note:"On top of normal knockout pts. Non-seeded team = not one of the 12 group leaders.",items:[
