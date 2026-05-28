@@ -891,7 +891,7 @@ export default function App(){
 
   const totalPredicted=Object.values(groupMatches).flat().filter(m=>m.homeScore!==""&&m.awayScore!=="").length;
   const doublesSelected=Object.values(doubleDown).filter(Boolean).length;
-  const koPicked=Object.values(koPicks).reduce((s,r)=>s+(typeof r==='string'?1:Object.keys(r).length),0);
+  const koPicked=Object.values(koPicks).reduce((s,r)=>s+(r===null?0:typeof r==='string'?1:Object.keys(r).length),0);
   const adventScore=useMemo(()=>calcAdventurousness(groupMatches,allStandings),[groupMatches,allStandings]);
   const adventInfo=adventLabel(adventScore);
 
