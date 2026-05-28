@@ -41,60 +41,84 @@ const FLAGS={
   England:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",Croatia:"🇭🇷",Ghana:"🇬🇭",Panama:"🇵🇦",TBD:"❓",
 };
 
+// ── GOLDEN BOOT — verified May 2026 from confirmed WC2026 squads ────────────
+// FIFA top 10: France, Spain, Argentina, England, Portugal, Brazil,
+//              Netherlands, Morocco, Belgium, Germany
+// OUT confirmed: Foden/Palmer/Alexander-Arnold (Eng), Rodrygo/Richarlison/Estêvão (Bra),
+//   Griezmann (Fra - not selected), ter Stegen (Ger - not selected),
+//   Xavi Simons (Ned - injured), Italy/Poland/Cameroon did not qualify
 const GOLDEN_BOOT_PLAYERS=[
-  {name:"Kylian Mbappé",nation:"France",flag:"🇫🇷"},
-  {name:"Erling Haaland",nation:"Norway",flag:"🇳🇴"},
-  {name:"Vinicius Jr",nation:"Brazil",flag:"🇧🇷"},
-  {name:"Harry Kane",nation:"England",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Lionel Messi",nation:"Argentina",flag:"🇦🇷"},
-  {name:"Cristiano Ronaldo",nation:"Portugal",flag:"🇵🇹"},
-  {name:"Lautaro Martínez",nation:"Argentina",flag:"🇦🇷"},
-  {name:"Bukayo Saka",nation:"England",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Jude Bellingham",nation:"England",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Phil Foden",nation:"England",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Pedri",nation:"Spain",flag:"🇪🇸"},
-  {name:"Florian Wirtz",nation:"Germany",flag:"🇩🇪"},
-  {name:"Jamal Musiala",nation:"Germany",flag:"🇩🇪"},
-  {name:"Federico Valverde",nation:"Uruguay",flag:"🇺🇾"},
-  {name:"Rafael Leão",nation:"Portugal",flag:"🇵🇹"},
-  {name:"Achraf Hakimi",nation:"Morocco",flag:"🇲🇦"},
-  {name:"Sadio Mané",nation:"Senegal",flag:"🇸🇳"},
-  {name:"Victor Osimhen",nation:"Nigeria",flag:"🇳🇬"},
-  {name:"Christian Pulisic",nation:"USA",flag:"🇺🇸"},
-  {name:"Antoine Griezmann",nation:"France",flag:"🇫🇷"},
-  {name:"Son Heung-min",nation:"South Korea",flag:"🇰🇷"},
-  {name:"Romelu Lukaku",nation:"Belgium",flag:"🇧🇪"},
-  {name:"Robert Lewandowski",nation:"Poland",flag:"🇵🇱"},
-  {name:"Darwin Núñez",nation:"Uruguay",flag:"🇺🇾"},
-  {name:"Richarlison",nation:"Brazil",flag:"🇧🇷"},
-  {name:"Gavi",nation:"Spain",flag:"🇪🇸"},
-  {name:"Memphis Depay",nation:"Netherlands",flag:"🇳🇱"},
-  {name:"Giovanni Reyna",nation:"USA",flag:"🇺🇸"},
-  {name:"Hakim Ziyech",nation:"Morocco",flag:"🇲🇦"},
-  {name:"Hirving Lozano",nation:"Mexico",flag:"🇲🇽"},
+  // FIFA top 10 — outfield stars
+  {name:"Kylian Mbappé",        nation:"France",       flag:"🇫🇷"},
+  {name:"Harry Kane",           nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Erling Haaland",       nation:"Norway",       flag:"🇳🇴"},
+  {name:"Lionel Messi",         nation:"Argentina",    flag:"🇦🇷"},
+  {name:"Cristiano Ronaldo",    nation:"Portugal",     flag:"🇵🇹"},
+  {name:"Lamine Yamal",         nation:"Spain",        flag:"🇪🇸"},
+  {name:"Vinicius Jr",          nation:"Brazil",       flag:"🇧🇷"},
+  {name:"Mikel Oyarzabal",      nation:"Spain",        flag:"🇪🇸"},
+  {name:"Florian Wirtz",        nation:"Germany",      flag:"🇩🇪"},
+  {name:"Jamal Musiala",        nation:"Germany",      flag:"🇩🇪"},
+  {name:"Jude Bellingham",      nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Bukayo Saka",          nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Ousmane Dembélé",      nation:"France",       flag:"🇫🇷"},
+  {name:"Marcus Thuram",        nation:"France",       flag:"🇫🇷"},
+  {name:"Raphinha",             nation:"Brazil",       flag:"🇧🇷"},
+  {name:"Neymar Jr",            nation:"Brazil",       flag:"🇧🇷"},
+  {name:"Kai Havertz",          nation:"Germany",      flag:"🇩🇪"},
+  {name:"Lautaro Martínez",     nation:"Argentina",    flag:"🇦🇷"},
+  {name:"Julián Álvarez",       nation:"Argentina",    flag:"🇦🇷"},
+  {name:"Pedri",                nation:"Spain",        flag:"🇪🇸"},
+  {name:"Rodri",                nation:"Spain",        flag:"🇪🇸"},
+  {name:"Bruno Fernandes",      nation:"Portugal",     flag:"🇵🇹"},
+  {name:"Bernardo Silva",       nation:"Portugal",     flag:"🇵🇹"},
+  {name:"Rafael Leão",          nation:"Portugal",     flag:"🇵🇹"},
+  {name:"Cody Gakpo",           nation:"Netherlands",  flag:"🇳🇱"},
+  {name:"Memphis Depay",        nation:"Netherlands",  flag:"🇳🇱"},
+  {name:"Achraf Hakimi",        nation:"Morocco",      flag:"🇲🇦"},
+  {name:"Brahim Díaz",          nation:"Morocco",      flag:"🇲🇦"},
+  {name:"Romelu Lukaku",        nation:"Belgium",      flag:"🇧🇪"},
+  {name:"Jeremy Doku",          nation:"Belgium",      flag:"🇧🇪"},
+  {name:"Sadio Mané",           nation:"Senegal",      flag:"🇸🇳"},
+  {name:"Martin Ødegaard",      nation:"Norway",       flag:"🇳🇴"},
+  {name:"Enzo Fernández",        nation:"Argentina",    flag:"🇦🇷"},
+  {name:"Son Heung-min",        nation:"South Korea",  flag:"🇰🇷"},
+  {name:"Darwin Núñez",         nation:"Uruguay",      flag:"🇺🇾"},
+  {name:"Nico Williams",        nation:"Spain",         flag:"🇪🇸"},
+  {name:"Nick Woltemade",       nation:"Germany",       flag:"🇩🇪"},
+  {name:"Jean-Philippe Mateta", nation:"France",        flag:"🇫🇷"},
+  {name:"Désiré Doué",          nation:"France",        flag:"🇫🇷"},
+  {name:"Gonçalo Ramos",        nation:"Portugal",      flag:"🇵🇹"},
+  {name:"Luis Díaz",            nation:"Colombia",      flag:"🇨🇴"},
+  {name:"Mohamed Salah",        nation:"Egypt",         flag:"🇪🇬"},
+  {name:"Deniz Undav",          nation:"Germany",       flag:"🇩🇪"},
+  {name:"Viktor Gyökeres",      nation:"Sweden",        flag:"🇸🇪"},
 ];
 
+// ── GOLDEN GLOVE — verified May 2026 from confirmed WC2026 squads ────────────
+// OUT: ter Stegen (Ger), Lloris (retired), Donnarumma/Vicario (Italy n/q),
+//      Onana (Cameroon n/q), Szczęsny (Poland n/q), Xavi Simons (Ned - injured, outfield)
 const GOLDEN_GLOVE_PLAYERS=[
-  {name:"Thibaut Courtois",nation:"Belgium",flag:"🇧🇪"},
-  {name:"Alisson Becker",nation:"Brazil",flag:"🇧🇷"},
-  {name:"Ederson",nation:"Brazil",flag:"🇧🇷"},
-  {name:"Jordan Pickford",nation:"England",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Gianluigi Donnarumma",nation:"Italy",flag:"🇮🇹"},
-  {name:"Hugo Lloris",nation:"France",flag:"🇫🇷"},
-  {name:"Jan Oblak",nation:"Slovenia",flag:"🇸🇮"},
-  {name:"Marc-André ter Stegen",nation:"Germany",flag:"🇩🇪"},
-  {name:"Manuel Neuer",nation:"Germany",flag:"🇩🇪"},
-  {name:"Unai Simón",nation:"Spain",flag:"🇪🇸"},
-  {name:"David Raya",nation:"Spain",flag:"🇪🇸"},
-  {name:"Yann Sommer",nation:"Switzerland",flag:"🇨🇭"},
-  {name:"Yassine Bounou",nation:"Morocco",flag:"🇲🇦"},
-  {name:"Édouard Mendy",nation:"Senegal",flag:"🇸🇳"},
-  {name:"André Onana",nation:"Cameroon",flag:"🇨🇲"},
-  {name:"Wojciech Szczęsny",nation:"Poland",flag:"🇵🇱"},
-  {name:"Nick Pope",nation:"England",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Gregor Kobel",nation:"Switzerland",flag:"🇨🇭"},
-  {name:"Emiliano Martínez",nation:"Argentina",flag:"🇦🇷"},
-  {name:"Guglielmo Vicario",nation:"Italy",flag:"🇮🇹"},
+  {name:"Mike Maignan",         nation:"France",       flag:"🇫🇷"},
+  {name:"Emiliano Martínez",    nation:"Argentina",    flag:"🇦🇷"},
+  {name:"Alisson Becker",       nation:"Brazil",       flag:"🇧🇷"},
+  {name:"Jordan Pickford",      nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Thibaut Courtois",     nation:"Belgium",      flag:"🇧🇪"},
+  {name:"Ederson",              nation:"Brazil",       flag:"🇧🇷"},
+  {name:"Unai Simón",           nation:"Spain",        flag:"🇪🇸"},
+  {name:"Manuel Neuer",         nation:"Germany",      flag:"🇩🇪"},
+  {name:"Diogo Costa",          nation:"Portugal",     flag:"🇵🇹"},
+  {name:"Yassine Bounou",       nation:"Morocco",      flag:"🇲🇦"},
+  {name:"Bart Verbruggen",      nation:"Netherlands",  flag:"🇳🇱"},
+  {name:"David Raya",           nation:"Spain",        flag:"🇪🇸"},
+  {name:"Dean Henderson",       nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Édouard Mendy",        nation:"Senegal",      flag:"🇸🇳"},
+  {name:"Yann Sommer",          nation:"Switzerland",  flag:"🇨🇭"},
+  {name:"Oliver Baumann",       nation:"Germany",      flag:"🇩🇪"},
+  {name:"Dominik Livaković",    nation:"Croatia",      flag:"🇭🇷"},
+  {name:"Kristoffer Klaesson",  nation:"Norway",       flag:"🇳🇴"},
+  {name:"Mathew Ryan",          nation:"Australia",    flag:"🇦🇺"},
+  {name:"Lawrence Ati-Zigi",    nation:"Ghana",        flag:"🇬🇭"},
 ];
 const R32_FIXED = [
   { id:73,  home:"2A", away:"2B" },   // Runner-up A vs Runner-up B
@@ -634,61 +658,7 @@ const R32_TO_R16 = [
   [0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15]
 ];
 
-const GOLDEN_BOOT_PLAYERS = [
-  {name:"Kylian Mbappé",       nation:"France",       flag:"🇫🇷"},
-  {name:"Erling Haaland",      nation:"Norway",       flag:"🇳🇴"},
-  {name:"Vinicius Jr",         nation:"Brazil",       flag:"🇧🇷"},
-  {name:"Harry Kane",          nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Lionel Messi",        nation:"Argentina",    flag:"🇦🇷"},
-  {name:"Cristiano Ronaldo",   nation:"Portugal",     flag:"🇵🇹"},
-  {name:"Lautaro Martínez",    nation:"Argentina",    flag:"🇦🇷"},
-  {name:"Bukayo Saka",         nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Jude Bellingham",     nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Phil Foden",          nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Pedri",               nation:"Spain",        flag:"🇪🇸"},
-  {name:"Florian Wirtz",       nation:"Germany",      flag:"🇩🇪"},
-  {name:"Jamal Musiala",       nation:"Germany",      flag:"🇩🇪"},
-  {name:"Federico Valverde",   nation:"Uruguay",      flag:"🇺🇾"},
-  {name:"Rafael Leão",         nation:"Portugal",     flag:"🇵🇹"},
-  {name:"Achraf Hakimi",       nation:"Morocco",      flag:"🇲🇦"},
-  {name:"Sadio Mané",          nation:"Senegal",      flag:"🇸🇳"},
-  {name:"Victor Osimhen",      nation:"Nigeria",      flag:"🇳🇬"},
-  {name:"Christian Pulisic",   nation:"USA",          flag:"🇺🇸"},
-  {name:"Antoine Griezmann",   nation:"France",       flag:"🇫🇷"},
-  {name:"Son Heung-min",       nation:"South Korea",  flag:"🇰🇷"},
-  {name:"Romelu Lukaku",       nation:"Belgium",      flag:"🇧🇪"},
-  {name:"Robert Lewandowski",  nation:"Poland",       flag:"🇵🇱"},
-  {name:"Darwin Núñez",        nation:"Uruguay",      flag:"🇺🇾"},
-  {name:"Richarlison",         nation:"Brazil",       flag:"🇧🇷"},
-  {name:"Gavi",                nation:"Spain",        flag:"🇪🇸"},
-  {name:"Memphis Depay",       nation:"Netherlands",  flag:"🇳🇱"},
-  {name:"Lorenzo Pellegrini",  nation:"Italy",        flag:"🇮🇹"},
-  {name:"Giovanni Reyna",      nation:"USA",          flag:"🇺🇸"},
-  {name:"Hakim Ziyech",        nation:"Morocco",      flag:"🇲🇦"},
-];
-
-const GOLDEN_GLOVE_PLAYERS = [
-  {name:"Thibaut Courtois",    nation:"Belgium",     flag:"🇧🇪"},
-  {name:"Alisson Becker",      nation:"Brazil",      flag:"🇧🇷"},
-  {name:"Ederson",             nation:"Brazil",      flag:"🇧🇷"},
-  {name:"Jordan Pickford",     nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Gianluigi Donnarumma",nation:"Italy",       flag:"🇮🇹"},
-  {name:"Hugo Lloris",         nation:"France",      flag:"🇫🇷"},
-  {name:"Jan Oblak",           nation:"Slovenia",    flag:"🇸🇮"},
-  {name:"Marc-André ter Stegen",nation:"Germany",    flag:"🇩🇪"},
-  {name:"Manuel Neuer",        nation:"Germany",     flag:"🇩🇪"},
-  {name:"Unai Simón",          nation:"Spain",       flag:"🇪🇸"},
-  {name:"David Raya",          nation:"Spain",       flag:"🇪🇸"},
-  {name:"Yann Sommer",         nation:"Switzerland", flag:"🇨🇭"},
-  {name:"Yassine Bounou",      nation:"Morocco",     flag:"🇲🇦"},
-  {name:"Édouard Mendy",       nation:"Senegal",     flag:"🇸🇳"},
-  {name:"André Onana",         nation:"Cameroon",    flag:"🇨🇲"},
-  {name:"Wojciech Szczęsny",   nation:"Poland",      flag:"🇵🇱"},
-  {name:"Nick Pope",           nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Gregor Kobel",        nation:"Switzerland", flag:"🇨🇭"},
-  {name:"Emiliano Martínez",   nation:"Argentina",   flag:"🇦🇷"},
-  {name:"Guglielmo Vicario",   nation:"Italy",       flag:"🇮🇹"},
-];
+const ANNEX_IDX={"1A":0,"1B":1,"1D":2,"1E":3,"1G":4,"1I":5,"1K":6,"1L":7};
 
 const ROUND_INDICES = [[0,1],[2,3],[4,5]];
 
@@ -863,16 +833,17 @@ export default function App(){
   const [formName,setFormName]=useState("");
   const [formHandle,setFormHandle]=useState("");
   const [formEmail,setFormEmail]=useState("");
+  const [formAgree,setFormAgree]=useState(false);
   const [emailError,setEmailError]=useState("");
+  const [agreeError,setAgreeError]=useState(false);
   const [waitlistEmail,setWaitlistEmail]=useState("");
   const [waitlistDone,setWaitlistDone]=useState(false);
+  const [simulateStyle,setSimulateStyle]=useState("balanced");
   const [groupMatches,setGroupMatches]=useState(()=>{
     const all={};Object.entries(GROUPS).forEach(([g,teams])=>{all[g]=generateGroupMatches(teams);});return all;
   });
   const [activeGroup,setActiveGroup]=useState("A");
   const [doubleDown,setDoubleDown]=useState({r1:null,r2:null,r3:null});
-  const [goldenMatch,setGoldenMatch]=useState(null);
-  const [goldenMatchLocked,setGoldenMatchLocked]=useState(false);
   const [goldenBootPick,setGoldenBootPick]=useState(null);
   const [goldenBootLocked,setGoldenBootLocked]=useState(false);
   const [bootSearch,setBootSearch]=useState("");
@@ -883,10 +854,12 @@ export default function App(){
   const [goldenGloveLocked,setGoldenGloveLocked]=useState(false);
   const [gloveSearch,setGloveSearch]=useState("");
   const [koPicks,setKoPicks]=useState({r32:{},r16:{},qf:{},sf:{},final:{}});
+  const [leagueStep,setLeagueStep]=useState("overview");
   const [leagueCode,setLeagueCode]=useState("");
+  const [leagueName,setLeagueName]=useState("");
   const [joinedLeagues,setJoinedLeagues]=useState([]);
   const [activeLeague,setActiveLeague]=useState(null);
-  const [leagueTab,setLeagueTab]=useState("overview");
+  const [viewingUser,setViewingUser]=useState(null);
   const [createdCode]=useState("MND26-"+Math.random().toString(36).substring(2,7).toUpperCase());
   const countdown=useCountdown();
 
@@ -917,7 +890,6 @@ export default function App(){
   const koPicked=Object.values(koPicks).reduce((s,r)=>s+Object.keys(r).length,0);
   const adventScore=useMemo(()=>calcAdventurousness(groupMatches,allStandings),[groupMatches,allStandings]);
   const adventInfo=adventLabel(adventScore);
-  const simulateStyle=adventScore===null?"balanced":adventScore<20?"cautious":adventScore<40?"balanced":adventScore<65?"bold":"maverick";
 
   const updateScore=(group,idx,side,val)=>{
     if(val!==""&&(isNaN(val)||parseInt(val)<0||parseInt(val)>99))return;
@@ -931,9 +903,12 @@ export default function App(){
   };
   const validateEmail=e=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
   const handleCreate=()=>{
+    let ok=true;
     if(!formName.trim()||!formHandle.trim())return;
-    if(!validateEmail(formEmail)){setEmailError("Please enter a valid email");return;}
-    setEmailError("");
+    if(!validateEmail(formEmail)){setEmailError("Please enter a valid email");ok=false;}
+    if(!formAgree){setAgreeError(true);ok=false;}
+    if(!ok)return;
+    setEmailError("");setAgreeError(false);
     setUser({name:formName,handle:"@"+formHandle.replace("@",""),email:formEmail,avatar:formName[0].toUpperCase()});
     setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
     setPage("predict");
@@ -944,59 +919,60 @@ export default function App(){
   const filteredGlove=gloveSearch.length>1?GOLDEN_GLOVE_PLAYERS.filter(p=>p.name.toLowerCase().includes(gloveSearch.toLowerCase())||p.nation.toLowerCase().includes(gloveSearch.toLowerCase())):[];
 
   const leagueMembers=[
-    {name:user?.name||"You",handle:user?.handle||"@you",pts:142,avatar:user?.avatar||"Y"},
-    {name:"Alex Chen",handle:"@alexc",pts:138,avatar:"A"},
-    {name:"Sara Kim",handle:"@sarakim",pts:125,avatar:"S"},
-    {name:"Tom Walsh",handle:"@tomw",pts:119,avatar:"T"},
-    {name:"Priya Nair",handle:"@priya",pts:108,avatar:"P"},
+    {name:user?.name||"You",handle:user?.handle||"@you",pts:142,avatar:user?.avatar||"Y",picks:{groupDone:totalPredicted,champion}},
+    {name:"Alex Chen",handle:"@alexc",pts:138,avatar:"A",picks:{groupDone:68,champion:"Brazil"}},
+    {name:"Sara Kim",handle:"@sarakim",pts:125,avatar:"S",picks:{groupDone:72,champion:"France"}},
+    {name:"Tom Walsh",handle:"@tomw",pts:119,avatar:"T",picks:{groupDone:60,champion:"England"}},
+    {name:"Priya Nair",handle:"@priya",pts:108,avatar:"P",picks:{groupDone:55,champion:"Spain"}},
   ];
 
-  function MatchCard({home,away,picked,onPick,matchLabel,slim=false}){
-    const isDark=t=>t!=="TBD"&&!SEEDED.has(t);
+  // ── Shared match card for knockout ──
+  function KOCard({home,away,picked,onPick,label,gold=false}){
     return(
-      <div style={{background:"var(--color-background-primary)",border:`1.5px solid ${picked?C.blue:"var(--color-border-tertiary)"}`,borderRadius:9,overflow:"hidden",marginBottom:slim?4:6}}>
-        {matchLabel&&<div style={{padding:"3px 8px",background:picked?C.blueLt:"var(--color-background-secondary)",borderBottom:"0.5px solid var(--color-border-tertiary)",fontSize:10,color:picked?C.blue:"var(--color-text-tertiary)",fontWeight:500,display:"flex",justifyContent:"space-between"}}>
-          <span>{matchLabel}</span>{picked&&<span style={{color:C.blue}}>✓ {picked}</span>}
-        </div>}
-        {[{team:home},{team:away}].map(({team},ti)=>(
+      <div style={{background:"var(--color-background-primary)",border:`${gold?"2px":"1.5px"} solid ${picked?C.blue:gold?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,overflow:"hidden",width:"100%"}}>
+        {label&&<div style={{padding:"2px 7px",background:"var(--color-background-secondary)",borderBottom:"0.5px solid var(--color-border-tertiary)",fontSize:9,color:"var(--color-text-tertiary)",fontWeight:500}}>{label}</div>}
+        {[home,away].map((team,ti)=>(
           <div key={ti} onClick={()=>team!=="TBD"&&onPick&&onPick(team)}
-            style={{padding:slim?"6px 8px":"8px 10px",display:"flex",alignItems:"center",gap:6,
+            style={{padding:"5px 7px",display:"flex",alignItems:"center",gap:5,
               cursor:team!=="TBD"&&onPick?"pointer":"default",
-              background:picked===team?C.blueLt:"transparent",
+              background:picked===team?(gold?C.goldLt:C.blueLt):"transparent",
               borderBottom:ti===0?"0.5px solid var(--color-border-tertiary)":"none"}}>
-            <span style={{fontSize:slim?14:16}}>{FLAGS[team]||"❓"}</span>
-            <span style={{flex:1,fontSize:slim?11:12,fontWeight:picked===team?600:400,color:picked===team?C.blue:"var(--color-text-primary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{team}</span>
-            {isDark(team)&&<span style={{fontSize:9,color:"#c026d3",flexShrink:0}}>★</span>}
-            {picked===team&&<span style={{fontSize:10,color:C.blue,fontWeight:700,flexShrink:0}}>✓</span>}
+            <span style={{fontSize:13}}>{FLAGS[team]||"❓"}</span>
+            <span style={{flex:1,fontSize:10,fontWeight:picked===team?600:400,
+              color:picked===team?(gold?"#7a5c10":C.blue):"var(--color-text-primary)",
+              overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{team}</span>
+            {picked===team&&!SEEDED.has(team)&&team!=="TBD"&&<span style={{fontSize:8,color:"#c026d3"}}>★</span>}
+            {picked===team&&<span style={{fontSize:9,color:gold?"#7a5c10":C.blue,fontWeight:700}}>✓</span>}
           </div>
         ))}
       </div>
     );
   }
 
+  const r32AllTBD=r32Bracket.every(m=>m.home==="TBD"&&m.away==="TBD");
+
   return(
     <div style={{minHeight:"100vh",background:"var(--color-background-tertiary)",fontFamily:"'DM Sans',system-ui,sans-serif"}}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 
+      {/* ── Fixed Nav ── */}
       {user&&(
-        <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200}}>
-          <div style={{maxWidth:1280,margin:"0 auto",padding:"0 1.5rem",display:"flex",alignItems:"center",gap:"1rem",height:56}}>
-            <div style={{display:"flex",alignItems:"center",gap:8,marginRight:"auto",cursor:"pointer"}} onClick={()=>setPage("home")}>
-              <span style={{fontSize:18,fontWeight:700,letterSpacing:"-0.04em",color:C.blue}}>Mundialist</span>
-            </div>
+        <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:56}}>
+          <div style={{maxWidth:1280,margin:"0 auto",padding:"0 1.5rem",display:"flex",alignItems:"center",gap:"1rem",height:"100%"}}>
+            <span style={{fontSize:18,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer",marginRight:"auto"}} onClick={()=>setPage("home")}>Mundialist</span>
             {NAV.map(({label,page:p})=>(
               <button key={p} onClick={()=>setPage(p)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,
                 fontWeight:page===p?600:400,color:page===p?C.blue:"var(--color-text-secondary)",
                 borderBottom:page===p?`2px solid ${C.blue}`:"2px solid transparent",
-                padding:"0 2px",paddingBottom:18,paddingTop:18,whiteSpace:"nowrap"}}>
+                padding:"17px 2px",whiteSpace:"nowrap"}}>
                 {label}
               </button>
             ))}
             <div style={{display:"flex",alignItems:"center",gap:8,marginLeft:4,flexShrink:0}}>
               <div style={{width:30,height:30,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#fff"}}>{user.avatar}</div>
-              <div>
-                <div style={{fontSize:12,color:"var(--color-text-primary)",fontWeight:500}}>{user.handle}</div>
-                <div style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{totalPredicted}/72 · {koPicked}/31</div>
+              <div style={{display:"flex",flexDirection:"column"}}>
+                <span style={{fontSize:12,color:"var(--color-text-primary)",fontWeight:500}}>{user.handle}</span>
+                <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{totalPredicted}/72 · {koPicked}/31</span>
               </div>
             </div>
           </div>
@@ -1005,11 +981,13 @@ export default function App(){
 
       <div style={{paddingTop:user?56:0}}>
 
+      {/* ══ HOME ══ */}
       {page==="home"&&(
         <div>
-          <div style={{background:`linear-gradient(135deg, ${C.blue} 0%, #1a2566 50%, #0d1433 100%)`,minHeight:"100vh",display:"flex",flexDirection:"column",justifyContent:"center",padding:"4rem 2rem",position:"relative",overflow:"hidden"}}>
-            <div style={{position:"absolute",top:0,left:0,right:0,bottom:0,opacity:0.04,backgroundImage:"radial-gradient(circle at 20% 50%, white 1px, transparent 1px)",backgroundSize:"60px 60px"}}/>
-            <div style={{maxWidth:680,margin:"0 auto",width:"100%",position:"relative",zIndex:1}}>
+          {/* Hero */}
+          <div style={{background:`linear-gradient(135deg,${C.blue} 0%,#1a2566 50%,#0d1433 100%)`,minHeight:"100vh",display:"flex",flexDirection:"column",justifyContent:"center",padding:"4rem 2rem",position:"relative",overflow:"hidden"}}>
+            <div style={{position:"absolute",top:0,left:0,right:0,bottom:0,opacity:0.04,backgroundImage:"radial-gradient(circle,white 1px,transparent 1px)",backgroundSize:"60px 60px"}}/>
+            <div style={{maxWidth:700,margin:"0 auto",width:"100%",position:"relative",zIndex:1}}>
               <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,255,255,0.1)",border:"0.5px solid rgba(255,255,255,0.2)",padding:"6px 14px",borderRadius:99,marginBottom:"2rem"}}>
                 <span style={{fontSize:16}}>⚽</span>
                 <span style={{fontSize:13,fontWeight:500,color:"rgba(255,255,255,0.9)",fontFamily:"monospace"}}>FIFA World Cup 2026 · June 11 – July 19</span>
@@ -1017,9 +995,25 @@ export default function App(){
               <h1 style={{fontSize:"clamp(36px,6vw,64px)",fontWeight:700,letterSpacing:"-0.04em",lineHeight:1.1,color:"#fff",margin:"0 0 1.25rem"}}>
                 The predictor<br/>that rewards<br/><span style={{color:C.gold}}>knowing your</span><br/>football.
               </h1>
-              <p style={{fontSize:18,color:"rgba(255,255,255,0.7)",lineHeight:1.7,margin:"0 0 2.5rem",maxWidth:480}}>
-                Predict every score across all 104 matches. Compete in private leagues. The bolder your picks, the bigger the rewards.
-              </p>
+              <p style={{fontSize:18,color:"rgba(255,255,255,0.7)",lineHeight:1.7,margin:"0 0 2rem",maxWidth:480}}>Predict every score. Compete in private leagues. The bolder your picks, the bigger the rewards.</p>
+
+              {/* Points teaser */}
+              <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:"2rem"}}>
+                {[{pts:"10",label:"Exact score"},
+                  {pts:"25",label:"Tournament champion"},
+                  {pts:"×2",label:"Double-down pick"},
+                  {pts:"+8",label:"Dark horse final"}].map(({pts,label})=>(
+                  <div key={label} style={{background:"rgba(255,255,255,0.08)",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:8,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontFamily:"monospace",fontSize:15,fontWeight:600,color:C.gold}}>{pts}</span>
+                    <span style={{fontSize:12,color:"rgba(255,255,255,0.7)"}}>{label}</span>
+                  </div>
+                ))}
+                <div style={{display:"flex",alignItems:"center",padding:"0 4px"}}>
+                  <button onClick={()=>setPage("points")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.5)",textDecoration:"underline"}}>see all scoring →</button>
+                </div>
+              </div>
+
+              {/* Countdown */}
               <div style={{display:"flex",gap:10,marginBottom:"2.5rem",flexWrap:"wrap"}}>
                 {[{val:countdown.d,label:"Days"},{val:countdown.h,label:"Hours"},{val:countdown.m,label:"Mins"},{val:countdown.s,label:"Secs"}].map(({val,label})=>(
                   <div key={label} style={{background:"rgba(255,255,255,0.1)",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:12,padding:"12px 18px",textAlign:"center",minWidth:70}}>
@@ -1030,8 +1024,9 @@ export default function App(){
                 <div style={{display:"flex",alignItems:"center",padding:"0 8px"}}><span style={{fontSize:13,color:"rgba(255,255,255,0.5)"}}>until kickoff</span></div>
               </div>
 
+              {/* CTA card */}
               {!user?(
-                <div style={{background:"rgba(255,255,255,0.08)",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:16,padding:"1.75rem",maxWidth:440}}>
+                <div style={{background:"rgba(255,255,255,0.08)",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:16,padding:"1.75rem",maxWidth:460}}>
                   {!waitlistDone?(
                     <>
                       <h2 style={{fontSize:18,fontWeight:600,margin:"0 0 0.5rem",color:"#fff"}}>Get notified when we go live</h2>
@@ -1042,28 +1037,34 @@ export default function App(){
                         <button onClick={()=>{if(validateEmail(waitlistEmail))setWaitlistDone(true);}}
                           style={{padding:"11px 20px",background:C.gold,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap"}}>Notify me</button>
                       </div>
+
+                      {/* League CTAs */}
+                      <div style={{display:"flex",gap:8,marginBottom:"1.25rem"}}>
+                        <button onClick={()=>{setPage("league");setLeagueStep("create");}} style={{flex:1,padding:"9px",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:8,background:"rgba(255,255,255,0.06)",color:"rgba(255,255,255,0.8)",fontSize:12,cursor:"pointer"}}>🏆 Start a league</button>
+                        <button onClick={()=>{setPage("league");setLeagueStep("join");}} style={{flex:1,padding:"9px",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:8,background:"rgba(255,255,255,0.06)",color:"rgba(255,255,255,0.8)",fontSize:12,cursor:"pointer"}}>🔑 I have an invite code</button>
+                      </div>
+
                       <div style={{borderTop:"0.5px solid rgba(255,255,255,0.1)",paddingTop:"1rem"}}>
-                        <p style={{fontSize:12,color:"rgba(255,255,255,0.4)",margin:"0 0 0.75rem"}}>Already have an account?</p>
+                        <p style={{fontSize:12,color:"rgba(255,255,255,0.4)",margin:"0 0 0.75rem"}}>Create your account to start predicting</p>
                         <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                          <div>
-                            <label style={{fontSize:11,color:"rgba(255,255,255,0.5)",display:"block",marginBottom:4}}>Full name</label>
-                            <input value={formName} onChange={e=>setFormName(e.target.value)} placeholder="Jamie Vardy"
-                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                          <input value={formName} onChange={e=>setFormName(e.target.value)} placeholder="Full name"
+                            style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                          <div style={{position:"relative"}}>
+                            <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,0.4)",fontSize:13}}>@</span>
+                            <input value={formHandle} onChange={e=>setFormHandle(e.target.value)} placeholder="username"
+                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px 9px 24px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
                           </div>
-                          <div>
-                            <label style={{fontSize:11,color:"rgba(255,255,255,0.5)",display:"block",marginBottom:4}}>Username</label>
-                            <div style={{position:"relative"}}>
-                              <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,0.4)",fontSize:13}}>@</span>
-                              <input value={formHandle} onChange={e=>setFormHandle(e.target.value)} placeholder="jamievardy"
-                                style={{width:"100%",boxSizing:"border-box",padding:"9px 12px 9px 24px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            </div>
-                          </div>
-                          <div>
-                            <label style={{fontSize:11,color:"rgba(255,255,255,0.5)",display:"block",marginBottom:4}}>Email</label>
-                            <input value={formEmail} onChange={e=>{setFormEmail(e.target.value);setEmailError("");}} placeholder="jamie@example.com" type="email"
-                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:`0.5px solid ${emailError?"#ef4444":"rgba(255,255,255,0.15)"}`,borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            {emailError&&<p style={{fontSize:11,color:"#ef4444",margin:"3px 0 0"}}>{emailError}</p>}
-                          </div>
+                          <input value={formEmail} onChange={e=>{setFormEmail(e.target.value);setEmailError("");}} placeholder="Email address" type="email"
+                            style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:`0.5px solid ${emailError?"#ef4444":"rgba(255,255,255,0.15)"}`,borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                          {emailError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{emailError}</p>}
+                          <label style={{display:"flex",alignItems:"flex-start",gap:8,cursor:"pointer"}}>
+                            <input type="checkbox" checked={formAgree} onChange={e=>{setFormAgree(e.target.checked);setAgreeError(false);}}
+                              style={{marginTop:2,accentColor:C.gold,flexShrink:0}}/>
+                            <span style={{fontSize:11,color:agreeError?"#ef4444":"rgba(255,255,255,0.5)",lineHeight:1.5}}>
+                              I agree to the <button onClick={e=>{e.preventDefault();setPage("terms");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:11,color:agreeError?"#ef4444":C.gold,padding:0,textDecoration:"underline"}}>Terms & Conditions</button> and consent to receive prediction updates and league emails from Mundialist.
+                            </span>
+                          </label>
+                          {agreeError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>Please agree to the terms to continue</p>}
                           <button onClick={handleCreate} style={{padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer",marginTop:4}}>Start predicting →</button>
                         </div>
                       </div>
@@ -1077,31 +1078,37 @@ export default function App(){
                   )}
                 </div>
               ):(
-                <div style={{background:"rgba(255,255,255,0.1)",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:12,padding:"1rem 1.5rem",display:"flex",alignItems:"center",gap:12,maxWidth:440}}>
+                <div style={{background:"rgba(255,255,255,0.1)",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:12,padding:"1rem 1.5rem",display:"flex",alignItems:"center",gap:12,maxWidth:460}}>
                   <div style={{width:40,height:40,borderRadius:"50%",background:C.gold,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:700,fontSize:16}}>{user.avatar}</div>
-                  <div><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>{user.name}</div><div style={{fontSize:12,color:"rgba(255,255,255,0.6)"}}>{totalPredicted}/72 picks · {koPicked}/31 knockout picks</div></div>
+                  <div><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>{user.name}</div><div style={{fontSize:12,color:"rgba(255,255,255,0.6)"}}>{totalPredicted}/72 group · {koPicked}/31 knockout</div></div>
                   <button onClick={()=>setPage("predict")} style={{marginLeft:"auto",padding:"8px 18px",background:C.gold,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap"}}>Continue →</button>
                 </div>
               )}
             </div>
           </div>
+
+          {/* Features strip */}
           <div style={{background:"var(--color-background-primary)",borderTop:`3px solid ${C.gold}`,padding:"3rem 2rem"}}>
-            <div style={{maxWidth:900,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:32}}>
+            <div style={{maxWidth:960,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:"2.5rem"}}>
               {[
-                {emoji:"⏰",title:"Everything locks June 11",sub:"Submit before the first whistle — no changes after kickoff"},
-                {emoji:"🏆",title:"Mini leagues + global ranking",sub:"Private leagues with friends, plus a worldwide leaderboard"},
-                {emoji:"🌟",title:"Dark horse & golden match bonuses",sub:"Brave picks earn more — bold predictions are rewarded"},
-                {emoji:"📧",title:"Daily match digest",sub:"Your league's picks land in your inbox every match day"},
-              ].map(({emoji,title,sub})=>(
-                <div key={title}>
-                  <div style={{fontSize:28,marginBottom:10}}>{emoji}</div>
-                  <div style={{fontSize:15,fontWeight:600,color:"var(--color-text-primary)",marginBottom:6}}>{title}</div>
-                  <div style={{fontSize:13,color:"var(--color-text-secondary)",lineHeight:1.6}}>{sub}</div>
+                {icon:"⏰",title:"Everything locks June 11",sub:"Submit before the first whistle. No changes after kickoff."},
+                {icon:"🏆",title:"Mini leagues + global rank",sub:"Private leagues with friends, plus a worldwide leaderboard."},
+                {icon:"🌟",title:"Dark horse bonuses",sub:"Brave picks earn more. Non-seeded teams reaching the final earn you +8 bonus pts."},
+                {icon:"📧",title:"Daily match digest",sub:"Your league standings land in your inbox every match day."},
+              ].map(({icon,title,sub})=>(
+                <div key={title} style={{display:"flex",gap:16,alignItems:"flex-start"}}>
+                  <div style={{width:40,height:40,borderRadius:10,background:C.blueLt,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{icon}</div>
+                  <div>
+                    <div style={{fontSize:14,fontWeight:600,color:"var(--color-text-primary)",marginBottom:4}}>{title}</div>
+                    <div style={{fontSize:13,color:"var(--color-text-secondary)",lineHeight:1.6}}>{sub}</div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-          <div style={{background:"var(--color-background-secondary)",padding:"2rem",textAlign:"center"}}>
+
+          {/* Social proof */}
+          <div style={{background:"var(--color-background-secondary)",padding:"1.5rem 2rem",textAlign:"center",borderTop:"0.5px solid var(--color-border-tertiary)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12,flexWrap:"wrap"}}>
               <div style={{display:"flex"}}>
                 {[C.blue,C.red,C.green,C.gold,C.purple].map((bg,i)=>(
@@ -1114,6 +1121,7 @@ export default function App(){
         </div>
       )}
 
+      {/* ══ GROUP STAGE ══ */}
       {page==="predict"&&(
         <div style={{maxWidth:800,margin:"0 auto",padding:"2rem 1.5rem"}}>
           <AdSlot/>
@@ -1123,43 +1131,61 @@ export default function App(){
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:0}}>Predict scores for all 72 matches. Locks June 11, 2026.</p>
             </div>
             <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
-              <div style={{background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:10,padding:"8px 14px",textAlign:"center",minWidth:60}}>
+              <div style={{background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:10,padding:"8px 14px",textAlign:"center"}}>
                 <div style={{fontSize:20,fontWeight:600,color:"var(--color-text-primary)",fontFamily:"monospace",lineHeight:1}}>{totalPredicted}<span style={{fontSize:11,color:"var(--color-text-tertiary)",fontWeight:400}}>/72</span></div>
                 <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:2}}>picks</div>
               </div>
-              <div style={{background:"var(--color-background-primary)",border:`0.5px solid ${doublesSelected===3?C.green:"var(--color-border-tertiary)"}`,borderRadius:10,padding:"8px 14px",textAlign:"center",minWidth:60}}>
+              <div style={{background:"var(--color-background-primary)",border:`0.5px solid ${doublesSelected===3?C.green:"var(--color-border-tertiary)"}`,borderRadius:10,padding:"8px 14px",textAlign:"center"}}>
                 <div style={{fontSize:20,fontWeight:600,color:doublesSelected===3?C.green:"var(--color-text-primary)",fontFamily:"monospace",lineHeight:1}}>{doublesSelected}<span style={{fontSize:11,color:"var(--color-text-tertiary)",fontWeight:400}}>/3</span></div>
                 <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:2}}>doubles</div>
               </div>
-              <button onClick={simulateAll} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer"}}>
-                Simulate {adventInfo.emoji||"↻"}
-              </button>
               <button onClick={clearAll} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer"}}>Clear</button>
             </div>
           </div>
 
+          {/* Prediction style selector + simulate */}
           <div style={{background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:10,padding:"12px 14px",marginBottom:"1.25rem"}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-              <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Prediction style</span>
-                {adventScore!==null&&<span style={{fontSize:12,fontWeight:500,color:adventInfo.color,background:adventInfo.color+"18",padding:"2px 9px",borderRadius:99}}>{adventInfo.emoji} {adventInfo.label}</span>}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
+              <div>
+                <div style={{fontSize:12,fontWeight:500,color:"var(--color-text-primary)",marginBottom:8}}>Simulation style</div>
+                <div style={{display:"flex",gap:6}}>
+                  {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
+                    <button key={k} onClick={()=>setSimulateStyle(k)}
+                      style={{padding:"6px 12px",borderRadius:8,fontSize:12,cursor:"pointer",fontWeight:simulateStyle===k?600:400,
+                        border:`0.5px solid ${simulateStyle===k?adventInfo.color:"var(--color-border-tertiary)"}`,
+                        background:simulateStyle===k?adventInfo.color+"18":"var(--color-background-secondary)",
+                        color:simulateStyle===k?adventInfo.color:"var(--color-text-secondary)"}}>
+                      {e} {l}
+                    </button>
+                  ))}
+                </div>
               </div>
-              {adventScore!==null&&<span style={{fontSize:12,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{adventScore}/100</span>}
+              <button onClick={simulateAll}
+                style={{padding:"9px 18px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap"}}>
+                Simulate ↻
+              </button>
             </div>
-            <div style={{height:6,background:"var(--color-background-secondary)",borderRadius:99,overflow:"hidden"}}>
-              <div style={{height:"100%",width:`${adventInfo.width||0}%`,background:adventInfo.color,borderRadius:99,transition:"width 0.3s"}}/>
-            </div>
-            <div style={{display:"flex",justifyContent:"space-between",marginTop:5}}>
-              {["🛡️ Cautious","⚖️ Balanced","🔥 Bold","🚀 Maverick"].map(l=><span key={l} style={{fontSize:10,color:"var(--color-text-tertiary)"}}>{l}</span>)}
-            </div>
+            {adventScore!==null&&(
+              <div style={{marginTop:10}}>
+                <div style={{height:4,background:"var(--color-background-secondary)",borderRadius:99,overflow:"hidden"}}>
+                  <div style={{height:"100%",width:`${adventInfo.width||0}%`,background:adventInfo.color,borderRadius:99,transition:"width 0.3s"}}/>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
+                  <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>Your pick style: <strong style={{color:adventInfo.color}}>{adventInfo.emoji} {adventInfo.label}</strong></span>
+                  <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{adventScore}/100</span>
+                </div>
+              </div>
+            )}
           </div>
 
+          {/* Group tabs */}
           <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:6,marginBottom:"1.25rem"}}>
             {Object.keys(GROUPS).map(g=>{
               const done=groupMatches[g].filter(m=>m.homeScore!==""&&m.awayScore!=="").length;
               const complete=done===6,active=activeGroup===g;
               return(<button key={g} onClick={()=>setActiveGroup(g)}
-                style={{padding:"9px 4px",borderRadius:8,cursor:"pointer",border:`0.5px solid ${active?C.blue:complete?C.green:"var(--color-border-tertiary)"}`,
+                style={{padding:"9px 4px",borderRadius:8,cursor:"pointer",
+                  border:`0.5px solid ${active?C.blue:complete?C.green:"var(--color-border-tertiary)"}`,
                   background:active?C.blueLt:complete?C.greenLt:"var(--color-background-primary)",
                   display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
                 <span style={{fontSize:13,fontWeight:500,color:active?C.blue:complete?C.green:"var(--color-text-primary)"}}>Group {g}</span>
@@ -1168,6 +1194,7 @@ export default function App(){
             })}
           </div>
 
+          {/* Match card */}
           <div style={card}>
             <div style={{padding:"12px 18px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <span style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>Group {activeGroup}</span>
@@ -1189,10 +1216,14 @@ export default function App(){
                   const doubleId=`${activeGroup}-${idx}`;
                   const isMyDouble=currentDouble===doubleId;
                   const canDouble=!isSeeded&&(!roundHasDouble||isMyDouble);
+                  // Only show dark horse label if team is picked to qualify
+                  const homeQualifies=allStandings[activeGroup]?.slice(0,2).some(r=>r.team===match.home);
+                  const awayQualifies=allStandings[activeGroup]?.slice(0,2).some(r=>r.team===match.away);
                   return(
                     <div key={idx} style={{padding:"12px 18px",borderBottom:"0.5px solid var(--color-border-tertiary)",background:isMyDouble?C.goldLt:done?"#f8faff":"transparent",display:"flex",alignItems:"center",gap:14}}>
                       <div style={{flex:1,display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end"}}>
                         <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500}}>{match.home}</span>
+                        {!SEEDED.has(match.home)&&homeQualifies&&<span style={{fontSize:10,color:"#c026d3"}}>★</span>}
                         <span style={{fontSize:22}}>{FLAGS[match.home]||"❓"}</span>
                       </div>
                       <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
@@ -1204,13 +1235,16 @@ export default function App(){
                       </div>
                       <div style={{flex:1,display:"flex",alignItems:"center",gap:8}}>
                         <span style={{fontSize:22}}>{FLAGS[match.away]||"❓"}</span>
+                        {!SEEDED.has(match.away)&&awayQualifies&&<span style={{fontSize:10,color:"#c026d3"}}>★</span>}
                         <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500}}>{match.away}</span>
                       </div>
                       {!isSeeded?(
                         <button onClick={()=>canDouble&&setDouble(roundKey,activeGroup,idx)}
                           title={isMyDouble?"Remove double":roundHasDouble?"Already used this matchday":"Double your points for this match"}
-                          style={{padding:"6px 11px",borderRadius:7,fontSize:12,fontWeight:isMyDouble?600:400,cursor:canDouble?"pointer":"not-allowed",
-                            border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,background:isMyDouble?C.goldLt:"transparent",
+                          style={{padding:"6px 11px",borderRadius:7,fontSize:12,fontWeight:isMyDouble?600:400,
+                            cursor:canDouble?"pointer":"not-allowed",
+                            border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,
+                            background:isMyDouble?C.goldLt:"transparent",
                             color:isMyDouble?C.gold:!canDouble?"var(--color-text-tertiary)":"var(--color-text-secondary)",
                             opacity:!canDouble&&!isMyDouble?0.3:1,flexShrink:0}}>
                           {isMyDouble?"⚡ ×2":"×2"}
@@ -1223,6 +1257,7 @@ export default function App(){
                 })}
               </div>);
             })}
+            {/* Standings */}
             <div style={{borderTop:"0.5px solid var(--color-border-tertiary)"}}>
               <div style={{padding:"8px 18px",background:"var(--color-background-secondary)",borderBottom:"0.5px solid var(--color-border-tertiary)"}}><span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.05em"}}>Predicted standing</span></div>
               <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
@@ -1250,67 +1285,155 @@ export default function App(){
         </div>
       )}
 
+      {/* ══ KNOCKOUT ══ */}
       {page==="bracket"&&(
-        <div style={{maxWidth:1300,margin:"0 auto",padding:"2rem 1.5rem",overflowX:"auto"}}>
-          <div style={{marginBottom:"1.25rem",display:"flex",alignItems:"flex-start",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
+        <div style={{maxWidth:1400,margin:"0 auto",padding:"2rem 1.5rem"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",flexWrap:"wrap",gap:10,marginBottom:"1.5rem"}}>
             <div>
               <h1 style={{fontSize:22,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 4px",color:"var(--color-text-primary)"}}>Knockout Stage</h1>
-              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 6px"}}>R32 pairings built from your group picks using FIFA's official Annex C. Tap a team to pick the winner — cascades automatically.</p>
-              <div style={{display:"flex",gap:10,fontSize:11,flexWrap:"wrap"}}>
+              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 6px"}}>Pick the winner of every match. Your picks cascade automatically to the next round.</p>
+              <div style={{display:"flex",gap:12,fontSize:11,alignItems:"center",flexWrap:"wrap"}}>
                 <span style={{color:C.blue}}>🔵 Tap to pick winner</span>
-                <span style={{color:"#c026d3"}}>★ dark horse (bonus pts)</span>
-                <span style={{color:C.gold,fontFamily:"monospace"}}>{koPicked}/31 picks</span>
+                <span style={{color:"#c026d3"}}>★ dark horse bonus</span>
+                <span style={{fontFamily:"monospace",color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>{koPicked}/31 picks</span>
               </div>
             </div>
             <button onClick={()=>setPage("predict")} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer",flexShrink:0}}>← Group stage</button>
           </div>
-          <div style={{display:"grid",gridTemplateColumns:"1.4fr 1.2fr 1fr 0.85fr 0.7fr",gap:12,alignItems:"start",minWidth:900}}>
-            <div>
-              <div style={{fontSize:10,fontWeight:600,color:C.blue,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:10,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
-                Round of 32 <span style={{fontSize:9,background:C.blueLt,color:C.blue,padding:"2px 6px",borderRadius:99}}>{Object.keys(koPicks.r32).length}/16</span>
+
+          {r32AllTBD&&(
+            <div style={{display:"flex",gap:12,padding:"14px 18px",background:C.blueLt,border:`0.5px solid ${C.blue}`,borderRadius:10,marginBottom:"1.5rem",alignItems:"center"}}>
+              <span style={{fontSize:22}}>⚽</span>
+              <div>
+                <div style={{fontSize:14,fontWeight:500,color:C.blue,marginBottom:2}}>Fill in your group stage picks first</div>
+                <div style={{fontSize:13,color:"var(--color-text-secondary)"}}>Your R32 pairings are built automatically from your group predictions using FIFA's official Annex C bracket logic.</div>
               </div>
-              {r32Bracket.map((match,i)=><MatchCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} matchLabel={`M${match.matchId}`} slim={true}/>)}
+              <button onClick={()=>setPage("predict")} style={{marginLeft:"auto",padding:"8px 16px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>Go to Group Stage →</button>
             </div>
-            <div style={{paddingTop:"0.8rem"}}>
-              <div style={{fontSize:10,fontWeight:600,color:C.blue,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:10,textAlign:"center"}}>Round of 16 <span style={{fontSize:9,background:C.blueLt,color:C.blue,padding:"2px 6px",borderRadius:99}}>{Object.keys(koPicks.r16).length}/8</span></div>
-              {r16Matchups.map((m,i)=><div key={i} style={{marginBottom:"0.5rem"}}><MatchCard home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} matchLabel={`R16 M${i+1}`}/></div>)}
+          )}
+
+          {/* R32 Grid */}
+          <div style={{marginBottom:"1.5rem"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"0.75rem"}}>
+              <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em"}}>Round of 32</span>
+              <span style={{fontSize:11,fontFamily:"monospace",color:C.blue,background:C.blueLt,padding:"2px 8px",borderRadius:99}}>{Object.keys(koPicks.r32).length}/16</span>
             </div>
-            <div style={{paddingTop:"3.5rem"}}>
-              <div style={{fontSize:10,fontWeight:600,color:C.blue,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:10,textAlign:"center"}}>Quarter-finals <span style={{fontSize:9,background:C.blueLt,color:C.blue,padding:"2px 6px",borderRadius:99}}>{Object.keys(koPicks.qf).length}/4</span></div>
-              {qfMatchups.map((m,i)=><div key={i} style={{marginBottom:"1.25rem"}}><MatchCard home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} matchLabel={`QF ${i+1}`}/></div>)}
-            </div>
-            <div style={{paddingTop:"8rem"}}>
-              <div style={{fontSize:10,fontWeight:600,color:C.blue,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:10,textAlign:"center"}}>Semi-finals <span style={{fontSize:9,background:C.blueLt,color:C.blue,padding:"2px 6px",borderRadius:99}}>{Object.keys(koPicks.sf).length}/2</span></div>
-              {sfMatchups.map((m,i)=><div key={i} style={{marginBottom:"3rem"}}><MatchCard home={m.home} away={m.away} picked={koPicks.sf[i]} onPick={t=>pickKO("sf",i,t)} matchLabel={`SF ${i+1}`}/></div>)}
-            </div>
-            <div style={{paddingTop:"18rem"}}>
-              <div style={{fontSize:10,fontWeight:600,color:C.gold,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:10,textAlign:"center"}}>Final</div>
-              <MatchCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} matchLabel="Final"/>
-              {champion!=="TBD"&&(
-                <div style={{marginTop:12,padding:"14px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:10,textAlign:"center"}}>
-                  <div style={{fontSize:22,marginBottom:4}}>🏆</div>
-                  <div style={{fontSize:11,color:"#7a5c10",marginBottom:6}}>Your champion</div>
-                  <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
-                    <span style={{fontSize:24}}>{FLAGS[champion]||"❓"}</span>
-                    <span style={{fontSize:15,fontWeight:600,color:"#7a5c10"}}>{champion}</span>
-                  </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+              {[0,1,2,3].map(col=>(
+                <div key={col} style={{display:"flex",flexDirection:"column",gap:5}}>
+                  {r32Bracket.slice(col*4,(col+1)*4).map((match,j)=>{
+                    const i=col*4+j;
+                    return <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`M${match.matchId}`}/>;
+                  })}
                 </div>
-              )}
+              ))}
             </div>
           </div>
-          <p style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:"1.5rem"}}>★ dark horse — non-seeded team. QF +3 / SF +5 / Final +8 bonus pts. R32 pairings use FIFA's official Annex C.</p>
+
+          <div style={{borderTop:"0.5px solid var(--color-border-tertiary)",marginBottom:"1.5rem"}}/>
+
+          {/* Centre-out bracket R16 → Final */}
+          <div style={{overflowX:"auto",paddingBottom:8}}>
+            <div style={{display:"flex",alignItems:"stretch",minWidth:900,gap:0}}>
+
+              {/* LEFT R16 */}
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0}}>
+                <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Round of 16</div>
+                {r16Matchups.slice(0,4).map((m,i)=>(
+                  <KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={`R16 ${i+1}`}/>
+                ))}
+              </div>
+
+              <div style={{width:14,flexShrink:0,display:"flex",flexDirection:"column",justifyContent:"space-around",padding:"18px 0"}}>
+                {[0,1,2,3].map(i=><div key={i} style={{height:1,background:"var(--color-border-tertiary)"}}/>)}
+              </div>
+
+              {/* LEFT QF */}
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0,padding:"22px 0"}}>
+                <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Quarter-finals</div>
+                {qfMatchups.slice(0,2).map((m,i)=>(
+                  <KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={`QF ${i+1}`}/>
+                ))}
+              </div>
+
+              <div style={{width:14,flexShrink:0,display:"flex",flexDirection:"column",justifyContent:"space-around",padding:"60px 0"}}>
+                {[0,1].map(i=><div key={i} style={{height:1,background:"var(--color-border-tertiary)"}}/>)}
+              </div>
+
+              {/* LEFT SF */}
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:132,flexShrink:0,padding:"80px 0"}}>
+                <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
+                <KOCard home={sfMatchups[0]?.home||"TBD"} away={sfMatchups[0]?.away||"TBD"} picked={koPicks.sf[0]} onPick={t=>pickKO("sf",0,t)} label="SF 1"/>
+              </div>
+
+              <div style={{width:14,flexShrink:0,display:"flex",alignItems:"center"}}>
+                <div style={{height:1,width:"100%",background:"var(--color-border-tertiary)"}}/>
+              </div>
+
+              {/* FINAL */}
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",width:144,flexShrink:0,gap:8}}>
+                <div style={{fontSize:10,fontWeight:500,color:C.gold,textTransform:"uppercase",letterSpacing:"0.06em"}}>Final</div>
+                <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true}/>
+                {champion!=="TBD"&&(
+                  <div style={{padding:"10px 12px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:8,textAlign:"center",width:"100%"}}>
+                    <div style={{fontSize:18,marginBottom:2}}>🏆</div>
+                    <div style={{fontSize:11,color:"#7a5c10",fontWeight:500}}>{champion}</div>
+                  </div>
+                )}
+              </div>
+
+              <div style={{width:14,flexShrink:0,display:"flex",alignItems:"center"}}>
+                <div style={{height:1,width:"100%",background:"var(--color-border-tertiary)"}}/>
+              </div>
+
+              {/* RIGHT SF */}
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:132,flexShrink:0,padding:"80px 0"}}>
+                <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
+                <KOCard home={sfMatchups[1]?.home||"TBD"} away={sfMatchups[1]?.away||"TBD"} picked={koPicks.sf[1]} onPick={t=>pickKO("sf",1,t)} label="SF 2"/>
+              </div>
+
+              <div style={{width:14,flexShrink:0,display:"flex",flexDirection:"column",justifyContent:"space-around",padding:"60px 0"}}>
+                {[0,1].map(i=><div key={i} style={{height:1,background:"var(--color-border-tertiary)"}}/>)}
+              </div>
+
+              {/* RIGHT QF */}
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0,padding:"22px 0"}}>
+                <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Quarter-finals</div>
+                {qfMatchups.slice(2,4).map((m,i)=>(
+                  <KOCard key={i+2} home={m.home} away={m.away} picked={koPicks.qf[i+2]} onPick={t=>pickKO("qf",i+2,t)} label={`QF ${i+3}`}/>
+                ))}
+              </div>
+
+              <div style={{width:14,flexShrink:0,display:"flex",flexDirection:"column",justifyContent:"space-around",padding:"18px 0"}}>
+                {[0,1,2,3].map(i=><div key={i} style={{height:1,background:"var(--color-border-tertiary)"}}/>)}
+              </div>
+
+              {/* RIGHT R16 */}
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0}}>
+                <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Round of 16</div>
+                {r16Matchups.slice(4,8).map((m,i)=>(
+                  <KOCard key={i+4} home={m.home} away={m.away} picked={koPicks.r16[i+4]} onPick={t=>pickKO("r16",i+4,t)} label={`R16 ${i+5}`}/>
+                ))}
+              </div>
+
+            </div>
+          </div>
+          <p style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:"1.5rem"}}>★ dark horse — non-seeded team advancing earns bonus pts: QF +3, SF +5, Final +8. R32 pairings use FIFA's official Annex C.</p>
         </div>
       )}
 
+      {/* ══ BONUSES ══ */}
       {page==="bonuses"&&(
         <div style={{maxWidth:660,margin:"0 auto",padding:"2rem 1.5rem"}}>
           <h1 style={{fontSize:22,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 4px",color:"var(--color-text-primary)"}}>Bonus Picks</h1>
           <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1.25rem"}}>Strategic extras on top of your match predictions. All editable until June 11.</p>
           <LockBanner/>
+
+          {/* Double-down */}
           <div style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${C.gold}`,borderRadius:"0 12px 12px 0"}}>
             <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <div>
-                <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Double-down picks</span>
+                <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Double-down</span>
                 <span style={{fontSize:12,color:"var(--color-text-secondary)",marginLeft:8}}>×2 on one match per matchday · 3 total · no seeded teams</span>
               </div>
               <span style={{fontSize:11,fontWeight:500,color:doublesSelected===3?C.green:C.gold,flexShrink:0,marginLeft:8}}>{doublesSelected}/3{doublesSelected===3?" ✓":""}</span>
@@ -1328,13 +1451,15 @@ export default function App(){
                 return(<div key={rk} style={{marginBottom:"1.25rem"}}>
                   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
                     <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.04em"}}>Matchday {ri+1}</span>
-                    {val?<span style={{fontSize:11,color:C.gold,fontWeight:500}}>⚡ Double selected</span>:<span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>No selection yet</span>}
+                    {val?<span style={{fontSize:11,color:C.gold,fontWeight:500}}>⚡ Selected</span>:<span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>No selection yet</span>}
                   </div>
                   <div style={{display:"flex",flexDirection:"column",gap:5,maxHeight:220,overflowY:"auto"}}>
                     {eligible.slice(0,8).map(m=>{
                       const mid=`${m.g}-${m.idx}`;const sel=val===mid;const other=val&&val!==mid;
                       return(<button key={mid} onClick={()=>setDouble(rk,m.g,m.idx)} disabled={!!other}
-                        style={{padding:"9px 12px",border:`0.5px solid ${sel?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,background:sel?C.goldLt:"var(--color-background-secondary)",cursor:other?"not-allowed":"pointer",display:"flex",alignItems:"center",gap:10,opacity:other?0.4:1,textAlign:"left"}}>
+                        style={{padding:"9px 12px",border:`0.5px solid ${sel?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,
+                          background:sel?C.goldLt:"var(--color-background-secondary)",cursor:other?"not-allowed":"pointer",
+                          display:"flex",alignItems:"center",gap:10,opacity:other?0.4:1,textAlign:"left"}}>
                         <span style={{fontSize:16}}>{FLAGS[m.home]||"❓"}</span>
                         <span style={{fontSize:13,color:"var(--color-text-primary)",flex:1,fontWeight:500}}>{m.home}</span>
                         {m.homeScore&&m.awayScore?<span style={{fontSize:12,fontFamily:"monospace",color:"var(--color-text-secondary)"}}>{m.homeScore}–{m.awayScore}</span>:null}
@@ -1350,108 +1475,94 @@ export default function App(){
             </div>
           </div>
 
-          <div style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${C.purple}`,borderRadius:"0 12px 12px 0"}}>
-            <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Golden Match</span>
-              <span style={{fontSize:11,color:C.purple,background:C.purpleLt,padding:"2px 8px",borderRadius:99}}>R16 only · ×2</span>
-            </div>
-            <div style={{padding:"1rem 16px"}}>
-              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick one Round of 16 match where your advancing team prediction earns double points.</p>
-              {!goldenMatchLocked?(
-                <div>
-                  <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:12}}>
-                    {r16Matchups.map((m,i)=>{const sel=goldenMatch===String(i);return(
-                      <button key={i} onClick={()=>setGoldenMatch(sel?null:String(i))}
-                        style={{padding:"10px 14px",border:`0.5px solid ${sel?C.purple:"var(--color-border-tertiary)"}`,borderRadius:8,background:sel?C.purpleLt:"var(--color-background-secondary)",cursor:"pointer",display:"flex",alignItems:"center",gap:10,textAlign:"left"}}>
-                        <span style={{fontSize:18}}>{FLAGS[m.home]||"❓"}</span>
-                        <span style={{fontSize:13,color:"var(--color-text-primary)",flex:1,fontWeight:500}}>{m.home}</span>
-                        <span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>vs</span>
-                        <span style={{fontSize:13,color:"var(--color-text-primary)",flex:1,textAlign:"right",fontWeight:500}}>{m.away}</span>
-                        <span style={{fontSize:18}}>{FLAGS[m.away]||"❓"}</span>
-                        {sel&&<span style={{fontSize:12,fontWeight:600,color:C.purple,marginLeft:4}}>⚡</span>}
-                      </button>);})}
-                    {r16Matchups.every(m=>m.home==="TBD")&&<p style={{fontSize:13,color:"var(--color-text-tertiary)",margin:0}}>Complete group stage and R32 picks first.</p>}
-                  </div>
-                  <button onClick={()=>goldenMatch&&setGoldenMatchLocked(true)} disabled={!goldenMatch}
-                    style={{width:"100%",padding:"11px",background:goldenMatch?C.purple:"var(--color-background-secondary)",color:goldenMatch?"#fff":"var(--color-text-tertiary)",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:goldenMatch?"pointer":"not-allowed"}}>Lock in golden match →</button>
-                </div>
-              ):(
-                <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:C.purpleLt,border:"0.5px solid #c4b5fd",borderRadius:10}}>
-                  <span style={{fontSize:20}}>⚡</span>
-                  <div><div style={{fontSize:13,fontWeight:500,color:"#4c1d95"}}>{r16Matchups[parseInt(goldenMatch)]?.home} vs {r16Matchups[parseInt(goldenMatch)]?.away}</div><div style={{fontSize:11,color:C.purple}}>Advancing team worth double</div></div>
-                  <button onClick={()=>setGoldenMatchLocked(false)} style={{marginLeft:"auto",padding:"4px 10px",background:"none",border:"0.5px solid #c4b5fd",borderRadius:6,fontSize:11,color:C.purple,cursor:"pointer"}}>Change</button>
-                </div>
-              )}
-            </div>
-          </div>
-
+          {/* Golden Boot */}
           <div style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${C.green}`,borderRadius:"0 12px 12px 0"}}>
             <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Golden Boot</span>
               <span style={{fontSize:11,color:C.green,background:C.greenLt,padding:"2px 8px",borderRadius:99}}>12 pts if correct</span>
             </div>
             <div style={{padding:"1rem 16px"}}>
-              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top scorer. Editable until June 11.</p>
+              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top scorer.</p>
               <PlayerSearch search={bootSearch} setSearch={setBootSearch} pick={goldenBootPick} setPick={setGoldenBootPick} filtered={filteredBoot} label="Player" pts={12} color={C.green} locked={goldenBootLocked} setLocked={setGoldenBootLocked} emoji="⚽"/>
             </div>
           </div>
 
+          {/* Top Assist */}
           <div style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${C.blue}`,borderRadius:"0 12px 12px 0"}}>
             <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Top Assist</span>
               <span style={{fontSize:11,color:C.blue,background:C.blueLt,padding:"2px 8px",borderRadius:99}}>8 pts if correct</span>
             </div>
             <div style={{padding:"1rem 16px"}}>
-              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top assist provider. Editable until June 11.</p>
+              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top assist provider.</p>
               <PlayerSearch search={assistSearch} setSearch={setAssistSearch} pick={topAssistPick} setPick={setTopAssistPick} filtered={filteredAssist} label="Player" pts={8} color={C.blue} locked={topAssistLocked} setLocked={setTopAssistLocked} emoji="🎯"/>
             </div>
           </div>
 
+          {/* Golden Glove */}
           <div style={{...card,borderLeft:`3px solid ${C.gold}`,borderRadius:"0 12px 12px 0"}}>
             <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Golden Glove</span>
               <span style={{fontSize:11,color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>8 pts if correct</span>
             </div>
             <div style={{padding:"1rem 16px"}}>
-              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's best goalkeeper. Editable until June 11.</p>
+              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's best goalkeeper.</p>
               <PlayerSearch search={gloveSearch} setSearch={setGloveSearch} pick={goldenGlovePick} setPick={setGoldenGlovePick} filtered={filteredGlove} label="Goalkeeper" pts={8} color={C.gold} locked={goldenGloveLocked} setLocked={setGoldenGloveLocked} emoji="🧤"/>
             </div>
           </div>
         </div>
       )}
 
+      {/* ══ LEAGUE ══ */}
       {page==="league"&&(
         <div style={{maxWidth:660,margin:"0 auto",padding:"2rem 1.5rem"}}>
           <h1 style={{fontSize:22,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 0.25rem",color:"var(--color-text-primary)"}}>My Leagues</h1>
-          <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1.5rem"}}>Your rankings across all leagues.</p>
+          <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1.5rem"}}>Compete with friends and the world.</p>
+
+          {/* Step tabs */}
           <div style={{display:"flex",background:"var(--color-background-secondary)",borderRadius:10,padding:4,marginBottom:"1.5rem"}}>
-            {["overview","join","create"].map(tab=>(<button key={tab} onClick={()=>{setLeagueTab(tab);setActiveLeague(null);}}
-              style={{flex:1,padding:"8px 12px",border:"none",borderRadius:7,background:leagueTab===tab&&!activeLeague?"var(--color-background-primary)":"transparent",color:leagueTab===tab&&!activeLeague?"var(--color-text-primary)":"var(--color-text-secondary)",fontWeight:leagueTab===tab&&!activeLeague?500:400,fontSize:13,cursor:"pointer"}}>
-              {tab==="overview"?"My Leagues":tab==="join"?"Join":"Create"}
+            {["overview","join","create"].map(tab=>(<button key={tab} onClick={()=>{setLeagueStep(tab);setActiveLeague(null);setViewingUser(null);}}
+              style={{flex:1,padding:"8px 12px",border:"none",borderRadius:7,
+                background:leagueStep===tab&&!activeLeague?"var(--color-background-primary)":"transparent",
+                color:leagueStep===tab&&!activeLeague?"var(--color-text-primary)":"var(--color-text-secondary)",
+                fontWeight:leagueStep===tab&&!activeLeague?500:400,fontSize:13,cursor:"pointer"}}>
+              {tab==="overview"?"My Leagues":tab==="join"?"Join a league":"Create a league"}
             </button>))}
           </div>
-          {activeLeague?(
+
+          {/* Viewing another user's predictions */}
+          {viewingUser&&(
             <div>
-              <button onClick={()=>setActiveLeague(null)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← Back</button>
+              <button onClick={()=>setViewingUser(null)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← Back to league</button>
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem"}}>
-                <div style={{flex:1}}><div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)"}}>{activeLeague.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{activeLeague.members?.toLocaleString()} members</div></div>
-                {activeLeague.code&&<span style={{fontFamily:"monospace",fontSize:11,color:"var(--color-text-tertiary)",background:"var(--color-background-secondary)",padding:"5px 10px",borderRadius:99,border:"0.5px solid var(--color-border-tertiary)"}}>{activeLeague.code}</span>}
+                <div style={{width:38,height:38,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:700,color:"#fff"}}>{viewingUser.avatar}</div>
+                <div><div style={{fontSize:16,fontWeight:500,color:"var(--color-text-primary)"}}>{viewingUser.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{viewingUser.handle} · {viewingUser.picks.groupDone}/72 group picks</div></div>
               </div>
               <div style={card}>
-                {leagueMembers.map((m,i)=>(
-                  <div key={i} style={{padding:"12px 16px",borderBottom:i<leagueMembers.length-1?"0.5px solid var(--color-border-tertiary)":"none",display:"grid",gridTemplateColumns:"2.5rem 1fr auto",gap:10,alignItems:"center",background:m.name===(user?.name||"You")?C.blueLt:"transparent"}}>
-                    <span style={{fontSize:13,fontWeight:600,color:i<3?C.blue:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{i===0?"🥇":i===1?"🥈":i===2?"🥉":i+1}</span>
-                    <div style={{display:"flex",alignItems:"center",gap:8}}>
-                      <div style={{width:30,height:30,borderRadius:"50%",background:[C.blue,C.red,C.green,C.gold,C.purple][i%5],display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:600,color:"#fff"}}>{m.avatar}</div>
-                      <div><div style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>{m.name}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>{m.handle}</div></div>
-                    </div>
-                    <span style={{fontFamily:"monospace",fontWeight:600,fontSize:15,color:"var(--color-text-primary)"}}>{m.pts}</span>
-                  </div>
-                ))}
+                <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)"}}><span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Tournament champion pick</span></div>
+                <div style={{padding:"1rem 16px",display:"flex",alignItems:"center",gap:12}}>
+                  <span style={{fontSize:28}}>{FLAGS[viewingUser.picks.champion]||"❓"}</span>
+                  <div><div style={{fontSize:16,fontWeight:500,color:"var(--color-text-primary)"}}>{viewingUser.picks.champion||"Not picked yet"}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>Champion prediction</div></div>
+                </div>
               </div>
+              <p style={{fontSize:12,color:"var(--color-text-tertiary)",marginTop:"1rem"}}>Full prediction visibility unlocks after tournament kickoff on June 11.</p>
             </div>
-          ):leagueTab==="overview"?(
+          )}
+
+          {/* League overview */}
+          {!viewingUser&&!activeLeague&&leagueStep==="overview"&&(
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {joinedLeagues.length===0&&(
+                <div style={{padding:"2rem",textAlign:"center",background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:12}}>
+                  <div style={{fontSize:28,marginBottom:8}}>🏆</div>
+                  <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)",marginBottom:4}}>No leagues yet</div>
+                  <div style={{fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem"}}>Create a private league or join one with an invite code.</div>
+                  <div style={{display:"flex",gap:8,justifyContent:"center"}}>
+                    <button onClick={()=>setLeagueStep("create")} style={{padding:"9px 18px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer"}}>Create a league</button>
+                    <button onClick={()=>setLeagueStep("join")} style={{padding:"9px 18px",background:"var(--color-background-secondary)",color:"var(--color-text-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer"}}>Join with code</button>
+                  </div>
+                </div>
+              )}
               {joinedLeagues.map(league=>(<button key={league.id} onClick={()=>setActiveLeague(league)}
                 style={{...card,padding:"14px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12,width:"100%",background:"var(--color-background-primary)"}}>
                 <div style={{width:38,height:38,borderRadius:9,background:league.id==="global"?C.blueLt:C.purpleLt,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{league.id==="global"?"🌍":"🏆"}</div>
@@ -1459,44 +1570,101 @@ export default function App(){
                 <div style={{textAlign:"right",flexShrink:0}}><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Your rank</div><div style={{fontSize:18,fontWeight:600,color:C.blue,fontFamily:"monospace"}}>#{league.rank||1}</div></div>
                 <span style={{color:"var(--color-text-tertiary)",fontSize:18}}>›</span>
               </button>))}
-              <button onClick={()=>setLeagueTab("join")} style={{padding:"12px",border:"0.5px dashed var(--color-border-tertiary)",borderRadius:12,background:"transparent",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)"}}>+ Join another league</button>
+              {joinedLeagues.length>0&&<button onClick={()=>setLeagueStep("join")} style={{padding:"12px",border:"0.5px dashed var(--color-border-tertiary)",borderRadius:12,background:"transparent",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)"}}>+ Join another league</button>}
             </div>
-          ):leagueTab==="join"?(
-            <div style={{...card,padding:"1.5rem",overflow:"visible"}}>
-              <h2 style={{fontSize:15,fontWeight:500,margin:"0 0 0.75rem",color:"var(--color-text-primary)"}}>Enter invite code</h2>
-              <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Ask your league admin — looks like <code style={{fontFamily:"monospace",fontSize:12,background:"var(--color-background-secondary)",padding:"2px 6px",borderRadius:4}}>MND26-XXXXX</code></p>
-              <input value={leagueCode} onChange={e=>setLeagueCode(e.target.value.toUpperCase())} placeholder="MND26-XXXXX" style={{...inp,fontFamily:"monospace",letterSpacing:"0.05em",marginBottom:10}}/>
-              <button onClick={()=>{if(leagueCode.startsWith("MND26-")){const nl={id:leagueCode,name:"Friends League",members:12,rank:3,code:leagueCode};setJoinedLeagues(p=>[...p,nl]);setActiveLeague(nl);setLeagueTab("overview");}}}
-                style={{width:"100%",padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:"pointer"}}>Join league →</button>
-            </div>
-          ):(
-            <div style={{...card,padding:"1.5rem",overflow:"visible"}}>
-              <h2 style={{fontSize:15,fontWeight:500,margin:"0 0 0.75rem",color:"var(--color-text-primary)"}}>Your league code</h2>
-              <div style={{display:"flex",alignItems:"center",gap:10,background:"var(--color-background-secondary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:10,padding:"14px 16px",marginBottom:12}}>
-                <span style={{flex:1,fontFamily:"monospace",fontSize:18,fontWeight:500,letterSpacing:"0.08em",color:"var(--color-text-primary)"}}>{createdCode}</span>
-                <button onClick={()=>navigator.clipboard?.writeText(createdCode)} style={{padding:"6px 12px",background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:12,cursor:"pointer",color:"var(--color-text-secondary)"}}>Copy</button>
+          )}
+
+          {/* League detail + member predictions */}
+          {!viewingUser&&activeLeague&&(
+            <div>
+              <button onClick={()=>setActiveLeague(null)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← My leagues</button>
+              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem"}}>
+                <div style={{flex:1}}><div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)"}}>{activeLeague.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{activeLeague.members?.toLocaleString()} members</div></div>
+                {activeLeague.code&&<span style={{fontFamily:"monospace",fontSize:11,color:"var(--color-text-tertiary)",background:"var(--color-background-secondary)",padding:"5px 10px",borderRadius:99,border:"0.5px solid var(--color-border-tertiary)"}}>{activeLeague.code}</span>}
               </div>
-              <button onClick={()=>{const nl={id:createdCode,name:"My Mundialist League",members:1,rank:1,code:createdCode};setJoinedLeagues(p=>[...p,nl]);setActiveLeague(nl);setLeagueTab("overview");}}
-                style={{width:"100%",padding:"11px",background:"var(--color-background-secondary)",color:"var(--color-text-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,fontSize:14,fontWeight:500,cursor:"pointer"}}>Go to my league →</button>
+              <div style={card}>
+                <div style={{padding:"10px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",gap:12}}>
+                  <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",flex:1}}>Player</span>
+                  <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:60,textAlign:"center"}}>Pts</span>
+                  <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:80,textAlign:"center"}}>Champion</span>
+                  <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:50,textAlign:"center"}}>Picks</span>
+                </div>
+                {leagueMembers.map((m,i)=>(
+                  <div key={i} onClick={()=>setViewingUser(m)}
+                    style={{padding:"12px 16px",borderBottom:i<leagueMembers.length-1?"0.5px solid var(--color-border-tertiary)":"none",
+                      display:"flex",alignItems:"center",gap:12,cursor:"pointer",
+                      background:m.name===(user?.name||"You")?C.blueLt:"transparent"}}>
+                    <span style={{fontSize:13,fontWeight:600,color:i<3?C.blue:"var(--color-text-tertiary)",fontFamily:"monospace",width:24,flexShrink:0}}>{i===0?"🥇":i===1?"🥈":i===2?"🥉":i+1}</span>
+                    <div style={{display:"flex",alignItems:"center",gap:8,flex:1}}>
+                      <div style={{width:28,height:28,borderRadius:"50%",background:[C.blue,C.red,C.green,C.gold,C.purple][i%5],display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:600,color:"#fff"}}>{m.avatar}</div>
+                      <div><div style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>{m.name}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>{m.handle}</div></div>
+                    </div>
+                    <span style={{fontFamily:"monospace",fontWeight:600,fontSize:14,color:"var(--color-text-primary)",width:60,textAlign:"center"}}>{m.pts}</span>
+                    <div style={{width:80,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+                      <span style={{fontSize:16}}>{FLAGS[m.picks.champion]||"❓"}</span>
+                      <span style={{fontSize:10,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:50}}>{m.picks.champion||"—"}</span>
+                    </div>
+                    <span style={{fontSize:11,color:"var(--color-text-tertiary)",fontFamily:"monospace",width:50,textAlign:"center"}}>{m.picks.groupDone}/72</span>
+                  </div>
+                ))}
+              </div>
+              <p style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:"0.75rem"}}>Tap any player to see their champion pick. Full predictions visible after June 11.</p>
+            </div>
+          )}
+
+          {/* Step: Join */}
+          {!viewingUser&&!activeLeague&&leagueStep==="join"&&(
+            <div style={{...card,padding:"1.5rem",overflow:"visible"}}>
+              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem"}}>
+                <div style={{width:36,height:36,borderRadius:9,background:C.blueLt,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🔑</div>
+                <div><div style={{fontSize:15,fontWeight:500,color:"var(--color-text-primary)"}}>Join a league</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>Enter the invite code from your league admin</div></div>
+              </div>
+              <input value={leagueCode} onChange={e=>setLeagueCode(e.target.value.toUpperCase())} placeholder="MND26-XXXXX"
+                style={{...inp,fontFamily:"monospace",letterSpacing:"0.05em",marginBottom:10}}/>
+              <button onClick={()=>{
+                if(leagueCode.startsWith("MND26-")){
+                  const nl={id:leagueCode,name:"Friends League",members:12,rank:3,code:leagueCode};
+                  setJoinedLeagues(p=>[...p.filter(l=>l.id!==leagueCode),nl]);
+                  setActiveLeague(nl);setLeagueStep("overview");
+                }
+              }} style={{width:"100%",padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:"pointer"}}>Join league →</button>
+            </div>
+          )}
+
+          {/* Step: Create */}
+          {!viewingUser&&!activeLeague&&leagueStep==="create"&&(
+            <div style={{...card,padding:"1.5rem",overflow:"visible"}}>
+              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem"}}>
+                <div style={{width:36,height:36,borderRadius:9,background:C.purpleLt,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🏆</div>
+                <div><div style={{fontSize:15,fontWeight:500,color:"var(--color-text-primary)"}}>Create a league</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>Share the code with your friends to invite them</div></div>
+              </div>
+              <div style={{marginBottom:10}}>
+                <label style={{fontSize:11,color:"var(--color-text-secondary)",display:"block",marginBottom:4}}>League name</label>
+                <input value={leagueName} onChange={e=>setLeagueName(e.target.value)} placeholder="e.g. Office Predictor 2026"
+                  style={{...inp,marginBottom:0}}/>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:10,background:"var(--color-background-secondary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:10,padding:"12px 14px",marginBottom:12}}>
+                <span style={{flex:1,fontFamily:"monospace",fontSize:16,fontWeight:500,letterSpacing:"0.08em",color:"var(--color-text-primary)"}}>{createdCode}</span>
+                <button onClick={()=>navigator.clipboard?.writeText(createdCode)} style={{padding:"5px 10px",background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:12,cursor:"pointer",color:"var(--color-text-secondary)"}}>Copy</button>
+              </div>
+              <button onClick={()=>{
+                const nl={id:createdCode,name:leagueName||"My Mundialist League",members:1,rank:1,code:createdCode};
+                setJoinedLeagues(p=>[...p.filter(l=>l.id!==createdCode),nl]);
+                setActiveLeague(nl);setLeagueStep("overview");
+              }} style={{width:"100%",padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:"pointer"}}>Create & go to league →</button>
             </div>
           )}
         </div>
       )}
 
+      {/* ══ INSTRUCTIONS ══ */}
       {page==="points"&&(
         <div style={{maxWidth:640,margin:"0 auto",padding:"2rem 1.5rem"}}>
           <h1 style={{fontSize:22,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 0.25rem",color:"var(--color-text-primary)"}}>How to Play</h1>
           <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1.25rem"}}>Everything you need to know about scoring and bonuses.</p>
           <LockBanner/>
           {[
-            {title:"Pre-tournament picks",accent:C.gold,items:[
-              {label:"Double-down",note:"×2 on chosen match · one per matchday · 3 total · no seeded teams",val:"×2",c:C.gold},
-              {label:"Golden Match",note:"×2 on chosen R16 advancing team · one pick only",val:"×2",c:C.purple},
-              {label:"Golden Boot — correct top scorer",note:"Editable until June 11",val:"12 pts",c:C.green},
-              {label:"Top Assist — correct top assist provider",note:"Editable until June 11",val:"8 pts",c:C.blue},
-              {label:"Golden Glove — correct best goalkeeper",note:"Editable until June 11",val:"8 pts",c:C.gold},
-            ]},
-            {title:"Group stage — match scores",accent:C.blue,items:[
+            {title:"Match score predictions",accent:C.blue,items:[
               {label:"Exact score",note:"e.g. predict 2–1, result 2–1",val:"10",c:C.blue},
               {label:"Correct result + correct goal difference",note:"e.g. predict 1–2, result 2–3",val:"8",c:C.blue},
               {label:"Correct draw, different score",note:"e.g. predict 1–1, result 2–2",val:"8",c:C.blue},
@@ -1508,7 +1676,7 @@ export default function App(){
               {label:"Both correct, positions swapped",val:"3",c:C.purple},
               {label:"Any other outcome",val:"0",c:"#888"},
             ]},
-            {title:"Knockout stage — all rounds",accent:C.green,note:"Points accumulate. A correct champion pick earns 15+16+18+20+25 = 94 pts total. R32 pairings follow FIFA's Annex C logic.",items:[
+            {title:"Knockout stage",accent:C.green,note:"Points accumulate — a correct champion pick earns 15+16+18+20+25 = 94 pts total.",items:[
               {label:"R32 correct advancing team",val:"15",c:C.green},
               {label:"R16 correct advancing team",val:"16",c:C.green},
               {label:"QF correct advancing team",val:"18",c:C.green},
@@ -1517,10 +1685,16 @@ export default function App(){
               {label:"Runner-up",val:"18",c:C.green},
               {label:"Third place",val:"12",c:C.green},
             ]},
-            {title:"Dark horse bonus",accent:C.red,note:"On top of normal knockout pts. Only if you predicted that team to reach that round.",items:[
-              {label:"Non-seeded team correctly predicted to reach QF",val:"+3",c:C.red},
-              {label:"Non-seeded team correctly predicted to reach SF",val:"+5",c:C.red},
-              {label:"Non-seeded team correctly predicted to reach Final",val:"+8",c:C.red},
+            {title:"Dark horse bonus",accent:C.red,note:"On top of normal knockout pts. Non-seeded team = not one of the 12 group leaders.",items:[
+              {label:"Non-seeded team reaches QF",val:"+3",c:C.red},
+              {label:"Non-seeded team reaches SF",val:"+5",c:C.red},
+              {label:"Non-seeded team reaches Final",val:"+8",c:C.red},
+            ]},
+            {title:"Bonus picks",accent:C.gold,items:[
+              {label:"Double-down",note:"×2 on one match per matchday · 3 total · no seeded teams",val:"×2",c:C.gold},
+              {label:"Golden Boot — correct top scorer",note:"Editable until June 11",val:"12 pts",c:C.green},
+              {label:"Top Assist — correct top assist provider",note:"Editable until June 11",val:"8 pts",c:C.blue},
+              {label:"Golden Glove — correct best goalkeeper",note:"Editable until June 11",val:"8 pts",c:C.gold},
             ]},
           ].map(({title,accent,note,items})=>(
             <div key={title} style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${accent}`,borderRadius:"0 12px 12px 0"}}>
@@ -1539,8 +1713,32 @@ export default function App(){
         </div>
       )}
 
+      {/* ══ TERMS ══ */}
+      {page==="terms"&&(
+        <div style={{maxWidth:640,margin:"0 auto",padding:"2rem 1.5rem"}}>
+          <button onClick={()=>setPage("home")} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← Back</button>
+          <h1 style={{fontSize:22,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 1.5rem",color:"var(--color-text-primary)"}}>Terms & Conditions</h1>
+          {[
+            {title:"1. Service",body:"Mundialist is a free-to-play FIFA World Cup 2026 prediction game. No real money is involved."},
+            {title:"2. Eligibility",body:"Open to anyone aged 18 or over. By registering you confirm you meet this requirement."},
+            {title:"3. Your data",body:"We collect your name, username and email address to operate the game and send you prediction updates and league standings. We do not sell your data to third parties."},
+            {title:"4. Emails",body:"By creating an account you consent to receive match digest emails and league update emails from Mundialist. You can unsubscribe at any time by emailing hello@mundialist.com."},
+            {title:"5. Fair play",body:"Multiple accounts, automated submissions or any form of cheating will result in disqualification."},
+            {title:"6. Changes",body:"We may update these terms at any time. Continued use of the service constitutes acceptance."},
+            {title:"7. Contact",body:"Questions? Email hello@mundialist.com."},
+          ].map(({title,body})=>(
+            <div key={title} style={{marginBottom:"1.25rem"}}>
+              <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)",marginBottom:4}}>{title}</div>
+              <div style={{fontSize:13,color:"var(--color-text-secondary)",lineHeight:1.7}}>{body}</div>
+            </div>
+          ))}
+          <p style={{fontSize:12,color:"var(--color-text-tertiary)",marginTop:"2rem"}}>Last updated: May 2026</p>
+        </div>
+      )}
+
       </div>
 
+      {/* Footer */}
       <footer style={{marginTop:"3rem",borderTop:"0.5px solid var(--color-border-tertiary)",background:"var(--color-background-primary)"}}>
         <div style={{borderBottom:"0.5px solid var(--color-border-tertiary)",padding:"0.75rem 2rem",display:"flex",alignItems:"center",justifyContent:"center"}}>
           <div style={{width:"100%",height:52,background:"var(--color-background-secondary)",border:"0.5px dashed var(--color-border-tertiary)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -1550,11 +1748,12 @@ export default function App(){
         <div style={{maxWidth:1200,margin:"0 auto",padding:"1.25rem 2rem",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <span style={{fontSize:14,fontWeight:700,color:C.blue,letterSpacing:"-0.03em"}}>Mundialist</span>
-            <span style={{fontSize:12,color:"var(--color-text-tertiary)"}}>· FIFA World Cup 2026 · USA · Canada · Mexico</span>
+            <span style={{fontSize:12,color:"var(--color-text-tertiary)"}}>· FIFA World Cup 2026</span>
           </div>
           <div style={{display:"flex",gap:"1.5rem"}}>
             <a href="mailto:sponsor@mundialist.com" style={{fontSize:12,color:"var(--color-text-tertiary)",textDecoration:"none"}}>Sponsor us</a>
             <a href="mailto:hello@mundialist.com" style={{fontSize:12,color:"var(--color-text-tertiary)",textDecoration:"none"}}>Contact</a>
+            <button onClick={()=>setPage("terms")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"var(--color-text-tertiary)",padding:0}}>Terms</button>
           </div>
         </div>
       </footer>
