@@ -853,7 +853,7 @@ export default function App(){
   const [goldenGlovePick,setGoldenGlovePick]=useState(null);
   const [goldenGloveLocked,setGoldenGloveLocked]=useState(false);
   const [gloveSearch,setGloveSearch]=useState("");
-  const [koPicks,setKoPicks]=useState({r32:{},r16:{},qf:{},sf:{},final:{}});
+  const [koPicks,setKoPicks]=useState({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
   const [leagueStep,setLeagueStep]=useState("overview");
   const [leagueCode,setLeagueCode]=useState("");
   const [leagueName,setLeagueName]=useState("");
@@ -872,6 +872,10 @@ export default function App(){
   const qfMatchups=useMemo(()=>[0,1,2,3].map(i=>({id:i,home:koPicks.r16[i*2]||"TBD",away:koPicks.r16[i*2+1]||"TBD"})),[koPicks.r16]);
   const sfMatchups=useMemo(()=>[0,1].map(i=>({id:i,home:koPicks.qf[i*2]||"TBD",away:koPicks.qf[i*2+1]||"TBD"})),[koPicks.qf]);
   const finalMatchup=useMemo(()=>({home:koPicks.sf[0]||"TBD",away:koPicks.sf[1]||"TBD"}),[koPicks.sf]);
+  const thirdPlaceMatchup=useMemo(()=>({
+    home:sfMatchups[0]&&koPicks.sf[0]?([sfMatchups[0].home,sfMatchups[0].away].find(t=>t!==koPicks.sf[0])||"TBD"):"TBD",
+    away:sfMatchups[1]&&koPicks.sf[1]?([sfMatchups[1].home,sfMatchups[1].away].find(t=>t!==koPicks.sf[1])||"TBD"):"TBD",
+  }),[sfMatchups,koPicks.sf]);
   const champion=koPicks.final[0]||"TBD";
 
   const pickKO=(round,id,team)=>{
@@ -880,14 +884,14 @@ export default function App(){
       if(round==="r32"){u.r16={};u.qf={};u.sf={};u.final={};}
       if(round==="r16"){u.qf={};u.sf={};u.final={};}
       if(round==="qf"){u.sf={};u.final={};}
-      if(round==="sf"){u.final={};}
+      if(round==="sf"){u.final={};u.third=null;}
       return u;
     });
   };
 
   const totalPredicted=Object.values(groupMatches).flat().filter(m=>m.homeScore!==""&&m.awayScore!=="").length;
   const doublesSelected=Object.values(doubleDown).filter(Boolean).length;
-  const koPicked=Object.values(koPicks).reduce((s,r)=>s+Object.keys(r).length,0);
+  const koPicked=Object.values(koPicks).reduce((s,r)=>s+(typeof r==='string'?1:Object.keys(r).length),0);
   const adventScore=useMemo(()=>calcAdventurousness(groupMatches,allStandings),[groupMatches,allStandings]);
   const adventInfo=adventLabel(adventScore);
 
@@ -941,7 +945,7 @@ export default function App(){
             <span style={{flex:1,fontSize:10,fontWeight:picked===team?600:400,
               color:picked===team?(gold?"#7a5c10":C.blue):"var(--color-text-primary)",
               overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{team}</span>
-            {picked===team&&!SEEDED.has(team)&&team!=="TBD"&&<span style={{fontSize:8,color:"#c026d3"}}>★</span>}
+            {picked===team&&!SEEDED.has(team)&&team!=="TBD"&&<span style={{fontSize:8,color:C.gold}}>★</span>}
             {picked===team&&<span style={{fontSize:9,color:gold?"#7a5c10":C.blue,fontWeight:700}}>✓</span>}
           </div>
         ))}
@@ -1223,7 +1227,7 @@ export default function App(){
                     <div key={idx} style={{padding:"12px 18px",borderBottom:"0.5px solid var(--color-border-tertiary)",background:isMyDouble?C.goldLt:done?"#f8faff":"transparent",display:"flex",alignItems:"center",gap:14}}>
                       <div style={{flex:1,display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end"}}>
                         <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500}}>{match.home}</span>
-                        {!SEEDED.has(match.home)&&homeQualifies&&<span style={{fontSize:10,color:"#c026d3"}}>★</span>}
+                        {!SEEDED.has(match.home)&&homeQualifies&&<span style={{fontSize:10,color:C.gold}}>★</span>}
                         <span style={{fontSize:22}}>{FLAGS[match.home]||"❓"}</span>
                       </div>
                       <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
@@ -1235,7 +1239,7 @@ export default function App(){
                       </div>
                       <div style={{flex:1,display:"flex",alignItems:"center",gap:8}}>
                         <span style={{fontSize:22}}>{FLAGS[match.away]||"❓"}</span>
-                        {!SEEDED.has(match.away)&&awayQualifies&&<span style={{fontSize:10,color:"#c026d3"}}>★</span>}
+                        {!SEEDED.has(match.away)&&awayQualifies&&<span style={{fontSize:10,color:C.gold}}>★</span>}
                         <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500}}>{match.away}</span>
                       </div>
                       {!isSeeded?(
@@ -1294,7 +1298,7 @@ export default function App(){
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 6px"}}>Pick the winner of every match. Your picks cascade automatically to the next round.</p>
               <div style={{display:"flex",gap:12,fontSize:11,alignItems:"center",flexWrap:"wrap"}}>
                 <span style={{color:C.blue}}>🔵 Tap to pick winner</span>
-                <span style={{color:"#c026d3"}}>★ dark horse bonus</span>
+                <span style={{color:C.gold}}>★ dark horse bonus</span>
                 <span style={{fontFamily:"monospace",color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>{koPicked}/31 picks</span>
               </div>
             </div>
@@ -1380,6 +1384,15 @@ export default function App(){
                     <div style={{fontSize:11,color:"#7a5c10",fontWeight:500}}>{champion}</div>
                   </div>
                 )}
+                <div style={{marginTop:16,width:"100%"}}>
+                  <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>3rd place match</div>
+                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>setKoPicks(prev=>({...prev,third:t}))} label="3rd place"/>
+                  {koPicks.third&&koPicks.third!=="TBD"&&(
+                    <div style={{marginTop:4,padding:"6px 10px",background:"var(--color-background-secondary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,textAlign:"center"}}>
+                      <div style={{fontSize:10,color:"var(--color-text-secondary)"}}>🥉 {koPicks.third}</div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div style={{width:14,flexShrink:0,display:"flex",alignItems:"center"}}>
@@ -1442,10 +1455,10 @@ export default function App(){
               {["r1","r2","r3"].map((rk,ri)=>{
                 const val=doubleDown[rk];
                 const eligible=[];
-                Object.entries(GROUPS).forEach(([g])=>{
+                Object.keys(GROUPS).forEach(g=>{
                   ROUND_INDICES[ri].forEach(idx=>{
                     const m=groupMatches[g][idx];
-                    if(!SEEDED.has(m.home)&&!SEEDED.has(m.away))eligible.push({g,idx,home:m.home,away:m.away,homeScore:m.homeScore,awayScore:m.awayScore});
+                    eligible.push({g,idx,home:m.home,away:m.away,homeScore:m.homeScore,awayScore:m.awayScore,hasSeeded:SEEDED.has(m.home)||SEEDED.has(m.away)});
                   });
                 });
                 return(<div key={rk} style={{marginBottom:"1.25rem"}}>
@@ -1454,8 +1467,9 @@ export default function App(){
                     {val?<span style={{fontSize:11,color:C.gold,fontWeight:500}}>⚡ Selected</span>:<span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>No selection yet</span>}
                   </div>
                   <div style={{display:"flex",flexDirection:"column",gap:5,maxHeight:220,overflowY:"auto"}}>
-                    {eligible.slice(0,8).map(m=>{
+                    {eligible.map(m=>{
                       const mid=`${m.g}-${m.idx}`;const sel=val===mid;const other=val&&val!==mid;
+                      if(m.hasSeeded) return null;
                       return(<button key={mid} onClick={()=>setDouble(rk,m.g,m.idx)} disabled={!!other}
                         style={{padding:"9px 12px",border:`0.5px solid ${sel?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,
                           background:sel?C.goldLt:"var(--color-background-secondary)",cursor:other?"not-allowed":"pointer",
@@ -1483,7 +1497,7 @@ export default function App(){
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top scorer.</p>
-              <PlayerSearch search={bootSearch} setSearch={setBootSearch} pick={goldenBootPick} setPick={setGoldenBootPick} filtered={filteredBoot} label="Player" pts={12} color={C.green} locked={goldenBootLocked} setLocked={setGoldenBootLocked} emoji="⚽"/>
+              <PlayerSearch search={bootSearch} setSearch={setBootSearch} pick={goldenBootPick} setPick={setGoldenBootPick} filtered={filteredBoot} label="Player" pts={15} color={C.green} locked={goldenBootLocked} setLocked={setGoldenBootLocked} emoji="⚽"/>
             </div>
           </div>
 
@@ -1495,7 +1509,7 @@ export default function App(){
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top assist provider.</p>
-              <PlayerSearch search={assistSearch} setSearch={setAssistSearch} pick={topAssistPick} setPick={setTopAssistPick} filtered={filteredAssist} label="Player" pts={8} color={C.blue} locked={topAssistLocked} setLocked={setTopAssistLocked} emoji="🎯"/>
+              <PlayerSearch search={assistSearch} setSearch={setAssistSearch} pick={topAssistPick} setPick={setTopAssistPick} filtered={filteredAssist} label="Player" pts={15} color={C.blue} locked={topAssistLocked} setLocked={setTopAssistLocked} emoji="🎯"/>
             </div>
           </div>
 
@@ -1507,7 +1521,7 @@ export default function App(){
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's best goalkeeper.</p>
-              <PlayerSearch search={gloveSearch} setSearch={setGloveSearch} pick={goldenGlovePick} setPick={setGoldenGlovePick} filtered={filteredGlove} label="Goalkeeper" pts={8} color={C.gold} locked={goldenGloveLocked} setLocked={setGoldenGloveLocked} emoji="🧤"/>
+              <PlayerSearch search={gloveSearch} setSearch={setGloveSearch} pick={goldenGlovePick} setPick={setGoldenGlovePick} filtered={filteredGlove} label="Goalkeeper" pts={15} color={C.gold} locked={goldenGloveLocked} setLocked={setGoldenGloveLocked} emoji="🧤"/>
             </div>
           </div>
         </div>
@@ -1676,25 +1690,25 @@ export default function App(){
               {label:"Both correct, positions swapped",val:"3",c:C.purple},
               {label:"Any other outcome",val:"0",c:"#888"},
             ]},
-            {title:"Knockout stage",accent:C.green,note:"Points accumulate — a correct champion pick earns 15+16+18+20+25 = 94 pts total.",items:[
-              {label:"R32 correct advancing team",val:"15",c:C.green},
-              {label:"R16 correct advancing team",val:"16",c:C.green},
-              {label:"QF correct advancing team",val:"18",c:C.green},
-              {label:"SF correct advancing team",val:"20",c:C.green},
+            {title:"Knockout stage",accent:C.green,note:"Points accumulate — a correct champion pick earns 12+14+16+18+25 = 85 pts total.",items:[
+              {label:"R32 correct advancing team",val:"12",c:C.green},
+              {label:"R16 correct advancing team",val:"14",c:C.green},
+              {label:"QF correct advancing team",val:"16",c:C.green},
+              {label:"SF correct advancing team",val:"18",c:C.green},
               {label:"Tournament champion",val:"25",c:C.gold},
-              {label:"Runner-up",val:"18",c:C.green},
-              {label:"Third place",val:"12",c:C.green},
+              {label:"Runner-up",val:"20",c:C.green},
+              {label:"Third place match",val:"12",c:C.green},
             ]},
             {title:"Dark horse bonus",accent:C.red,note:"On top of normal knockout pts. Non-seeded team = not one of the 12 group leaders.",items:[
-              {label:"Non-seeded team reaches QF",val:"+3",c:C.red},
-              {label:"Non-seeded team reaches SF",val:"+5",c:C.red},
-              {label:"Non-seeded team reaches Final",val:"+8",c:C.red},
+              {label:"Non-seeded team reaches QF",val:"+5",c:C.red},
+              {label:"Non-seeded team reaches SF",val:"+10",c:C.red},
+              {label:"Non-seeded team reaches Final",val:"+15",c:C.red},
             ]},
             {title:"Bonus picks",accent:C.gold,items:[
               {label:"Double-down",note:"×2 on one match per matchday · 3 total · no seeded teams",val:"×2",c:C.gold},
-              {label:"Golden Boot — correct top scorer",note:"Editable until June 11",val:"12 pts",c:C.green},
-              {label:"Top Assist — correct top assist provider",note:"Editable until June 11",val:"8 pts",c:C.blue},
-              {label:"Golden Glove — correct best goalkeeper",note:"Editable until June 11",val:"8 pts",c:C.gold},
+              {label:"Golden Boot — correct top scorer",note:"Editable until June 11",val:"15 pts",c:C.green},
+              {label:"Top Assist — correct top assist provider",note:"Editable until June 11",val:"15 pts",c:C.blue},
+              {label:"Golden Glove — correct best goalkeeper",note:"Editable until June 11",val:"15 pts",c:C.gold},
             ]},
           ].map(({title,accent,note,items})=>(
             <div key={title} style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${accent}`,borderRadius:"0 12px 12px 0"}}>
