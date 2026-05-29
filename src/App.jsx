@@ -838,6 +838,7 @@ export default function App(){
   const [emailError,setEmailError]=useState("");
   const [agreeError,setAgreeError]=useState(false);
   const [waitlistEmail,setWaitlistEmail]=useState("");
+  const [saveStatus,setSaveStatus]=useState(null); // null | 'saving' | 'saved' | 'error'
   const [authMode,setAuthMode]=useState("signup"); // 'signup' | 'signin'
   const [authLoading,setAuthLoading]=useState(false);
   const [authError,setAuthError]=useState("");
@@ -886,12 +887,13 @@ export default function App(){
   const pickKO=(round,id,team)=>{
     setKoPicks(prev=>{
       const u={...prev,[round]:{...prev[round],[id]:team}};
-      if(round==="r32"){u.r16={};u.qf={};u.sf={};u.final={};}
+      if(round==="r32"){u.r16={};u.qf={};u.sf={};u.final={};u.third=null;}
       if(round==="r16"){u.qf={};u.sf={};u.final={};}
       if(round==="qf"){u.sf={};u.final={};}
       if(round==="sf"){u.final={};u.third=null;}
       return u;
     });
+    saveKOPick(round,id,team);
   };
 
   const totalPredicted=Object.values(groupMatches).flat().filter(m=>m.homeScore!==""&&m.awayScore!=="").length;
@@ -902,9 +904,30 @@ export default function App(){
 
   const updateScore=(group,idx,side,val)=>{
     if(val!==""&&(isNaN(val)||parseInt(val)<0||parseInt(val)>99))return;
-    setGroupMatches(prev=>{const u=[...prev[group]];u[idx]={...u[idx],[side]:val};return{...prev,[group]:u};});
+    setGroupMatches(prev=>{
+      const u=[...prev[group]];
+      u[idx]={...u[idx],[side]:val};
+      const updated={...prev,[group]:u};
+      // Auto-save when both scores are filled
+      const m=u[idx];
+      const home=side==="homeScore"?val:m.homeScore;
+      const away=side==="awayScore"?val:m.awayScore;
+      if(home!==""&&away!=="")saveGroupPick(group,idx,home,away);
+      return updated;
+    });
   };
-  const setDouble=(rk,gk,idx)=>{const id=`${gk}-${idx}`;setDoubleDown(prev=>({...prev,[rk]:prev[rk]===id?null:id}));};
+  const setDouble=(rk,gk,idx)=>{
+    const id=`${gk}-${idx}`;
+    setDoubleDown(prev=>{
+      const newVal=prev[rk]===id?null:id;
+      const updates={};
+      if(rk==="r1")updates.double_down_r1=newVal;
+      if(rk==="r2")updates.double_down_r2=newVal;
+      if(rk==="r3")updates.double_down_r3=newVal;
+      saveBonusPicks(updates);
+      return{...prev,[rk]:newVal};
+    });
+  };
   const simulateAll=()=>{setGroupMatches(simulateAllMatches(simulateStyle));setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});};
   const clearAll=()=>{
     const all={};Object.entries(GROUPS).forEach(([g,teams])=>{all[g]=generateGroupMatches(teams);});
@@ -965,6 +988,7 @@ export default function App(){
       if(profile){
         setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:data.user.id});
         setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
+        loadUserData(data.user.id);
         setPage("predict");
       }
     } catch(err){
@@ -972,6 +996,104 @@ export default function App(){
     } finally {
       setAuthLoading(false);
     }
+  };
+
+  // ── Save helpers ──────────────────────────────────────────────────────────
+  const showSaved=()=>{setSaveStatus('saved');setTimeout(()=>setSaveStatus(null),2000);};
+  const showSaving=()=>setSaveStatus('saving');
+  const showError=()=>{setSaveStatus('error');setTimeout(()=>setSaveStatus(null),3000);};
+
+  const saveGroupPick=async(group,idx,homeScore,awayScore)=>{
+    if(!user?.id)return;
+    showSaving();
+    try{
+      await supabase.from('predictions').upsert({
+        user_id:user.id,
+        match_id:`GS-${group}-${idx}`,
+        home_score:parseInt(homeScore)||0,
+        away_score:parseInt(awayScore)||0,
+        updated_at:new Date().toISOString(),
+      },{onConflict:'user_id,match_id'});
+      showSaved();
+    }catch(e){showError();}
+  };
+
+  const saveKOPick=async(round,id,team)=>{
+    if(!user?.id)return;
+    showSaving();
+    try{
+      await supabase.from('predictions').upsert({
+        user_id:user.id,
+        match_id:`KO-${round}-${id}`,
+        advancing_team:team,
+        updated_at:new Date().toISOString(),
+      },{onConflict:'user_id,match_id'});
+      showSaved();
+    }catch(e){showError();}
+  };
+
+  const saveBonusPicks=async(updates)=>{
+    if(!user?.id)return;
+    showSaving();
+    try{
+      await supabase.from('bonus_picks').upsert({
+        user_id:user.id,
+        ...updates,
+        updated_at:new Date().toISOString(),
+      },{onConflict:'user_id'});
+      showSaved();
+    }catch(e){showError();}
+  };
+
+  const saveWaitlistEmail=async(email)=>{
+    try{
+      await supabase.from('waitlist').upsert({email},{onConflict:'email'});
+    }catch(e){console.error('Waitlist save failed',e);}
+  };
+
+  // ── Load existing predictions on sign in ──────────────────────────────────
+  const loadUserData=async(userId)=>{
+    try{
+      // Load group predictions
+      const {data:preds}=await supabase.from('predictions')
+        .select('*').eq('user_id',userId);
+      if(preds?.length){
+        const newMatches={};
+        Object.entries(GROUPS).forEach(([g,teams])=>{
+          newMatches[g]=generateGroupMatches(teams);
+        });
+        const newKO={r32:{},r16:{},qf:{},sf:{},final:{},third:null};
+        preds.forEach(p=>{
+          if(p.match_id?.startsWith('GS-')){
+            const [,g,idx]=p.match_id.split('-');
+            if(newMatches[g]?.[parseInt(idx)]){
+              newMatches[g][parseInt(idx)].homeScore=String(p.home_score??'');
+              newMatches[g][parseInt(idx)].awayScore=String(p.away_score??'');
+            }
+          }
+          if(p.match_id?.startsWith('KO-')&&p.advancing_team){
+            const parts=p.match_id.split('-');
+            const round=parts[1];
+            const id=parts[2];
+            if(round==='third') newKO.third=p.advancing_team;
+            else if(newKO[round]!==undefined) newKO[round][parseInt(id)]=p.advancing_team;
+          }
+        });
+        setGroupMatches(newMatches);
+        setKoPicks(newKO);
+      }
+      // Load bonus picks
+      const {data:bonus}=await supabase.from('bonus_picks')
+        .select('*').eq('user_id',userId).single();
+      if(bonus){
+        if(bonus.golden_boot_player){setGoldenBootPick({name:bonus.golden_boot_player,nation:'',flag:'⚽'});setGoldenBootLocked(bonus.golden_boot_locked||false);}
+        if(bonus.top_assist_player){setTopAssistPick({name:bonus.top_assist_player,nation:'',flag:'🎯'});setTopAssistLocked(bonus.top_assist_locked||false);}
+        if(bonus.golden_glove_player){setGoldenGlovePick({name:bonus.golden_glove_player,nation:'',flag:'🧤'});setGoldenGloveLocked(bonus.golden_glove_locked||false);}
+        if(bonus.double_down_r1)setDoubleDown(prev=>({...prev,r1:bonus.double_down_r1}));
+        if(bonus.double_down_r2)setDoubleDown(prev=>({...prev,r2:bonus.double_down_r2}));
+        if(bonus.double_down_r3)setDoubleDown(prev=>({...prev,r3:bonus.double_down_r3}));
+      }
+    }catch(e){console.error('Load failed',e);}
   };
 
   // Check for existing session on load
@@ -982,6 +1104,7 @@ export default function App(){
           if(profile){
             setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:session.user.id});
             setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
+            loadUserData(session.user.id);
           }
         });
       }
@@ -1028,6 +1151,17 @@ export default function App(){
   return(
     <div style={{minHeight:"100vh",background:"var(--color-background-tertiary)",fontFamily:"'DM Sans',system-ui,sans-serif"}}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+      {/* ── Save toast ── */}
+      {saveStatus&&(
+        <div style={{position:"fixed",bottom:24,right:24,zIndex:999,padding:"10px 16px",borderRadius:10,fontSize:13,fontWeight:500,
+          background:saveStatus==="saved"?C.green:saveStatus==="error"?"#ef4444":"var(--color-background-secondary)",
+          color:saveStatus==="saving"?"var(--color-text-primary)":"#fff",
+          border:`0.5px solid ${saveStatus==="saved"?C.green:saveStatus==="error"?"#ef4444":"var(--color-border-tertiary)"}`,
+          boxShadow:"0 4px 12px rgba(0,0,0,0.15)",transition:"all 0.2s"}}>
+          {saveStatus==="saving"?"Saving...":saveStatus==="saved"?"✓ Saved":"⚠ Save failed"}
+        </div>
+      )}
 
       {/* ── Fixed Nav ── */}
       {user&&(
@@ -1112,7 +1246,7 @@ export default function App(){
                       <div style={{display:"flex",gap:8,marginBottom:"1rem"}}>
                         <input value={waitlistEmail} onChange={e=>setWaitlistEmail(e.target.value)} placeholder="your@email.com" type="email"
                           style={{flex:1,padding:"11px 14px",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:8,fontSize:14,background:"rgba(255,255,255,0.08)",color:"#fff",outline:"none"}}/>
-                        <button onClick={()=>{if(validateEmail(waitlistEmail))setWaitlistDone(true);}}
+                        <button onClick={()=>{if(validateEmail(waitlistEmail)){setWaitlistDone(true);saveWaitlistEmail(waitlistEmail);}}}
                           style={{padding:"11px 20px",background:C.gold,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap"}}>Notify me</button>
                       </div>
 
@@ -1601,7 +1735,7 @@ export default function App(){
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top scorer.</p>
-              <PlayerSearch search={bootSearch} setSearch={setBootSearch} pick={goldenBootPick} setPick={setGoldenBootPick} filtered={filteredBoot} label="Player" pts={15} color={C.green} locked={goldenBootLocked} setLocked={setGoldenBootLocked} emoji="⚽"/>
+              <PlayerSearch search={bootSearch} setSearch={setBootSearch} pick={goldenBootPick} setPick={setGoldenBootPick} filtered={filteredBoot} label="Player" pts={15} color={C.green} locked={goldenBootLocked} setLocked={(v)=>{setGoldenBootLocked(v);if(v&&goldenBootPick)saveBonusPicks({golden_boot_player:goldenBootPick.name,golden_boot_locked:true});}} emoji="⚽"/>
             </div>
           </div>
 
@@ -1613,7 +1747,7 @@ export default function App(){
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top assist provider.</p>
-              <PlayerSearch search={assistSearch} setSearch={setAssistSearch} pick={topAssistPick} setPick={setTopAssistPick} filtered={filteredAssist} label="Player" pts={15} color={C.blue} locked={topAssistLocked} setLocked={setTopAssistLocked} emoji="🎯"/>
+              <PlayerSearch search={assistSearch} setSearch={setAssistSearch} pick={topAssistPick} setPick={setTopAssistPick} filtered={filteredAssist} label="Player" pts={15} color={C.blue} locked={topAssistLocked} setLocked={(v)=>{setTopAssistLocked(v);if(v&&topAssistPick)saveBonusPicks({top_assist_player:topAssistPick.name,top_assist_locked:true});}} emoji="🎯"/>
             </div>
           </div>
 
@@ -1625,7 +1759,7 @@ export default function App(){
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's best goalkeeper.</p>
-              <PlayerSearch search={gloveSearch} setSearch={setGloveSearch} pick={goldenGlovePick} setPick={setGoldenGlovePick} filtered={filteredGlove} label="Goalkeeper" pts={15} color={C.gold} locked={goldenGloveLocked} setLocked={setGoldenGloveLocked} emoji="🧤"/>
+              <PlayerSearch search={gloveSearch} setSearch={setGloveSearch} pick={goldenGlovePick} setPick={setGoldenGlovePick} filtered={filteredGlove} label="Goalkeeper" pts={15} color={C.gold} locked={goldenGloveLocked} setLocked={(v)=>{setGoldenGloveLocked(v);if(v&&goldenGlovePick)saveBonusPicks({golden_glove_player:goldenGlovePick.name,golden_glove_locked:true});}} emoji="🧤"/>
             </div>
           </div>
         </div>
