@@ -1046,8 +1046,12 @@ export default function App(){
               <div style={{width:30,height:30,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#fff"}}>{user.avatar}</div>
               <div style={{display:"flex",flexDirection:"column"}}>
                 <span style={{fontSize:12,color:"var(--color-text-primary)",fontWeight:500}}>{user.handle}</span>
-                <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{totalPredicted}/72 · {koPicked}/31</span>
+                <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{totalPredicted}/72 · {koPicked}/32</span>
               </div>
+              <button onClick={async()=>{await supabase.auth.signOut();setUser(null);setPage("home");}}
+                style={{padding:"4px 8px",background:"none",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:11,color:"var(--color-text-tertiary)",cursor:"pointer",marginLeft:4}}>
+                Sign out
+              </button>
             </div>
           </div>
         </nav>
