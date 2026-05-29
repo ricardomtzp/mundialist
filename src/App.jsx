@@ -1006,43 +1006,37 @@ export default function App(){
   const saveGroupPick=async(group,idx,homeScore,awayScore)=>{
     if(!user?.id)return;
     showSaving();
-    try{
-      await supabase.from('predictions').upsert({
-        user_id:user.id,
-        match_id:`GS-${group}-${idx}`,
-        home_score:parseInt(homeScore)||0,
-        away_score:parseInt(awayScore)||0,
-        updated_at:new Date().toISOString(),
-      },{onConflict:'user_id,match_id'});
-      showSaved();
-    }catch(e){showError();}
+    const {error}=await supabase.from('predictions').upsert({
+      user_id:user.id,
+      match_id:`GS-${group}-${idx}`,
+      home_score:parseInt(homeScore)||0,
+      away_score:parseInt(awayScore)||0,
+    },{onConflict:'user_id,match_id'});
+    if(error){console.error('saveGroupPick error:',error);showError();}
+    else showSaved();
   };
 
   const saveKOPick=async(round,id,team)=>{
     if(!user?.id)return;
     showSaving();
-    try{
-      await supabase.from('predictions').upsert({
-        user_id:user.id,
-        match_id:`KO-${round}-${id}`,
-        advancing_team:team,
-        updated_at:new Date().toISOString(),
-      },{onConflict:'user_id,match_id'});
-      showSaved();
-    }catch(e){showError();}
+    const {error}=await supabase.from('predictions').upsert({
+      user_id:user.id,
+      match_id:`KO-${round}-${id}`,
+      advancing_team:team,
+    },{onConflict:'user_id,match_id'});
+    if(error){console.error('saveKOPick error:',error);showError();}
+    else showSaved();
   };
 
   const saveBonusPicks=async(updates)=>{
     if(!user?.id)return;
     showSaving();
-    try{
-      await supabase.from('bonus_picks').upsert({
-        user_id:user.id,
-        ...updates,
-        updated_at:new Date().toISOString(),
-      },{onConflict:'user_id'});
-      showSaved();
-    }catch(e){showError();}
+    const {error}=await supabase.from('bonus_picks').upsert({
+      user_id:user.id,
+      ...updates,
+    },{onConflict:'user_id'});
+    if(error){console.error('saveBonusPicks error:',error);showError();}
+    else showSaved();
   };
 
   const saveWaitlistEmail=async(email)=>{
