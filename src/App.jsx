@@ -678,106 +678,107 @@ const R32_TO_R16 = [
 const ANNEX_IDX={"1A":0,"1B":1,"1D":2,"1E":3,"1G":4,"1I":5,"1K":6,"1L":7};
 
 
-// FIFA WC2026 match venues
-// Group stage matchday order: [0]=MD1 match1, [1]=MD1 match2, [2]=MD2 match1, [3]=MD2 match2, [4]=MD3 match1, [5]=MD3 match2
+// FIFA WC2026 match venues — verified from official FIFA schedule
+// Match order: [MD1 match1, MD1 match2, MD2 match1, MD2 match2, MD3 match1, MD3 match2]
 const GROUP_VENUES={
-  A:[
-    {venue:"SoFi Stadium",city:"Los Angeles"},
-    {venue:"Estadio Azteca",city:"Mexico City"},
-    {venue:"Rose Bowl",city:"Los Angeles"},
-    {venue:"Estadio Azteca",city:"Mexico City"},
-    {venue:"Levi's Stadium",city:"San Francisco"},
-    {venue:"Rose Bowl",city:"Los Angeles"},
+  A:[ // Mexico, South Africa, South Korea, Czechia
+    {venue:"Mexico City Stadium",city:"Mexico City, Mexico"},      // Mexico vs South Africa
+    {venue:"Estadio Guadalajara",city:"Zapopan, Mexico"},          // South Korea vs Czechia
+    {venue:"Estadio Guadalajara",city:"Zapopan, Mexico"},          // Mexico vs South Korea
+    {venue:"Atlanta Stadium",city:"Atlanta, USA"},                 // Czechia vs South Africa
+    {venue:"Mexico City Stadium",city:"Mexico City, Mexico"},      // Czechia vs Mexico
+    {venue:"Estadio Monterrey",city:"Guadalupe, Mexico"},          // South Africa vs South Korea
   ],
-  B:[
-    {venue:"BC Place",city:"Vancouver"},
-    {venue:"BMO Field",city:"Toronto"},
-    {venue:"BC Place",city:"Vancouver"},
-    {venue:"BMO Field",city:"Toronto"},
-    {venue:"BC Place",city:"Vancouver"},
-    {venue:"BMO Field",city:"Toronto"},
+  B:[ // Canada, Switzerland, Qatar, Bosnia and Herzegovina
+    {venue:"Toronto Stadium",city:"Toronto, Canada"},              // Canada vs Bosnia
+    {venue:"San Francisco Bay Area Stadium",city:"San Francisco, USA"}, // Qatar vs Switzerland
+    {venue:"BC Place",city:"Vancouver, Canada"},                   // Canada vs Qatar
+    {venue:"Los Angeles Stadium",city:"Los Angeles, USA"},         // Switzerland vs Bosnia
+    {venue:"BC Place",city:"Vancouver, Canada"},                   // Switzerland vs Canada
+    {venue:"Seattle Stadium",city:"Seattle, USA"},                 // Bosnia vs Qatar
   ],
-  C:[
-    {venue:"AT&T Stadium",city:"Dallas"},
-    {venue:"SoFi Stadium",city:"Los Angeles"},
-    {venue:"Lumen Field",city:"Seattle"},
-    {venue:"AT&T Stadium",city:"Dallas"},
-    {venue:"SoFi Stadium",city:"Los Angeles"},
-    {venue:"Lumen Field",city:"Seattle"},
+  C:[ // Brazil, Morocco, Haiti, Scotland
+    {venue:"New York New Jersey Stadium",city:"New Jersey, USA"},  // Brazil vs Morocco
+    {venue:"Boston Stadium",city:"Boston, USA"},                   // Haiti vs Scotland
+    {venue:"Philadelphia Stadium",city:"Philadelphia, USA"},       // Brazil vs Haiti
+    {venue:"Boston Stadium",city:"Boston, USA"},                   // Scotland vs Morocco
+    {venue:"Miami Stadium",city:"Miami, USA"},                     // Scotland vs Brazil
+    {venue:"Atlanta Stadium",city:"Atlanta, USA"},                 // Morocco vs Haiti
   ],
-  D:[
-    {venue:"MetLife Stadium",city:"New York/New Jersey"},
-    {venue:"AT&T Stadium",city:"Dallas"},
-    {venue:"Arrowhead Stadium",city:"Kansas City"},
-    {venue:"MetLife Stadium",city:"New York/New Jersey"},
-    {venue:"AT&T Stadium",city:"Dallas"},
-    {venue:"Arrowhead Stadium",city:"Kansas City"},
+  D:[ // USA, Paraguay, Australia, Türkiye
+    {venue:"Los Angeles Stadium",city:"Los Angeles, USA"},         // USA vs Paraguay
+    {venue:"BC Place",city:"Vancouver, Canada"},                   // Australia vs Türkiye
+    {venue:"Seattle Stadium",city:"Seattle, USA"},                 // USA vs Australia
+    {venue:"San Francisco Bay Area Stadium",city:"San Francisco, USA"}, // Türkiye vs Paraguay
+    {venue:"Los Angeles Stadium",city:"Los Angeles, USA"},         // Türkiye vs USA
+    {venue:"San Francisco Bay Area Stadium",city:"San Francisco, USA"}, // Paraguay vs Australia
   ],
-  E:[
-    {venue:"Allianz Field",city:"Minneapolis"},
-    {venue:"Lincoln Financial Field",city:"Philadelphia"},
-    {venue:"Allianz Field",city:"Minneapolis"},
-    {venue:"Lincoln Financial Field",city:"Philadelphia"},
-    {venue:"Allianz Field",city:"Minneapolis"},
-    {venue:"Lincoln Financial Field",city:"Philadelphia"},
+  E:[ // Germany, Curaçao, Ivory Coast, Ecuador
+    {venue:"Houston Stadium",city:"Houston, USA"},                 // Germany vs Curaçao
+    {venue:"Philadelphia Stadium",city:"Philadelphia, USA"},       // Ivory Coast vs Ecuador
+    {venue:"Toronto Stadium",city:"Toronto, Canada"},              // Germany vs Ivory Coast
+    {venue:"Kansas City Stadium",city:"Kansas City, USA"},         // Ecuador vs Curaçao
+    {venue:"New York New Jersey Stadium",city:"New Jersey, USA"},  // Ecuador vs Germany
+    {venue:"Philadelphia Stadium",city:"Philadelphia, USA"},       // Curaçao vs Ivory Coast
   ],
-  F:[
-    {venue:"Hard Rock Stadium",city:"Miami"},
-    {venue:"Camping World Stadium",city:"Orlando"},
-    {venue:"Hard Rock Stadium",city:"Miami"},
-    {venue:"Camping World Stadium",city:"Orlando"},
-    {venue:"Hard Rock Stadium",city:"Miami"},
-    {venue:"Camping World Stadium",city:"Orlando"},
+  F:[ // Netherlands, Japan, Sweden, Tunisia
+    {venue:"Dallas Stadium",city:"Dallas, USA"},                   // Netherlands vs Japan
+    {venue:"Estadio Monterrey",city:"Guadalupe, Mexico"},          // Sweden vs Tunisia
+    {venue:"Houston Stadium",city:"Houston, USA"},                 // Netherlands vs Sweden
+    {venue:"Estadio Monterrey",city:"Guadalupe, Mexico"},          // Tunisia vs Japan
+    {venue:"Dallas Stadium",city:"Dallas, USA"},                   // Japan vs Sweden
+    {venue:"Kansas City Stadium",city:"Kansas City, USA"},         // Tunisia vs Netherlands
   ],
-  G:[
-    {venue:"Mercedes-Benz Stadium",city:"Atlanta"},
-    {venue:"Geodis Park",city:"Nashville"},
-    {venue:"Mercedes-Benz Stadium",city:"Atlanta"},
-    {venue:"Geodis Park",city:"Nashville"},
-    {venue:"Mercedes-Benz Stadium",city:"Atlanta"},
-    {venue:"Geodis Park",city:"Nashville"},
+  G:[ // Belgium, Egypt, Iran, New Zealand
+    {venue:"BC Place",city:"Vancouver, Canada"},                   // Belgium vs Egypt
+    {venue:"Los Angeles Stadium",city:"Los Angeles, USA"},         // Iran vs New Zealand
+    {venue:"Los Angeles Stadium",city:"Los Angeles, USA"},         // Belgium vs Iran
+    {venue:"BC Place",city:"Vancouver, Canada"},                   // New Zealand vs Egypt
+    {venue:"Seattle Stadium",city:"Seattle, USA"},                 // Egypt vs Iran
+    {venue:"BC Place",city:"Vancouver, Canada"},                   // New Zealand vs Belgium
   ],
-  H:[
-    {venue:"Estadio Akron",city:"Guadalajara"},
-    {venue:"Estadio BBVA",city:"Monterrey"},
-    {venue:"Estadio Akron",city:"Guadalajara"},
-    {venue:"Estadio BBVA",city:"Monterrey"},
-    {venue:"Estadio Akron",city:"Guadalajara"},
-    {venue:"Estadio BBVA",city:"Monterrey"},
+  H:[ // Spain, Cape Verde, Saudi Arabia, Uruguay
+    {venue:"Atlanta Stadium",city:"Atlanta, USA"},                 // Spain vs Cape Verde
+    {venue:"Miami Stadium",city:"Miami, USA"},                     // Saudi Arabia vs Uruguay
+    {venue:"Atlanta Stadium",city:"Atlanta, USA"},                 // Spain vs Saudi Arabia
+    {venue:"Miami Stadium",city:"Miami, USA"},                     // Uruguay vs Cape Verde
+    {venue:"Houston Stadium",city:"Houston, USA"},                 // Cape Verde vs Saudi Arabia
+    {venue:"Estadio Guadalajara",city:"Zapopan, Mexico"},          // Uruguay vs Spain
   ],
-  I:[
-    {venue:"Lumen Field",city:"Seattle"},
-    {venue:"Oracle Park",city:"San Francisco"},
-    {venue:"Lumen Field",city:"Seattle"},
-    {venue:"Oracle Park",city:"San Francisco"},
-    {venue:"Lumen Field",city:"Seattle"},
-    {venue:"Oracle Park",city:"San Francisco"},
+  I:[ // France, Senegal, Norway, Iraq
+    {venue:"New York New Jersey Stadium",city:"New Jersey, USA"},  // France vs Senegal
+    {venue:"Boston Stadium",city:"Boston, USA"},                   // Iraq vs Norway
+    {venue:"Philadelphia Stadium",city:"Philadelphia, USA"},       // France vs Iraq
+    {venue:"New York New Jersey Stadium",city:"New Jersey, USA"},  // Norway vs Senegal
+    {venue:"Boston Stadium",city:"Boston, USA"},                   // Norway vs France
+    {venue:"Toronto Stadium",city:"Toronto, Canada"},              // Senegal vs Iraq
   ],
-  J:[
-    {venue:"MetLife Stadium",city:"New York/New Jersey"},
-    {venue:"Gillette Stadium",city:"Boston"},
-    {venue:"MetLife Stadium",city:"New York/New Jersey"},
-    {venue:"Gillette Stadium",city:"Boston"},
-    {venue:"MetLife Stadium",city:"New York/New Jersey"},
-    {venue:"Gillette Stadium",city:"Boston"},
+  J:[ // Argentina, Algeria, Austria, Jordan
+    {venue:"Kansas City Stadium",city:"Kansas City, USA"},         // Argentina vs Algeria
+    {venue:"San Francisco Bay Area Stadium",city:"San Francisco, USA"}, // Austria vs Jordan
+    {venue:"Dallas Stadium",city:"Dallas, USA"},                   // Argentina vs Austria
+    {venue:"San Francisco Bay Area Stadium",city:"San Francisco, USA"}, // Jordan vs Algeria
+    {venue:"Kansas City Stadium",city:"Kansas City, USA"},         // Algeria vs Austria
+    {venue:"Dallas Stadium",city:"Dallas, USA"},                   // Jordan vs Argentina
   ],
-  K:[
-    {venue:"Estadio BBVA",city:"Monterrey"},
-    {venue:"Estadio Akron",city:"Guadalajara"},
-    {venue:"Estadio BBVA",city:"Monterrey"},
-    {venue:"Estadio Akron",city:"Guadalajara"},
-    {venue:"Estadio BBVA",city:"Monterrey"},
-    {venue:"Estadio Akron",city:"Guadalajara"},
+  K:[ // Portugal, DR Congo, Uzbekistan, Colombia
+    {venue:"Houston Stadium",city:"Houston, USA"},                 // Portugal vs DR Congo
+    {venue:"Estadio Guadalajara",city:"Zapopan, Mexico"},          // Uzbekistan vs Colombia
+    {venue:"Houston Stadium",city:"Houston, USA"},                 // Portugal vs Uzbekistan
+    {venue:"Estadio Guadalajara",city:"Zapopan, Mexico"},          // Colombia vs DR Congo
+    {venue:"Miami Stadium",city:"Miami, USA"},                     // Colombia vs Portugal
+    {venue:"Atlanta Stadium",city:"Atlanta, USA"},                 // DR Congo vs Uzbekistan
   ],
-  L:[
-    {venue:"AT&T Stadium",city:"Dallas"},
-    {venue:"NRG Stadium",city:"Houston"},
-    {venue:"AT&T Stadium",city:"Dallas"},
-    {venue:"NRG Stadium",city:"Houston"},
-    {venue:"AT&T Stadium",city:"Dallas"},
-    {venue:"NRG Stadium",city:"Houston"},
+  L:[ // England, Croatia, Ghana, Panama
+    {venue:"Dallas Stadium",city:"Dallas, USA"},                   // England vs Croatia
+    {venue:"Toronto Stadium",city:"Toronto, Canada"},              // Ghana vs Panama
+    {venue:"Boston Stadium",city:"Boston, USA"},                   // England vs Ghana
+    {venue:"Toronto Stadium",city:"Toronto, Canada"},              // Panama vs Croatia
+    {venue:"New York New Jersey Stadium",city:"New Jersey, USA"},  // Panama vs England
+    {venue:"Philadelphia Stadium",city:"Philadelphia, USA"},       // Croatia vs Ghana
   ],
 };
+
 const ROUND_INDICES = [[0,1],[2,3],[4,5]];
 
 
@@ -1564,7 +1565,7 @@ export default function App(){
                   <div style={{height:"100%",width:`${adventInfo.width||0}%`,background:adventInfo.color,borderRadius:99,transition:"width 0.3s"}}/>
                 </div>
                 <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
-                  <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>Your pick style: <strong style={{color:adventInfo.color}}>{adventInfo.emoji} {adventInfo.label}</strong></span>
+                  <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>Pick style from your predictions: <strong style={{color:adventInfo.color}}>{adventInfo.emoji} {adventInfo.label}</strong></span>
                   <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{adventScore}/100</span>
                 </div>
               </div>
