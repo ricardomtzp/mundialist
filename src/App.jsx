@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { supabase } from "./supabase.js";
 
 const C = {
   blue:"#2A398D", blueLt:"#E8EBF7",
@@ -837,6 +838,10 @@ export default function App(){
   const [emailError,setEmailError]=useState("");
   const [agreeError,setAgreeError]=useState(false);
   const [waitlistEmail,setWaitlistEmail]=useState("");
+  const [authMode,setAuthMode]=useState("signup"); // 'signup' | 'signin'
+  const [authLoading,setAuthLoading]=useState(false);
+  const [authError,setAuthError]=useState("");
+  const [formPassword,setFormPassword]=useState("");
   const [waitlistDone,setWaitlistDone]=useState(false);
   const [simulateStyle,setSimulateStyle]=useState("balanced");
   const [groupMatches,setGroupMatches]=useState(()=>{
@@ -891,7 +896,7 @@ export default function App(){
 
   const totalPredicted=Object.values(groupMatches).flat().filter(m=>m.homeScore!==""&&m.awayScore!=="").length;
   const doublesSelected=Object.values(doubleDown).filter(Boolean).length;
-  const koPicked=Object.values(koPicks).reduce((s,r)=>s+(r===null?0:typeof r==='string'?1:Object.keys(r).length),0);
+  const koPicked=Object.values(koPicks).reduce((s,r)=>s+(typeof r==='string'?1:Object.keys(r).length),0);
   const adventScore=useMemo(()=>calcAdventurousness(groupMatches,allStandings),[groupMatches,allStandings]);
   const adventInfo=adventLabel(adventScore);
 
@@ -903,20 +908,85 @@ export default function App(){
   const simulateAll=()=>{setGroupMatches(simulateAllMatches(simulateStyle));setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});};
   const clearAll=()=>{
     const all={};Object.entries(GROUPS).forEach(([g,teams])=>{all[g]=generateGroupMatches(teams);});
-    setGroupMatches(all);setDoubleDown({r1:null,r2:null,r3:null});setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
+    setGroupMatches(all);setDoubleDown({r1:null,r2:null,r3:null});setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{}});
   };
   const validateEmail=e=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
-  const handleCreate=()=>{
+  const handleCreate=async()=>{
     let ok=true;
     if(!formName.trim()||!formHandle.trim())return;
     if(!validateEmail(formEmail)){setEmailError("Please enter a valid email");ok=false;}
     if(!formAgree){setAgreeError(true);ok=false;}
     if(!ok)return;
-    setEmailError("");setAgreeError(false);
-    setUser({name:formName,handle:"@"+formHandle.replace("@",""),email:formEmail,avatar:formName[0].toUpperCase()});
-    setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
-    setPage("predict");
+    setEmailError("");setAgreeError(false);setAuthLoading(true);setAuthError("");
+    try {
+      // Sign up with Supabase auth
+      const {data,error}=await supabase.auth.signUp({
+        email:formEmail,
+        password:formPassword||formEmail+formName, // temp password if not set
+        options:{data:{name:formName,handle:formHandle.replace("@","")}}
+      });
+      if(error)throw error;
+      // Insert user profile
+      if(data.user){
+        await supabase.from("users").upsert({
+          id:data.user.id,
+          name:formName,
+          handle:formHandle.replace("@",""),
+          email:formEmail,
+          avatar_letter:formName[0].toUpperCase(),
+        });
+        // Auto-join global league
+        await supabase.from("league_members").upsert({
+          league_id:"00000000-0000-0000-0000-000000000001",
+          user_id:data.user.id,
+        });
+      }
+      setUser({name:formName,handle:"@"+formHandle.replace("@",""),email:formEmail,avatar:formName[0].toUpperCase(),id:data.user?.id});
+      setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
+      setPage("predict");
+    } catch(err){
+      setAuthError(err.message||"Sign up failed. Please try again.");
+    } finally {
+      setAuthLoading(false);
+    }
   };
+
+  const handleSignIn=async()=>{
+    if(!validateEmail(formEmail)){setEmailError("Please enter a valid email");return;}
+    setAuthLoading(true);setAuthError("");
+    try {
+      const {data,error}=await supabase.auth.signInWithPassword({
+        email:formEmail,
+        password:formPassword,
+      });
+      if(error)throw error;
+      // Load user profile
+      const {data:profile}=await supabase.from("users").select("*").eq("id",data.user.id).single();
+      if(profile){
+        setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:data.user.id});
+        setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
+        setPage("predict");
+      }
+    } catch(err){
+      setAuthError(err.message||"Sign in failed. Please check your email and password.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // Check for existing session on load
+  useEffect(()=>{
+    supabase.auth.getSession().then(({data:{session}})=>{
+      if(session?.user){
+        supabase.from("users").select("*").eq("id",session.user.id).single().then(({data:profile})=>{
+          if(profile){
+            setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:session.user.id});
+            setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
+          }
+        });
+      }
+    });
+  },[]);
 
   const filteredBoot=bootSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(bootSearch.toLowerCase())||p.nation.toLowerCase().includes(bootSearch.toLowerCase())):[];
   const filteredAssist=assistSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(assistSearch.toLowerCase())||p.nation.toLowerCase().includes(assistSearch.toLowerCase())):[];
@@ -1061,6 +1131,8 @@ export default function App(){
                           <input value={formEmail} onChange={e=>{setFormEmail(e.target.value);setEmailError("");}} placeholder="Email address" type="email"
                             style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:`0.5px solid ${emailError?"#ef4444":"rgba(255,255,255,0.15)"}`,borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
                           {emailError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{emailError}</p>}
+                          <input value={formPassword} onChange={e=>setFormPassword(e.target.value)} placeholder="Password" type="password"
+                            style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
                           <label style={{display:"flex",alignItems:"flex-start",gap:8,cursor:"pointer"}}>
                             <input type="checkbox" checked={formAgree} onChange={e=>{setFormAgree(e.target.checked);setAgreeError(false);}}
                               style={{marginTop:2,accentColor:C.gold,flexShrink:0}}/>
@@ -1069,7 +1141,14 @@ export default function App(){
                             </span>
                           </label>
                           {agreeError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>Please agree to the terms to continue</p>}
-                          <button onClick={handleCreate} style={{padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer",marginTop:4}}>Start predicting →</button>
+                          {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
+                          <button onClick={handleCreate} disabled={authLoading}
+                            style={{padding:"11px",background:authLoading?"rgba(42,57,141,0.5)":C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:authLoading?"not-allowed":"pointer",marginTop:4}}>
+                            {authLoading?"Creating account...":"Start predicting →"}
+                          </button>
+                          <button onClick={()=>setAuthMode("signin")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.4)",padding:"4px 0",textAlign:"center"}}>
+                            Already have an account? Sign in →
+                          </button>
                         </div>
                       </div>
                     </>
@@ -1078,6 +1157,27 @@ export default function App(){
                       <div style={{fontSize:40,marginBottom:12}}>🎉</div>
                       <h2 style={{fontSize:18,fontWeight:600,color:"#fff",margin:"0 0 8px"}}>You're on the list!</h2>
                       <p style={{fontSize:13,color:"rgba(255,255,255,0.6)",margin:0,lineHeight:1.6}}>We'll email <strong style={{color:"rgba(255,255,255,0.9)"}}>{waitlistEmail}</strong> when predictions open.</p>
+                    </div>
+                  )}
+                  {/* Sign in form */}
+                  {authMode==="signin"&&(
+                    <div style={{borderTop:"0.5px solid rgba(255,255,255,0.1)",paddingTop:"1rem",marginTop:"0.5rem"}}>
+                      <h3 style={{fontSize:15,fontWeight:500,color:"#fff",margin:"0 0 1rem"}}>Sign in</h3>
+                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                        <input value={formEmail} onChange={e=>{setFormEmail(e.target.value);setEmailError("");}} placeholder="Email address" type="email"
+                          style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:`0.5px solid ${emailError?"#ef4444":"rgba(255,255,255,0.15)"}`,borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                        {emailError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{emailError}</p>}
+                        <input value={formPassword} onChange={e=>setFormPassword(e.target.value)} placeholder="Password" type="password"
+                          style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                        {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
+                        <button onClick={handleSignIn} disabled={authLoading}
+                          style={{padding:"11px",background:authLoading?"rgba(42,57,141,0.5)":C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:authLoading?"not-allowed":"pointer"}}>
+                          {authLoading?"Signing in...":"Sign in →"}
+                        </button>
+                        <button onClick={()=>setAuthMode("signup")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.4)",padding:"4px 0",textAlign:"center"}}>
+                          New here? Create an account →
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
