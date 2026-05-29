@@ -784,54 +784,54 @@ const ROUND_INDICES = [[0,1],[2,3],[4,5]];
 
 // ── Simulation with style bias ─────────────────────────────────────────────
 // Simulate a match using FIFA rankings and prediction style
-// rankDiff: positive means home team is stronger
-function simulateMatch(homeTeam, awayTeam, style){
-  const homeRank=getRank(homeTeam);
-  const awayRank=getRank(awayTeam);
-  const diff=homeRank-awayRank; // positive = home stronger
+// Style strongly affects both result and goal distribution
+function simulateMatch(homeTeam,awayTeam,style){
+  const hr=getRank(homeTeam),ar=getRank(awayTeam);
+  const diff=hr-ar; // positive = home stronger
 
-  // Base win probability for home team (logistic curve)
-  const baseHomeWinProb=1/(1+Math.pow(10,-diff/30));
+  // Style parameters — controls how much rankings matter vs randomness
+  const params={
+    cautious: {noise:0.03, upsetChance:0.02, drawBase:0.20, maxGoals:2, avgWin:1.1},
+    balanced: {noise:0.12, upsetChance:0.08, drawBase:0.25, maxGoals:3, avgWin:1.7},
+    bold:     {noise:0.22, upsetChance:0.16, drawBase:0.22, maxGoals:4, avgWin:2.2},
+    maverick: {noise:0.40, upsetChance:0.35, drawBase:0.18, maxGoals:6, avgWin:2.8},
+  }[style]||{noise:0.12,upsetChance:0.08,drawBase:0.25,maxGoals:3,avgWin:1.7};
 
-  // Style modifies how much we respect rankings
-  // Cautious: follow rankings closely
-  // Maverick: almost random, upsets likely
-  const styleNoise={cautious:0.05,balanced:0.15,bold:0.28,maverick:0.45}[style]||0.15;
-  const noise=(Math.random()-0.5)*2*styleNoise;
-  const homeWinProb=Math.max(0.05,Math.min(0.95,baseHomeWinProb+noise));
+  // Base win prob from ranking diff (logistic curve)
+  let homeWinProb=1/(1+Math.pow(10,-diff/18));
+  // Add noise
+  homeWinProb+=((Math.random()-0.5)*2*params.noise);
+  // Upset flip: maverick can completely reverse the expected result
+  if(Math.random()<params.upsetChance) homeWinProb=1-homeWinProb;
+  homeWinProb=Math.max(0.04,Math.min(0.96,homeWinProb));
 
-  // Decide result
+  // Draw probability
+  const rankCloseness=Math.max(0,1-Math.abs(diff)/60);
+  const drawProb=Math.min(0.38,params.drawBase+rankCloseness*0.10);
+
   const r=Math.random();
-  // Draw probability increases when teams are close
-  const drawProb=0.25-Math.abs(diff)*0.003;
-  const clampedDrawProb=Math.max(0.10,Math.min(0.35,drawProb));
+  let homeWins,isDraw;
+  if(r<drawProb){isDraw=true;}
+  else if(r<drawProb+(1-drawProb)*homeWinProb){homeWins=true;}
+  else{homeWins=false;}
 
-  let homeWins, isDraw;
-  if(r<clampedDrawProb){isDraw=true;homeWins=false;}
-  else if(r<clampedDrawProb+(1-clampedDrawProb)*homeWinProb){homeWins=true;isDraw=false;}
-  else{homeWins=false;isDraw=false;}
-
-  // Generate goals — higher ranked teams score more
-  const avgGoals=style==="maverick"?3.2:style==="bold"?2.8:style==="balanced"?2.5:2.2;
-  const winnerGoals=()=>{
-    const g=Math.round(Math.random()*avgGoals*0.8+avgGoals*0.4);
-    return Math.max(1,Math.min(style==="maverick"?7:5,g));
-  };
-  const loserGoals=(w)=>Math.max(0,Math.min(w-1,Math.round(Math.random()*(w-0.5))));
+  // Goals — tightly bounded by style
+  const winGoals=()=>Math.max(1,Math.min(params.maxGoals,
+    1+Math.round(Math.random()*params.avgWin)));
+  const loseGoals=(w)=>Math.max(0,Math.min(w-1,
+    style==="cautious"?Math.round(Math.random()*0.4):
+    style==="balanced"?Math.round(Math.random()*w*0.5):
+    style==="bold"?Math.round(Math.random()*w*0.65):
+    Math.round(Math.random()*w*0.85)));
 
   let h,a;
   if(isDraw){
-    h=Math.round(Math.random()*2.5);a=h;
-    // Small chance of high-scoring draw in maverick/bold
-    if((style==="maverick"||style==="bold")&&Math.random()<0.2){h=Math.round(Math.random()*2+1);a=h;}
-  } else if(homeWins){
-    h=winnerGoals();a=loserGoals(h);
-  } else {
-    a=winnerGoals();h=loserGoals(a);
-  }
+    const maxDraw=style==="cautious"?1:style==="balanced"?2:style==="bold"?3:4;
+    h=Math.floor(Math.random()*(maxDraw+1));a=h;
+  } else if(homeWins){h=winGoals();a=loseGoals(h);}
+  else{a=winGoals();h=loseGoals(a);}
   return{homeScore:String(h),awayScore:String(a)};
 }
-
 function simulateAllMatches(style="balanced"){
   const all={};
   Object.entries(GROUPS).forEach(([g,teams])=>{
@@ -996,7 +996,6 @@ export default function App(){
   const [emailError,setEmailError]=useState("");
   const [agreeError,setAgreeError]=useState(false);
   const [waitlistEmail,setWaitlistEmail]=useState("");
-  const [lastSimulatedStyle,setLastSimulatedStyle]=useState(null);
   const [saveStatus,setSaveStatus]=useState(null); // null | 'saving' | 'saved' | 'error'
   const [authMode,setAuthMode]=useState("signup"); // 'signup' | 'signin'
   const [authLoading,setAuthLoading]=useState(false);
@@ -1063,7 +1062,6 @@ export default function App(){
 
   const updateScore=(group,idx,side,val)=>{
     if(val!==""&&(isNaN(val)||parseInt(val)<0||parseInt(val)>99))return;
-    setLastSimulatedStyle(null);
     setGroupMatches(prev=>{
       const u=[...prev[group]];
       u[idx]={...u[idx],[side]:val};
@@ -1088,7 +1086,7 @@ export default function App(){
       return{...prev,[rk]:newVal};
     });
   };
-  const simulateAll=()=>{setGroupMatches(simulateAllMatches(simulateStyle));setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});setLastSimulatedStyle(simulateStyle);};
+  const simulateAll=()=>{setGroupMatches(simulateAllMatches(simulateStyle));setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});};
   const clearAll=()=>{
     const all={};Object.entries(GROUPS).forEach(([g,teams])=>{all[g]=generateGroupMatches(teams);});
     setGroupMatches(all);setDoubleDown({r1:null,r2:null,r3:null});setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{}});
@@ -1561,24 +1559,17 @@ export default function App(){
                 Simulate ↻
               </button>
             </div>
-            {(adventScore!==null||lastSimulatedStyle)&&(()=>{
-              const displayStyle=lastSimulatedStyle||null;
-              const styleMap={cautious:{label:"Cautious",emoji:"🛡️",color:C.blue,width:15},balanced:{label:"Balanced",emoji:"⚖️",color:C.green,width:40},bold:{label:"Bold",emoji:"🔥",color:C.gold,width:65},maverick:{label:"Maverick",emoji:"🚀",color:C.red,width:90}};
-              const shown=displayStyle?styleMap[displayStyle]:adventInfo;
-              return(
-                <div style={{marginTop:10}}>
-                  <div style={{height:4,background:"var(--color-background-secondary)",borderRadius:99,overflow:"hidden"}}>
-                    <div style={{height:"100%",width:`${shown.width||0}%`,background:shown.color,borderRadius:99,transition:"width 0.3s"}}/>
-                  </div>
-                  <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
-                    <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>
-                      {displayStyle?"Simulated as:":"Pick style from your predictions:"} <strong style={{color:shown.color}}>{shown.emoji} {shown.label}</strong>
-                    </span>
-                    {!displayStyle&&<span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{adventScore}/100</span>}
-                  </div>
+            {adventScore!==null&&(
+              <div style={{marginTop:10}}>
+                <div style={{height:4,background:"var(--color-background-secondary)",borderRadius:99,overflow:"hidden"}}>
+                  <div style={{height:"100%",width:`${adventInfo.width||0}%`,background:adventInfo.color,borderRadius:99,transition:"width 0.3s"}}/>
                 </div>
-              );
-            })()}
+                <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
+                  <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>Your pick style: <strong style={{color:adventInfo.color}}>{adventInfo.emoji} {adventInfo.label}</strong></span>
+                  <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{adventScore}/100</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Group tabs */}
