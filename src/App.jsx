@@ -996,6 +996,7 @@ export default function App(){
   const [emailError,setEmailError]=useState("");
   const [agreeError,setAgreeError]=useState(false);
   const [waitlistEmail,setWaitlistEmail]=useState("");
+  const [lastSimulatedStyle,setLastSimulatedStyle]=useState(null);
   const [saveStatus,setSaveStatus]=useState(null); // null | 'saving' | 'saved' | 'error'
   const [authMode,setAuthMode]=useState("signup"); // 'signup' | 'signin'
   const [authLoading,setAuthLoading]=useState(false);
@@ -1062,6 +1063,7 @@ export default function App(){
 
   const updateScore=(group,idx,side,val)=>{
     if(val!==""&&(isNaN(val)||parseInt(val)<0||parseInt(val)>99))return;
+    setLastSimulatedStyle(null);
     setGroupMatches(prev=>{
       const u=[...prev[group]];
       u[idx]={...u[idx],[side]:val};
@@ -1086,7 +1088,7 @@ export default function App(){
       return{...prev,[rk]:newVal};
     });
   };
-  const simulateAll=()=>{setGroupMatches(simulateAllMatches(simulateStyle));setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});};
+  const simulateAll=()=>{setGroupMatches(simulateAllMatches(simulateStyle));setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});setLastSimulatedStyle(simulateStyle);};
   const clearAll=()=>{
     const all={};Object.entries(GROUPS).forEach(([g,teams])=>{all[g]=generateGroupMatches(teams);});
     setGroupMatches(all);setDoubleDown({r1:null,r2:null,r3:null});setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{}});
@@ -1559,17 +1561,24 @@ export default function App(){
                 Simulate ↻
               </button>
             </div>
-            {adventScore!==null&&(
-              <div style={{marginTop:10}}>
-                <div style={{height:4,background:"var(--color-background-secondary)",borderRadius:99,overflow:"hidden"}}>
-                  <div style={{height:"100%",width:`${adventInfo.width||0}%`,background:adventInfo.color,borderRadius:99,transition:"width 0.3s"}}/>
+            {(adventScore!==null||lastSimulatedStyle)&&(()=>{
+              const displayStyle=lastSimulatedStyle||null;
+              const styleMap={cautious:{label:"Cautious",emoji:"🛡️",color:C.blue,width:15},balanced:{label:"Balanced",emoji:"⚖️",color:C.green,width:40},bold:{label:"Bold",emoji:"🔥",color:C.gold,width:65},maverick:{label:"Maverick",emoji:"🚀",color:C.red,width:90}};
+              const shown=displayStyle?styleMap[displayStyle]:adventInfo;
+              return(
+                <div style={{marginTop:10}}>
+                  <div style={{height:4,background:"var(--color-background-secondary)",borderRadius:99,overflow:"hidden"}}>
+                    <div style={{height:"100%",width:`${shown.width||0}%`,background:shown.color,borderRadius:99,transition:"width 0.3s"}}/>
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
+                    <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>
+                      {displayStyle?"Simulated as:":"Pick style from your predictions:"} <strong style={{color:shown.color}}>{shown.emoji} {shown.label}</strong>
+                    </span>
+                    {!displayStyle&&<span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{adventScore}/100</span>}
+                  </div>
                 </div>
-                <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
-                  <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>Pick style from your predictions: <strong style={{color:adventInfo.color}}>{adventInfo.emoji} {adventInfo.label}</strong></span>
-                  <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{adventScore}/100</span>
-                </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
 
           {/* Group tabs */}
