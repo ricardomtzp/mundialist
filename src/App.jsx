@@ -25,6 +25,22 @@ const GROUPS = {
 };
 
 const SEEDED=new Set(["Mexico","Canada","USA","Brazil","Germany","Spain","France","England","Portugal","Belgium","Netherlands","Argentina"]);
+
+// FIFA World Rankings April 2026 (higher = better)
+const FIFA_RANK={
+  France:100,Spain:99,Argentina:98,England:97,Portugal:96,
+  Brazil:95,Netherlands:94,Morocco:93,Belgium:92,Germany:91,
+  USA:88,Mexico:86,Uruguay:85,Croatia:84,Switzerland:83,
+  Colombia:82,Senegal:81,Japan:80,Ecuador:79,"South Korea":78,
+  Norway:77,Australia:76,"Ivory Coast":75,Canada:74,
+  Austria:73,Algeria:72,Tunisia:71,Sweden:70,Qatar:69,
+  Ghana:68,Bolivia:67,Paraguay:66,Iraq:65,Jordan:64,
+  "DR Congo":63,Uzbekistan:62,"Cape Verde":61,"Saudi Arabia":60,
+  Egypt:59,Iran:58,"New Zealand":57,Haiti:56,Scotland:55,
+  Czechia:54,"Bosnia and Herzegovina":53,"South Africa":52,
+  Türkiye:51,Curaçao:50,
+};
+const getRank=t=>FIFA_RANK[t]||50;
 const STRONG=new Set(["Brazil","France","Germany","Spain","England","Argentina","Portugal","Netherlands","USA","Mexico","Belgium","Morocco"]);
 
 const FLAGS={
@@ -661,17 +677,158 @@ const R32_TO_R16 = [
 
 const ANNEX_IDX={"1A":0,"1B":1,"1D":2,"1E":3,"1G":4,"1I":5,"1K":6,"1L":7};
 
+
+// FIFA WC2026 match venues
+// Group stage matchday order: [0]=MD1 match1, [1]=MD1 match2, [2]=MD2 match1, [3]=MD2 match2, [4]=MD3 match1, [5]=MD3 match2
+const GROUP_VENUES={
+  A:[
+    {venue:"SoFi Stadium",city:"Los Angeles"},
+    {venue:"Estadio Azteca",city:"Mexico City"},
+    {venue:"Rose Bowl",city:"Los Angeles"},
+    {venue:"Estadio Azteca",city:"Mexico City"},
+    {venue:"Levi's Stadium",city:"San Francisco"},
+    {venue:"Rose Bowl",city:"Los Angeles"},
+  ],
+  B:[
+    {venue:"BC Place",city:"Vancouver"},
+    {venue:"BMO Field",city:"Toronto"},
+    {venue:"BC Place",city:"Vancouver"},
+    {venue:"BMO Field",city:"Toronto"},
+    {venue:"BC Place",city:"Vancouver"},
+    {venue:"BMO Field",city:"Toronto"},
+  ],
+  C:[
+    {venue:"AT&T Stadium",city:"Dallas"},
+    {venue:"SoFi Stadium",city:"Los Angeles"},
+    {venue:"Lumen Field",city:"Seattle"},
+    {venue:"AT&T Stadium",city:"Dallas"},
+    {venue:"SoFi Stadium",city:"Los Angeles"},
+    {venue:"Lumen Field",city:"Seattle"},
+  ],
+  D:[
+    {venue:"MetLife Stadium",city:"New York/New Jersey"},
+    {venue:"AT&T Stadium",city:"Dallas"},
+    {venue:"Arrowhead Stadium",city:"Kansas City"},
+    {venue:"MetLife Stadium",city:"New York/New Jersey"},
+    {venue:"AT&T Stadium",city:"Dallas"},
+    {venue:"Arrowhead Stadium",city:"Kansas City"},
+  ],
+  E:[
+    {venue:"Allianz Field",city:"Minneapolis"},
+    {venue:"Lincoln Financial Field",city:"Philadelphia"},
+    {venue:"Allianz Field",city:"Minneapolis"},
+    {venue:"Lincoln Financial Field",city:"Philadelphia"},
+    {venue:"Allianz Field",city:"Minneapolis"},
+    {venue:"Lincoln Financial Field",city:"Philadelphia"},
+  ],
+  F:[
+    {venue:"Hard Rock Stadium",city:"Miami"},
+    {venue:"Camping World Stadium",city:"Orlando"},
+    {venue:"Hard Rock Stadium",city:"Miami"},
+    {venue:"Camping World Stadium",city:"Orlando"},
+    {venue:"Hard Rock Stadium",city:"Miami"},
+    {venue:"Camping World Stadium",city:"Orlando"},
+  ],
+  G:[
+    {venue:"Mercedes-Benz Stadium",city:"Atlanta"},
+    {venue:"Geodis Park",city:"Nashville"},
+    {venue:"Mercedes-Benz Stadium",city:"Atlanta"},
+    {venue:"Geodis Park",city:"Nashville"},
+    {venue:"Mercedes-Benz Stadium",city:"Atlanta"},
+    {venue:"Geodis Park",city:"Nashville"},
+  ],
+  H:[
+    {venue:"Estadio Akron",city:"Guadalajara"},
+    {venue:"Estadio BBVA",city:"Monterrey"},
+    {venue:"Estadio Akron",city:"Guadalajara"},
+    {venue:"Estadio BBVA",city:"Monterrey"},
+    {venue:"Estadio Akron",city:"Guadalajara"},
+    {venue:"Estadio BBVA",city:"Monterrey"},
+  ],
+  I:[
+    {venue:"Lumen Field",city:"Seattle"},
+    {venue:"Oracle Park",city:"San Francisco"},
+    {venue:"Lumen Field",city:"Seattle"},
+    {venue:"Oracle Park",city:"San Francisco"},
+    {venue:"Lumen Field",city:"Seattle"},
+    {venue:"Oracle Park",city:"San Francisco"},
+  ],
+  J:[
+    {venue:"MetLife Stadium",city:"New York/New Jersey"},
+    {venue:"Gillette Stadium",city:"Boston"},
+    {venue:"MetLife Stadium",city:"New York/New Jersey"},
+    {venue:"Gillette Stadium",city:"Boston"},
+    {venue:"MetLife Stadium",city:"New York/New Jersey"},
+    {venue:"Gillette Stadium",city:"Boston"},
+  ],
+  K:[
+    {venue:"Estadio BBVA",city:"Monterrey"},
+    {venue:"Estadio Akron",city:"Guadalajara"},
+    {venue:"Estadio BBVA",city:"Monterrey"},
+    {venue:"Estadio Akron",city:"Guadalajara"},
+    {venue:"Estadio BBVA",city:"Monterrey"},
+    {venue:"Estadio Akron",city:"Guadalajara"},
+  ],
+  L:[
+    {venue:"AT&T Stadium",city:"Dallas"},
+    {venue:"NRG Stadium",city:"Houston"},
+    {venue:"AT&T Stadium",city:"Dallas"},
+    {venue:"NRG Stadium",city:"Houston"},
+    {venue:"AT&T Stadium",city:"Dallas"},
+    {venue:"NRG Stadium",city:"Houston"},
+  ],
+};
 const ROUND_INDICES = [[0,1],[2,3],[4,5]];
 
 
 // ── Simulation with style bias ─────────────────────────────────────────────
-function rndGoalsStyled(strong,style){
-  const upsetChance=style==="maverick"?0.35:style==="bold"?0.22:style==="balanced"?0.12:0.05;
-  if(strong&&Math.random()<upsetChance) strong=false;
+// Simulate a match using FIFA rankings and prediction style
+// rankDiff: positive means home team is stronger
+function simulateMatch(homeTeam, awayTeam, style){
+  const homeRank=getRank(homeTeam);
+  const awayRank=getRank(awayTeam);
+  const diff=homeRank-awayRank; // positive = home stronger
+
+  // Base win probability for home team (logistic curve)
+  const baseHomeWinProb=1/(1+Math.pow(10,-diff/30));
+
+  // Style modifies how much we respect rankings
+  // Cautious: follow rankings closely
+  // Maverick: almost random, upsets likely
+  const styleNoise={cautious:0.05,balanced:0.15,bold:0.28,maverick:0.45}[style]||0.15;
+  const noise=(Math.random()-0.5)*2*styleNoise;
+  const homeWinProb=Math.max(0.05,Math.min(0.95,baseHomeWinProb+noise));
+
+  // Decide result
   const r=Math.random();
-  if(r<0.15)return 0;if(r<0.40)return 1;if(r<0.65)return 2;
-  if(r<0.82)return strong?3:2;if(r<0.93)return strong?4:3;
-  return style==="maverick"||style==="bold"?5:3;
+  // Draw probability increases when teams are close
+  const drawProb=0.25-Math.abs(diff)*0.003;
+  const clampedDrawProb=Math.max(0.10,Math.min(0.35,drawProb));
+
+  let homeWins, isDraw;
+  if(r<clampedDrawProb){isDraw=true;homeWins=false;}
+  else if(r<clampedDrawProb+(1-clampedDrawProb)*homeWinProb){homeWins=true;isDraw=false;}
+  else{homeWins=false;isDraw=false;}
+
+  // Generate goals — higher ranked teams score more
+  const avgGoals=style==="maverick"?3.2:style==="bold"?2.8:style==="balanced"?2.5:2.2;
+  const winnerGoals=()=>{
+    const g=Math.round(Math.random()*avgGoals*0.8+avgGoals*0.4);
+    return Math.max(1,Math.min(style==="maverick"?7:5,g));
+  };
+  const loserGoals=(w)=>Math.max(0,Math.min(w-1,Math.round(Math.random()*(w-0.5))));
+
+  let h,a;
+  if(isDraw){
+    h=Math.round(Math.random()*2.5);a=h;
+    // Small chance of high-scoring draw in maverick/bold
+    if((style==="maverick"||style==="bold")&&Math.random()<0.2){h=Math.round(Math.random()*2+1);a=h;}
+  } else if(homeWins){
+    h=winnerGoals();a=loserGoals(h);
+  } else {
+    a=winnerGoals();h=loserGoals(a);
+  }
+  return{homeScore:String(h),awayScore:String(a)};
 }
 
 function simulateAllMatches(style="balanced"){
@@ -681,10 +838,10 @@ function simulateAllMatches(style="balanced"){
       {home:teams[0],away:teams[1]},{home:teams[2],away:teams[3]},
       {home:teams[0],away:teams[2]},{home:teams[1],away:teams[3]},
       {home:teams[0],away:teams[3]},{home:teams[1],away:teams[2]},
-    ].map(m=>({...m,
-      homeScore:String(rndGoalsStyled(STRONG.has(m.home),style)),
-      awayScore:String(rndGoalsStyled(STRONG.has(m.away),style)),
-    }));
+    ].map(m=>{
+      const result=simulateMatch(m.home,m.away,style);
+      return{...m,...result};
+    });
   });
   return all;
 }
@@ -1462,12 +1619,20 @@ export default function App(){
                         {!SEEDED.has(match.home)&&homeQualifies&&<span style={{fontSize:10,color:C.gold}}>★</span>}
                         <span style={{fontSize:22}}>{FLAGS[match.home]||"❓"}</span>
                       </div>
-                      <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-                        <input type="number" min="0" max="99" value={match.homeScore} onChange={e=>updateScore(activeGroup,idx,"homeScore",e.target.value)}
-                          style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
-                        <span style={{fontSize:14,color:"var(--color-text-tertiary)"}}>–</span>
-                        <input type="number" min="0" max="99" value={match.awayScore} onChange={e=>updateScore(activeGroup,idx,"awayScore",e.target.value)}
-                          style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,flexShrink:0}}>
+                        <div style={{display:"flex",alignItems:"center",gap:8}}>
+                          <input type="number" min="0" max="99" value={match.homeScore} onChange={e=>updateScore(activeGroup,idx,"homeScore",e.target.value)}
+                            style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                          <span style={{fontSize:14,color:"var(--color-text-tertiary)"}}>–</span>
+                          <input type="number" min="0" max="99" value={match.awayScore} onChange={e=>updateScore(activeGroup,idx,"awayScore",e.target.value)}
+                            style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                        </div>
+                        {GROUP_VENUES[activeGroup]?.[idx]&&(
+                          <div style={{fontSize:9,color:"var(--color-text-tertiary)",textAlign:"center",lineHeight:1.3}}>
+                            <div>{GROUP_VENUES[activeGroup][idx].venue}</div>
+                            <div style={{color:"var(--color-text-secondary)",fontSize:9}}>{GROUP_VENUES[activeGroup][idx].city}</div>
+                          </div>
+                        )}
                       </div>
                       <div style={{flex:1,display:"flex",alignItems:"center",gap:8}}>
                         <span style={{fontSize:22}}>{FLAGS[match.away]||"❓"}</span>
