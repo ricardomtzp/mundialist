@@ -934,6 +934,35 @@ function adventLabel(pct){
   return{label:"Maverick",color:C.red,emoji:"🚀",width:pct};
 }
 
+// ── Points calculation engine ─────────────────────────────────────────────
+function calcMatchPoints(predHome, predAway, actualHome, actualAway){
+  if(actualHome===null||actualAway===null)return 0;
+  if(predHome===null||predAway===null)return 0;
+  const ph=parseInt(predHome),pa=parseInt(predAway);
+  const ah=parseInt(actualHome),aa=parseInt(actualAway);
+  // Exact score
+  if(ph===ah&&pa===aa)return 10;
+  const predResult=ph>pa?'H':ph<pa?'A':'D';
+  const actualResult=ah>aa?'H':ah<aa?'A':'D';
+  // Correct result
+  if(predResult===actualResult){
+    // Correct draw, different score
+    if(predResult==='D')return 8;
+    // Correct result + correct GD
+    if((ph-pa)===(ah-aa))return 8;
+    return 6;
+  }
+  return 0;
+}
+
+function calcKOPoints(round, pickedTeam, actualWinner, isDarkHorse){
+  if(!actualWinner||!pickedTeam)return 0;
+  if(pickedTeam!==actualWinner)return 0;
+  const base={r32:12,r16:14,qf:16,sf:18,final:25,third:12}[round]||0;
+  const darkBonus=isDarkHorse?{qf:5,sf:10,final:15}[round]||0:0;
+  return base+darkBonus;
+}
+
 function useCountdown(){
   const target=new Date("2026-06-11T18:00:00Z").getTime();
   const calc=()=>{
@@ -996,6 +1025,8 @@ export default function App(){
   const [emailError,setEmailError]=useState("");
   const [agreeError,setAgreeError]=useState(false);
   const [waitlistEmail,setWaitlistEmail]=useState("");
+  const [actualResults,setActualResults]=useState({}); // {matchId: {home, away, status}}
+  const [totalPoints,setTotalPoints]=useState(0);
   const [saveStatus,setSaveStatus]=useState(null); // null | 'saving' | 'saved' | 'error'
   const [authMode,setAuthMode]=useState("signup"); // 'signup' | 'signin'
   const [authLoading,setAuthLoading]=useState(false);
@@ -1147,6 +1178,7 @@ export default function App(){
         setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:data.user.id});
         setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
         loadUserData(data.user.id);
+        loadActualResults();
         setPage("predict");
       }
     } catch(err){
@@ -1203,6 +1235,47 @@ export default function App(){
     }catch(e){console.error('Waitlist save failed',e);}
   };
 
+  // ── Load actual match results from DB ────────────────────────────────────
+  const loadActualResults=async()=>{
+    const {data}=await supabase.from('matches').select('id,home_team,away_team,actual_home,actual_away,status,stage,group_name,match_day');
+    if(data){
+      const map={};
+      data.forEach(m=>{map[m.id]=m;});
+      setActualResults(map);
+    }
+  };
+
+  // ── Calculate total points ────────────────────────────────────────────────
+  const calcTotalPoints=useCallback((groupMatchesData, koPicked, doubleDownData, actualResultsData)=>{
+    let total=0;
+    // Group stage points
+    Object.entries(GROUPS).forEach(([g,teams])=>{
+      const matches=groupMatchesData[g]||[];
+      matches.forEach((m,idx)=>{
+        const matchId=`OF-2026-06-${String(idx+1).padStart(2,'0')}-${m.home?.replace(/\s/g,'-')}-${m.away?.replace(/\s/g,'-')}`;
+        // Find actual result by home/away team names
+        const actual=Object.values(actualResultsData).find(r=>
+          r.home_team===m.home&&r.away_team===m.away&&r.status==='finished'
+        );
+        if(!actual)return;
+        let pts=calcMatchPoints(m.homeScore,m.awayScore,actual.actual_home,actual.actual_away);
+        // Check double-down
+        const doubleId=`${g}-${idx}`;
+        if(Object.values(doubleDownData).includes(doubleId))pts*=2;
+        total+=pts;
+      });
+    });
+    // Knockout points
+    Object.entries(koPicked.r32||{}).forEach(([id,team])=>{
+      const match=Object.values(actualResultsData).find(r=>r.stage==='r32'&&r.status==='finished');
+      if(!match)return;
+      const winner=match.actual_home>match.actual_away?match.home_team:match.away_team;
+      if(team===winner)total+=calcKOPoints('r32',team,winner,!SEEDED.has(team));
+    });
+    setTotalPoints(total);
+    return total;
+  },[]);
+
   // ── Load existing predictions on sign in ──────────────────────────────────
   const loadUserData=async(userId)=>{
     try{
@@ -1257,6 +1330,7 @@ export default function App(){
             setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:session.user.id});
             setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
             loadUserData(session.user.id);
+            loadActualResults();
           }
         });
       }
@@ -1332,7 +1406,7 @@ export default function App(){
               <div style={{width:30,height:30,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#fff"}}>{user.avatar}</div>
               <div style={{display:"flex",flexDirection:"column"}}>
                 <span style={{fontSize:12,color:"var(--color-text-primary)",fontWeight:500}}>{user.handle}</span>
-                <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{totalPredicted}/72 · {koPicked}/32</span>
+                <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{totalPredicted}/72 · {koPicked}/32{totalPoints>0?" · "+totalPoints+"pts":""}</span>
               </div>
               <button onClick={async()=>{await supabase.auth.signOut();setUser(null);setPage("home");}}
                 style={{padding:"4px 8px",background:"none",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:11,color:"var(--color-text-tertiary)",cursor:"pointer",marginLeft:4}}>
@@ -1621,13 +1695,38 @@ export default function App(){
                         <span style={{fontSize:22}}>{FLAGS[match.home]||"❓"}</span>
                       </div>
                       <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,flexShrink:0}}>
-                        <div style={{display:"flex",alignItems:"center",gap:8}}>
-                          <input type="number" min="0" max="99" value={match.homeScore} onChange={e=>updateScore(activeGroup,idx,"homeScore",e.target.value)}
-                            style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
-                          <span style={{fontSize:14,color:"var(--color-text-tertiary)"}}>–</span>
-                          <input type="number" min="0" max="99" value={match.awayScore} onChange={e=>updateScore(activeGroup,idx,"awayScore",e.target.value)}
-                            style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
-                        </div>
+                        {(()=>{
+                          const actual=Object.values(actualResults).find(r=>r.home_team===match.home&&r.away_team===match.away&&r.status==="finished");
+                          if(actual){
+                            const pts=calcMatchPoints(match.homeScore,match.awayScore,actual.actual_home,actual.actual_away)*(isMyDouble?2:1);
+                            const col=pts>=10?C.green:pts>=6?C.blue:pts>0?C.gold:"#888";
+                            return(
+                              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                                <div style={{display:"flex",gap:16,alignItems:"center"}}>
+                                  <div style={{textAlign:"center"}}>
+                                    <div style={{fontSize:9,color:"var(--color-text-tertiary)",marginBottom:2}}>your pick</div>
+                                    <span style={{fontSize:18,fontWeight:600,fontFamily:"monospace",color:"var(--color-text-primary)"}}>{match.homeScore||"–"} – {match.awayScore||"–"}</span>
+                                  </div>
+                                  <div style={{width:1,height:32,background:"var(--color-border-tertiary)"}}/>
+                                  <div style={{textAlign:"center"}}>
+                                    <div style={{fontSize:9,color:C.blue,marginBottom:2}}>actual</div>
+                                    <span style={{fontSize:18,fontWeight:600,fontFamily:"monospace",color:C.blue}}>{actual.actual_home} – {actual.actual_away}</span>
+                                  </div>
+                                </div>
+                                <span style={{padding:"2px 10px",borderRadius:99,fontSize:11,fontWeight:500,background:col+"22",color:col}}>{pts>0?"+"+pts+" pts":"0 pts"}</span>
+                              </div>
+                            );
+                          }
+                          return(
+                            <div style={{display:"flex",alignItems:"center",gap:8}}>
+                              <input type="number" min="0" max="99" value={match.homeScore} onChange={e=>updateScore(activeGroup,idx,"homeScore",e.target.value)}
+                                style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                              <span style={{fontSize:14,color:"var(--color-text-tertiary)"}}>–</span>
+                              <input type="number" min="0" max="99" value={match.awayScore} onChange={e=>updateScore(activeGroup,idx,"awayScore",e.target.value)}
+                                style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                            </div>
+                          );
+                        })()}
                         {GROUP_VENUES[activeGroup]?.[idx]&&(
                           <div style={{fontSize:9,color:"var(--color-text-tertiary)",textAlign:"center",lineHeight:1.3}}>
                             <div>{GROUP_VENUES[activeGroup][idx].venue}</div>
