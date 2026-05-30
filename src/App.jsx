@@ -1076,33 +1076,31 @@ function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,lo
       )}
       <button onClick={()=>pick&&setLocked(true)} disabled={!pick} style={{width:"100%",padding:"11px",background:pick?color:"var(--color-background-secondary)",color:pick?"#fff":"var(--color-text-tertiary)",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:pick?"pointer":"not-allowed"}}>Lock in pick →</button>
     </div>
-  ):(
-    <LockedPick pick={pick} emoji={emoji} color={color} pts={pts} actualWinner={actualWinner} setLocked={setLocked}/>
+  ):(()=>{
+    const isCorrect=actualWinner&&pick?.name===actualWinner;
+    const isWrong=actualWinner&&pick?.name!==actualWinner;
+    const borderCol=isCorrect?C.green:isWrong?"#ef4444":color;
+    const bgCol=isCorrect?C.greenLt:isWrong?"#fef2f2":color+"11";
+    return(
+      <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:bgCol,border:`0.5px solid ${borderCol}`,borderRadius:10}}>
+        <span style={{fontSize:26}}>{pick?.flag||emoji}</span>
+        <div style={{flex:1}}>
+          <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{pick?.name}</div>
+          {actualWinner?(
+            <div style={{fontSize:12,color:isCorrect?C.green:"#ef4444",fontWeight:500}}>
+              {isCorrect?`✓ Correct! +${pts} pts`:`✗ Winner was ${actualWinner}`}
+            </div>
+          ):(
+            <div style={{fontSize:12,color}}>{pick?.nation} · {pts} pts if correct</div>
+          )}
+        </div>
+        {!actualWinner&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
+      </div>
+    );
+  })()
   );
 }
 
-function LockedPick({pick,emoji,color,pts,actualWinner,setLocked}){
-  const isCorrect=actualWinner&&pick?.name===actualWinner;
-  const isWrong=actualWinner&&pick?.name!==actualWinner;
-  const borderCol=isCorrect?C.green:isWrong?"#ef4444":color;
-  const bgCol=isCorrect?C.greenLt:isWrong?"#fef2f2":color+"11";
-  return(
-    <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:bgCol,border:`0.5px solid ${borderCol}`,borderRadius:10}}>
-      <span style={{fontSize:26}}>{pick?.flag||emoji}</span>
-      <div style={{flex:1}}>
-        <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{pick?.name}</div>
-        {actualWinner?(
-          <div style={{fontSize:12,color:isCorrect?C.green:"#ef4444",fontWeight:500}}>
-            {isCorrect?`✓ Correct! +${pts} pts`:`✗ Winner was ${actualWinner}`}
-          </div>
-        ):(
-          <div style={{fontSize:12,color}}>{pick?.nation} · {pts} pts if correct</div>
-        )}
-      </div>
-      {!actualWinner&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
-    </div>
-  );
-}
 const NAV=[{label:"Home",page:"home"},{label:"Group Stage",page:"predict"},{label:"Knockout",page:"bracket"},{label:"Bonuses",page:"bonuses"},{label:"My League",page:"league"},{label:"Instructions",page:"points"}];
 
 export default function App(){
@@ -2052,14 +2050,27 @@ export default function App(){
                 <span style={{fontFamily:"monospace",color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>{koPicked}/31 picks</span>
               </div>
             </div>
-            <div style={{display:"flex",gap:8,flexShrink:0}}>
-              <button onClick={()=>{
-                const simKO=simulateKnockout(r32Bracket,simulateStyle);
-                setKoPicks(simKO);
-              }} style={{padding:"8px 14px",border:`0.5px solid ${C.blue}`,borderRadius:8,background:C.blueLt,fontSize:12,color:C.blue,cursor:"pointer"}}>
-                Simulate {adventInfo.emoji||"↻"}
-              </button>
-              <button onClick={()=>setPage("predict")} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer"}}>← Group stage</button>
+            <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-end",flexShrink:0}}>
+              <div style={{display:"flex",gap:6}}>
+                {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
+                  <button key={k} onClick={()=>setSimulateStyle(k)}
+                    style={{padding:"6px 12px",borderRadius:8,fontSize:12,cursor:"pointer",fontWeight:simulateStyle===k?600:400,
+                      border:`0.5px solid ${simulateStyle===k?C.blue:"var(--color-border-tertiary)"}`,
+                      background:simulateStyle===k?C.blueLt:"var(--color-background-primary)",
+                      color:simulateStyle===k?C.blue:"var(--color-text-secondary)"}}>
+                    {e} {l}
+                  </button>
+                ))}
+              </div>
+              <div style={{display:"flex",gap:8}}>
+                <button onClick={()=>{
+                  const simKO=simulateKnockout(r32Bracket,simulateStyle);
+                  setKoPicks(simKO);
+                }} style={{padding:"8px 14px",border:`0.5px solid ${C.blue}`,borderRadius:8,background:C.blueLt,fontSize:12,color:C.blue,cursor:"pointer"}}>
+                  Simulate ↻
+                </button>
+                <button onClick={()=>setPage("predict")} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer"}}>← Group stage</button>
+              </div>
             </div>
           </div>
 
@@ -2144,7 +2155,7 @@ export default function App(){
                 )}
                 <div style={{marginTop:16,width:"100%"}}>
                   <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>3rd place match</div>
-                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>setKoPicks(prev=>({...prev,third:t}))} label="3rd place" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
+                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label="3rd place" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
                   {koPicks.third&&koPicks.third!=="TBD"&&(
                     <div style={{marginTop:4,padding:"6px 10px",background:"var(--color-background-secondary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,textAlign:"center"}}>
                       <div style={{fontSize:10,color:"var(--color-text-secondary)"}}>🥉 {koPicks.third}</div>
