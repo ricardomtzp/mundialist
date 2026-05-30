@@ -1097,8 +1097,7 @@ function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,lo
         {!actualWinner&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
       </div>
     );
-  })()
-  );
+  })()}
 }
 
 const NAV=[{label:"Home",page:"home"},{label:"Group Stage",page:"predict"},{label:"Knockout",page:"bracket"},{label:"Bonuses",page:"bonuses"},{label:"My League",page:"league"},{label:"Instructions",page:"points"}];
