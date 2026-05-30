@@ -1076,30 +1076,33 @@ function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,lo
       )}
       <button onClick={()=>pick&&setLocked(true)} disabled={!pick} style={{width:"100%",padding:"11px",background:pick?color:"var(--color-background-secondary)",color:pick?"#fff":"var(--color-text-tertiary)",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:pick?"pointer":"not-allowed"}}>Lock in pick →</button>
     </div>
-  ):(()=>{
-    const isCorrect=actualWinner&&pick?.name===actualWinner;
-    const isWrong=actualWinner&&pick?.name!==actualWinner;
-    const borderCol=isCorrect?C.green:isWrong?"#ef4444":color;
-    const bgCol=isCorrect?C.greenLt:isWrong?"#fef2f2":color+"11";
-    return(
-      <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:bgCol,border:`0.5px solid ${borderCol}`,borderRadius:10}}>
-        <span style={{fontSize:26}}>{pick?.flag||emoji}</span>
-        <div style={{flex:1}}>
-          <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{pick?.name}</div>
-          {actualWinner?(
-            <div style={{fontSize:12,color:isCorrect?C.green:"#ef4444",fontWeight:500}}>
-              {isCorrect?`✓ Correct! +${pts} pts`:`✗ Winner was ${actualWinner}`}
-            </div>
-          ):(
-            <div style={{fontSize:12,color}}>{pick?.nation} · {pts} pts if correct</div>
-          )}
-        </div>
-        {!actualWinner&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
-      </div>
-    );
-  })()}
+  ):(
+    <LockedPick pick={pick} emoji={emoji} color={color} pts={pts} actualWinner={actualWinner} setLocked={setLocked}/>
+  );
 }
 
+function LockedPick({pick,emoji,color,pts,actualWinner,setLocked}){
+  const isCorrect=actualWinner&&pick?.name===actualWinner;
+  const isWrong=actualWinner&&pick?.name!==actualWinner;
+  const borderCol=isCorrect?C.green:isWrong?"#ef4444":color;
+  const bgCol=isCorrect?C.greenLt:isWrong?"#fef2f2":color+"11";
+  return(
+    <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:bgCol,border:`0.5px solid ${borderCol}`,borderRadius:10}}>
+      <span style={{fontSize:26}}>{pick?.flag||emoji}</span>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{pick?.name}</div>
+        {actualWinner?(
+          <div style={{fontSize:12,color:isCorrect?C.green:"#ef4444",fontWeight:500}}>
+            {isCorrect?`✓ Correct! +${pts} pts`:`✗ Winner was ${actualWinner}`}
+          </div>
+        ):(
+          <div style={{fontSize:12,color}}>{pick?.nation} · {pts} pts if correct</div>
+        )}
+      </div>
+      {!actualWinner&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
+    </div>
+  );
+}
 const NAV=[{label:"Home",page:"home"},{label:"Group Stage",page:"predict"},{label:"Knockout",page:"bracket"},{label:"Bonuses",page:"bonuses"},{label:"My League",page:"league"},{label:"Instructions",page:"points"}];
 
 export default function App(){
