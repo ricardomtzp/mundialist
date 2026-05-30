@@ -1518,7 +1518,7 @@ export default function App(){
         // Get champion, runner-up and 3rd place from KO predictions
         const finalPred2=userPreds.find(p=>p.match_id==='KO-final-0');
         const championPick2=finalPred2?.advancing_team||null;
-        const thirdPred=userPreds.find(p=>p.match_id==='KO-third');
+        const thirdPred=userPreds.find(p=>p.match_id==='KO-third'||p.match_id==='KO-third-0');
         // Runner-up: both SF winners go to final, the one who doesn't win is runner-up
         const sfWinners=userPreds.filter(p=>p.match_id?.startsWith('KO-sf-')&&p.advancing_team).map(p=>p.advancing_team);
         const runnerUpPick=championPick2&&sfWinners.length===2?sfWinners.find(t=>t!==championPick2)||null:null;
