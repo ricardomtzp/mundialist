@@ -1053,33 +1053,11 @@ function AdSlot(){return(<div style={{width:"100%",height:72,background:"var(--c
 function LockBanner(){return(<div style={{display:"flex",gap:10,padding:"11px 14px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:10,marginBottom:"1.25rem",fontSize:13,color:"#7a5c10",lineHeight:1.5}}><span>🔒</span><div><strong>All predictions lock at tournament kickoff — June 11, 2026.</strong></div></div>);}
 
 function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,locked,setLocked,emoji,actualWinner=null}){
-  const isCorrect=actualWinner&&pick?.name===actualWinner;
-  const isWrong=actualWinner&&pick?.name!==actualWinner;
-  if(locked){
-    const borderCol=isCorrect?C.green:isWrong?"#ef4444":color;
-    const bgCol=isCorrect?C.greenLt:isWrong?"#fef2f2":color+"11";
-    return(
-      <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:bgCol,border:`0.5px solid ${borderCol}`,borderRadius:10}}>
-        <span style={{fontSize:26}}>{pick?.flag||emoji}</span>
-        <div style={{flex:1}}>
-          <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{pick?.name}</div>
-          {actualWinner?(
-            <div style={{fontSize:12,color:isCorrect?C.green:"#ef4444",fontWeight:500}}>
-              {isCorrect?`✓ Correct! +${pts} pts`:`✗ Winner was ${actualWinner}`}
-            </div>
-          ):(
-            <div style={{fontSize:12,color}}>{pick?.nation} · {pts} pts if correct</div>
-          )}
-        </div>
-        {!actualWinner&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
-      </div>
-    );
-  }
-  return(
+  return !locked?(
     <div>
-      <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={`Search ${label.toLowerCase()} name...`} style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,fontSize:14,background:"var(--color-background-primary)",color:"var(--color-text-primary)",outline:"none",marginBottom:8}}/>
+      <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={`Search ${label.toLowerCase()} name...`} style={{...inp,marginBottom:8}}/>
       {search.length>1&&(
-        <div style={{background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:12,overflow:"hidden",marginBottom:10}}>
+        <div style={{...card,marginBottom:10,overflow:"visible"}}>
           {filtered.length>0?filtered.slice(0,6).map(p=>(
             <div key={p.name} onClick={()=>{setPick(p);setSearch(p.name);}} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",gap:10,background:pick?.name===p.name?color+"11":"transparent"}}>
               <span style={{fontSize:20}}>{p.flag}</span>
@@ -1098,8 +1076,31 @@ function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,lo
       )}
       <button onClick={()=>pick&&setLocked(true)} disabled={!pick} style={{width:"100%",padding:"11px",background:pick?color:"var(--color-background-secondary)",color:pick?"#fff":"var(--color-text-tertiary)",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:pick?"pointer":"not-allowed"}}>Lock in pick →</button>
     </div>
+  ):(()=>{
+    const isCorrect=actualWinner&&pick?.name===actualWinner;
+    const isWrong=actualWinner&&pick?.name!==actualWinner;
+    const borderCol=isCorrect?C.green:isWrong?"#ef4444":color;
+    const bgCol=isCorrect?C.greenLt:isWrong?"#fef2f2":color+"11";
+    return(
+      <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:bgCol,border:`0.5px solid ${borderCol}`,borderRadius:10}}>
+        <span style={{fontSize:26}}>{pick?.flag||emoji}</span>
+        <div style={{flex:1}}>
+          <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{pick?.name}</div>
+          {actualWinner?(
+            <div style={{fontSize:12,color:isCorrect?C.green:"#ef4444",fontWeight:500}}>
+              {isCorrect?`✓ Correct! +${pts} pts`:`✗ Winner was ${actualWinner}`}
+            </div>
+          ):(
+            <div style={{fontSize:12,color}}>{pick?.nation} · {pts} pts if correct</div>
+          )}
+        </div>
+        {!actualWinner&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
+      </div>
+    );
+  })()
   );
 }
+
 const NAV=[{label:"Home",page:"home"},{label:"Group Stage",page:"predict"},{label:"Knockout",page:"bracket"},{label:"Bonuses",page:"bonuses"},{label:"My League",page:"league"},{label:"Instructions",page:"points"}];
 
 export default function App(){
@@ -2062,9 +2063,18 @@ export default function App(){
                 ))}
               </div>
               <div style={{display:"flex",gap:8}}>
-                <button onClick={()=>{
+                <button onClick={async()=>{
                   const simKO=simulateKnockout(r32Bracket,simulateStyle);
                   setKoPicks(simKO);
+                  // Save all simulated KO picks to Supabase
+                  const saves=[];
+                  Object.entries(simKO.r32||{}).forEach(([id,team])=>saves.push(saveKOPick('r32',id,team)));
+                  Object.entries(simKO.r16||{}).forEach(([id,team])=>saves.push(saveKOPick('r16',id,team)));
+                  Object.entries(simKO.qf||{}).forEach(([id,team])=>saves.push(saveKOPick('qf',id,team)));
+                  Object.entries(simKO.sf||{}).forEach(([id,team])=>saves.push(saveKOPick('sf',id,team)));
+                  if(simKO.final?.[0])saves.push(saveKOPick('final',0,simKO.final[0]));
+                  if(simKO.third)saves.push(saveKOPick('third',0,simKO.third));
+                  await Promise.all(saves);
                 }} style={{padding:"8px 14px",border:`0.5px solid ${C.blue}`,borderRadius:8,background:C.blueLt,fontSize:12,color:C.blue,cursor:"pointer"}}>
                   Simulate ↻
                 </button>
