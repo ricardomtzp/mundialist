@@ -1309,7 +1309,7 @@ export default function App(){
       }
       // Load bonus picks
       const {data:bonus}=await supabase.from('bonus_picks')
-        .select('*').eq('user_id',userId).maybeSingle();
+        .select('*').eq('user_id',userId).single();
       if(bonus){
         if(bonus.golden_boot_player){setGoldenBootPick({name:bonus.golden_boot_player,nation:'',flag:'⚽'});setGoldenBootLocked(bonus.golden_boot_locked||false);}
         if(bonus.top_assist_player){setTopAssistPick({name:bonus.top_assist_player,nation:'',flag:'🎯'});setTopAssistLocked(bonus.top_assist_locked||false);}
@@ -1342,17 +1342,100 @@ export default function App(){
     if(user?.id) loadActualResults();
   },[user?.id]);
 
+  // Load league members when active league changes
+  useEffect(()=>{
+    if(activeLeague?.id) loadLeagueMembers(activeLeague.id);
+  },[activeLeague?.id, actualResults]);
+
   const filteredBoot=bootSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(bootSearch.toLowerCase())||p.nation.toLowerCase().includes(bootSearch.toLowerCase())):[];
   const filteredAssist=assistSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(assistSearch.toLowerCase())||p.nation.toLowerCase().includes(assistSearch.toLowerCase())):[];
   const filteredGlove=gloveSearch.length>1?GOLDEN_GLOVE_PLAYERS.filter(p=>p.name.toLowerCase().includes(gloveSearch.toLowerCase())||p.nation.toLowerCase().includes(gloveSearch.toLowerCase())):[];
 
-  const leagueMembers=[
-    {name:user?.name||"You",handle:user?.handle||"@you",pts:142,avatar:user?.avatar||"Y",picks:{groupDone:totalPredicted,champion}},
-    {name:"Alex Chen",handle:"@alexc",pts:138,avatar:"A",picks:{groupDone:68,champion:"Brazil"}},
-    {name:"Sara Kim",handle:"@sarakim",pts:125,avatar:"S",picks:{groupDone:72,champion:"France"}},
-    {name:"Tom Walsh",handle:"@tomw",pts:119,avatar:"T",picks:{groupDone:60,champion:"England"}},
-    {name:"Priya Nair",handle:"@priya",pts:108,avatar:"P",picks:{groupDone:55,champion:"Spain"}},
-  ];
+  const [leagueMembers,setLeagueMembers]=useState([]);
+  const [leagueMembersLoading,setLeagueMembersLoading]=useState(false);
+
+  const loadLeagueMembers=async(leagueId)=>{
+    setLeagueMembersLoading(true);
+    try{
+      // Get all members of this league
+      const {data:members}=await supabase
+        .from('league_members')
+        .select('user_id, total_points')
+        .eq('league_id', leagueId==='global'?'00000000-0000-0000-0000-000000000001':leagueId);
+      if(!members?.length){setLeagueMembers([]);setLeagueMembersLoading(false);return;}
+
+      // Load profiles and bonus picks for each member
+      const memberIds=members.map(m=>m.user_id);
+      const [{data:profiles},{data:bonuses},{data:preds}]=await Promise.all([
+        supabase.from('users').select('id,name,handle,avatar_letter').in('id',memberIds),
+        supabase.from('bonus_picks').select('user_id,golden_boot_player,top_assist_player,golden_glove_player,ko_picks').in('user_id',memberIds),
+        supabase.from('predictions').select('user_id,match_id,home_score,away_score,is_double_down').in('user_id',memberIds),
+      ]);
+
+      const profileMap={};
+      (profiles||[]).forEach(p=>{profileMap[p.id]=p;});
+      const bonusMap={};
+      (bonuses||[]).forEach(b=>{bonusMap[b.user_id]=b;});
+      const predMap={};
+      (preds||[]).forEach(p=>{
+        if(!predMap[p.user_id])predMap[p.user_id]=[];
+        predMap[p.user_id].push(p);
+      });
+
+      // Calculate points for each member
+      const withPoints=members.map(m=>{
+        const profile=profileMap[m.user_id]||{};
+        const bonus=bonusMap[m.user_id]||{};
+        const userPreds=predMap[m.user_id]||[];
+
+        // Count group picks
+        const groupDone=userPreds.filter(p=>p.match_id?.startsWith('GS-')&&p.home_score!==null).length;
+
+        // Calculate points from predictions vs actual results
+        let pts=0;
+        userPreds.forEach(p=>{
+          if(p.match_id?.startsWith('GS-')){
+            const actual=Object.values(actualResults).find(r=>
+              r.home_team&&r.away_team&&
+              p.match_id===`GS-${r.group_name}-${r.match_day||0}`&&
+              r.status==='finished'
+            );
+            if(actual){
+              let matchPts=calcMatchPoints(p.home_score,p.away_score,actual.actual_home,actual.actual_away);
+              if(p.is_double_down)matchPts*=2;
+              pts+=matchPts;
+            }
+          }
+        });
+
+        // Get champion pick from ko_picks
+        const koPicks=bonus.ko_picks||{};
+        const championPick=koPicks.final?.[0]||null;
+
+        return{
+          id:m.user_id,
+          name:profile.name||"Unknown",
+          handle:"@"+(profile.handle||"unknown"),
+          avatar:profile.avatar_letter||profile.name?.[0]?.toUpperCase()||"?",
+          pts,
+          picks:{
+            groupDone,
+            champion:championPick,
+            goldenBoot:bonus.golden_boot_player||null,
+            topAssist:bonus.top_assist_player||null,
+            goldenGlove:bonus.golden_glove_player||null,
+          },
+          isMe:m.user_id===user?.id,
+        };
+      }).sort((a,b)=>b.pts-a.pts);
+
+      setLeagueMembers(withPoints);
+    }catch(e){
+      console.error('loadLeagueMembers error:',e);
+    }finally{
+      setLeagueMembersLoading(false);
+    }
+  };
 
   // ── Shared match card for knockout ──
   function KOCard({home,away,picked,onPick,label,gold=false}){
@@ -2055,13 +2138,25 @@ export default function App(){
                 <div><div style={{fontSize:16,fontWeight:500,color:"var(--color-text-primary)"}}>{viewingUser.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{viewingUser.handle} · {viewingUser.picks.groupDone}/72 group picks</div></div>
               </div>
               <div style={card}>
-                <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)"}}><span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Tournament champion pick</span></div>
-                <div style={{padding:"1rem 16px",display:"flex",alignItems:"center",gap:12}}>
-                  <span style={{fontSize:28}}>{FLAGS[viewingUser.picks.champion]||"❓"}</span>
-                  <div><div style={{fontSize:16,fontWeight:500,color:"var(--color-text-primary)"}}>{viewingUser.picks.champion||"Not picked yet"}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>Champion prediction</div></div>
-                </div>
+                {[
+                  {label:"Champion",val:viewingUser.picks.champion,emoji:"🏆"},
+                  {label:"Golden Boot",val:viewingUser.picks.goldenBoot,emoji:"⚽"},
+                  {label:"Top Assist",val:viewingUser.picks.topAssist,emoji:"🎯"},
+                  {label:"Golden Glove",val:viewingUser.picks.goldenGlove,emoji:"🧤"},
+                ].map(({label,val,emoji},i,arr)=>(
+                  <div key={label} style={{padding:"12px 16px",borderBottom:i<arr.length-1?"0.5px solid var(--color-border-tertiary)":"none",display:"flex",alignItems:"center",gap:12}}>
+                    <span style={{fontSize:20}}>{val?FLAGS[val]||emoji:emoji}</span>
+                    <div>
+                      <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginBottom:2}}>{label}</div>
+                      <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{val||"Not picked yet"}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <p style={{fontSize:12,color:"var(--color-text-tertiary)",marginTop:"1rem"}}>Full prediction visibility unlocks after tournament kickoff on June 11.</p>
+              <div style={{marginTop:"0.75rem",padding:"10px 14px",background:"var(--color-background-secondary)",borderRadius:8,display:"flex",gap:16}}>
+                <div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:600,color:C.blue,fontFamily:"monospace"}}>{viewingUser.pts}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>points</div></div>
+                <div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)",fontFamily:"monospace"}}>{viewingUser.picks.groupDone}/72</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>group picks</div></div>
+              </div>
             </div>
           )}
 
