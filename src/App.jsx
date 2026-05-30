@@ -1097,7 +1097,10 @@ function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,lo
         {!actualWinner&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
       </div>
     );
-  })()}
+  })()
+  );
+}
+
 const NAV=[{label:"Home",page:"home"},{label:"Group Stage",page:"predict"},{label:"Knockout",page:"bracket"},{label:"Bonuses",page:"bonuses"},{label:"My League",page:"league"},{label:"Instructions",page:"points"}];
 
 export default function App(){
@@ -1463,7 +1466,7 @@ export default function App(){
       const [{data:profiles},{data:bonuses},{data:preds}]=await Promise.all([
         supabase.from('users').select('id,name,handle,avatar_letter').in('id',memberIds),
         supabase.from('bonus_picks').select('user_id,golden_boot_player,top_assist_player,golden_glove_player,ko_picks').in('user_id',memberIds),
-        supabase.from('predictions').select('user_id,match_id,home_score,away_score,is_double_down').in('user_id',memberIds),
+        supabase.from('predictions').select('user_id,match_id,home_score,away_score,is_double_down,advancing_team').in('user_id',memberIds),
       ]);
 
       const profileMap={};
@@ -1513,13 +1516,13 @@ export default function App(){
 
 
 
-        // Get runner-up and 3rd place from predictions
-        const sfPreds=userPreds.filter(p=>p.match_id?.startsWith('KO-sf-'));
-        const runnerUpPred=userPreds.find(p=>p.match_id==='KO-final-0');
+        // Get champion, runner-up and 3rd place from KO predictions
+        const finalPred2=userPreds.find(p=>p.match_id==='KO-final-0');
+        const championPick2=finalPred2?.advancing_team||null;
         const thirdPred=userPreds.find(p=>p.match_id==='KO-third');
-        // Runner-up is the SF loser who made the final but lost
-        const runnerUpPick=runnerUpPred?.advancing_team?
-          (sfPreds.find(p=>p.advancing_team&&p.advancing_team!==runnerUpPred.advancing_team)?.advancing_team||null):null;
+        // Runner-up: both SF winners go to final, the one who doesn't win is runner-up
+        const sfWinners=userPreds.filter(p=>p.match_id?.startsWith('KO-sf-')&&p.advancing_team).map(p=>p.advancing_team);
+        const runnerUpPick=championPick2&&sfWinners.length===2?sfWinners.find(t=>t!==championPick2)||null:null;
 
         // Double-down matches
         const doubleDowns=[];
@@ -1550,7 +1553,7 @@ export default function App(){
           pts,
           picks:{
             groupDone,
-            champion:championPick,
+            champion:championPick2||championPick,
             runnerUp:runnerUpPick,
             thirdPlace:thirdPred?.advancing_team||null,
             goldenBoot:bonus.golden_boot_player||null,
