@@ -1344,8 +1344,8 @@ export default function App(){
 
   // Load league members when active league changes
   useEffect(()=>{
-    if(activeLeague?.id) loadLeagueMembers(activeLeague.id);
-  },[activeLeague?.id, actualResults]);
+    if(activeLeague?.id&&Object.keys(actualResults).length>=0) loadLeagueMembers(activeLeague.id);
+  },[activeLeague?.id, JSON.stringify(Object.keys(actualResults))]);
 
   const filteredBoot=bootSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(bootSearch.toLowerCase())||p.nation.toLowerCase().includes(bootSearch.toLowerCase())):[];
   const filteredAssist=assistSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(assistSearch.toLowerCase())||p.nation.toLowerCase().includes(assistSearch.toLowerCase())):[];
@@ -1395,10 +1395,15 @@ export default function App(){
         let pts=0;
         userPreds.forEach(p=>{
           if(p.match_id?.startsWith('GS-')){
+            const parts=p.match_id.split('-');
+            const grp=parts[1];
+            const idx=parseInt(parts[2]);
+            const teams=GROUPS[grp];
+            if(!teams)return;
+            const matchDef=generateGroupMatches(teams)[idx];
+            if(!matchDef)return;
             const actual=Object.values(actualResults).find(r=>
-              r.home_team&&r.away_team&&
-              p.match_id===`GS-${r.group_name}-${r.match_day||0}`&&
-              r.status==='finished'
+              r.home_team===matchDef.home&&r.away_team===matchDef.away&&r.status==='finished'
             );
             if(actual){
               let matchPts=calcMatchPoints(p.home_score,p.away_score,actual.actual_home,actual.actual_away);
@@ -1408,9 +1413,11 @@ export default function App(){
           }
         });
 
-        // Get champion pick from ko_picks
-        const koPicks=bonus.ko_picks||{};
-        const championPick=koPicks.final?.[0]||null;
+        // Get champion pick from predictions (KO-final-0)
+        const finalPred=userPreds.find(p=>p.match_id==='KO-final-0');
+        const championPick=finalPred?.advancing_team||null;
+
+
 
         return{
           id:m.user_id,
@@ -1427,7 +1434,7 @@ export default function App(){
           },
           isMe:m.user_id===user?.id,
         };
-      }).sort((a,b)=>b.pts-a.pts);
+      }).sort((a,b)=>b.pts-a.pts||b.picks.groupDone-a.picks.groupDone);
 
       setLeagueMembers(withPoints);
     }catch(e){
