@@ -847,6 +847,78 @@ function simulateAllMatches(style="balanced"){
   return all;
 }
 
+// Simulate the full knockout bracket using FIFA rankings + style
+function simulateKnockout(r32Bracket, style){
+  const newKO={r32:{},r16:{},qf:{},sf:{},final:{},third:null};
+
+  // Simulate R32
+  r32Bracket.forEach((match,i)=>{
+    if(match.home==="TBD"||match.away==="TBD")return;
+    const result=simulateMatch(match.home,match.away,style);
+    const homeGoals=parseInt(result.homeScore);
+    const awayGoals=parseInt(result.awayScore);
+    // In knockout, no draws — if draw, pick winner by rank
+    let winner;
+    if(homeGoals>awayGoals) winner=match.home;
+    else if(awayGoals>homeGoals) winner=match.away;
+    else winner=getRank(match.home)>=getRank(match.away)?match.home:match.away;
+    newKO.r32[i]=winner;
+  });
+
+  // Build R16 matchups from R32 results
+  const r16pairs=[[0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15]];
+  r16pairs.forEach(([a,b],i)=>{
+    const home=newKO.r32[a]||"TBD";
+    const away=newKO.r32[b]||"TBD";
+    if(home==="TBD"||away==="TBD")return;
+    const result=simulateMatch(home,away,style);
+    const hg=parseInt(result.homeScore),ag=parseInt(result.awayScore);
+    newKO.r16[i]=hg>ag?home:ag>hg?away:getRank(home)>=getRank(away)?home:away;
+  });
+
+  // QF
+  [[0,1],[2,3],[4,5],[6,7]].forEach(([a,b],i)=>{
+    const home=newKO.r16[a]||"TBD";
+    const away=newKO.r16[b]||"TBD";
+    if(home==="TBD"||away==="TBD")return;
+    const result=simulateMatch(home,away,style);
+    const hg=parseInt(result.homeScore),ag=parseInt(result.awayScore);
+    newKO.qf[i]=hg>ag?home:ag>hg?away:getRank(home)>=getRank(away)?home:away;
+  });
+
+  // SF — track losers for 3rd place
+  const sfLosers=[];
+  [[0,1],[2,3]].forEach(([a,b],i)=>{
+    const home=newKO.qf[a]||"TBD";
+    const away=newKO.qf[b]||"TBD";
+    if(home==="TBD"||away==="TBD")return;
+    const result=simulateMatch(home,away,style);
+    const hg=parseInt(result.homeScore),ag=parseInt(result.awayScore);
+    const winner=hg>ag?home:ag>hg?away:getRank(home)>=getRank(away)?home:away;
+    const loser=winner===home?away:home;
+    newKO.sf[i]=winner;
+    sfLosers.push(loser);
+  });
+
+  // Final
+  const finHome=newKO.sf[0]||"TBD";
+  const finAway=newKO.sf[1]||"TBD";
+  if(finHome!=="TBD"&&finAway!=="TBD"){
+    const result=simulateMatch(finHome,finAway,style);
+    const hg=parseInt(result.homeScore),ag=parseInt(result.awayScore);
+    newKO.final[0]=hg>ag?finHome:ag>hg?finAway:getRank(finHome)>=getRank(finAway)?finHome:finAway;
+  }
+
+  // 3rd place
+  if(sfLosers.length===2){
+    const result=simulateMatch(sfLosers[0],sfLosers[1],style);
+    const hg=parseInt(result.homeScore),ag=parseInt(result.awayScore);
+    newKO.third=hg>ag?sfLosers[0]:ag>hg?sfLosers[1]:getRank(sfLosers[0])>=getRank(sfLosers[1])?sfLosers[0]:sfLosers[1];
+  }
+
+  return newKO;
+}
+
 function generateGroupMatches(teams){
   return [
     {home:teams[0],away:teams[1],homeScore:"",awayScore:""},
@@ -980,7 +1052,7 @@ const inp={width:"100%",boxSizing:"border-box",padding:"10px 12px",border:"0.5px
 function AdSlot(){return(<div style={{width:"100%",height:72,background:"var(--color-background-secondary)",border:"0.5px dashed var(--color-border-tertiary)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:"1.5rem"}}><span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Advertisement — sponsor@mundialist.com</span></div>);}
 function LockBanner(){return(<div style={{display:"flex",gap:10,padding:"11px 14px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:10,marginBottom:"1.25rem",fontSize:13,color:"#7a5c10",lineHeight:1.5}}><span>🔒</span><div><strong>All predictions lock at tournament kickoff — June 11, 2026.</strong></div></div>);}
 
-function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,locked,setLocked,emoji}){
+function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,locked,setLocked,emoji,actualWinner=null}){
   return !locked?(
     <div>
       <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={`Search ${label.toLowerCase()} name...`} style={{...inp,marginBottom:8}}/>
@@ -1004,12 +1076,28 @@ function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,lo
       )}
       <button onClick={()=>pick&&setLocked(true)} disabled={!pick} style={{width:"100%",padding:"11px",background:pick?color:"var(--color-background-secondary)",color:pick?"#fff":"var(--color-text-tertiary)",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:pick?"pointer":"not-allowed"}}>Lock in pick →</button>
     </div>
-  ):(
-    <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:color+"11",border:`0.5px solid ${color}`,borderRadius:10}}>
-      <span style={{fontSize:26}}>{pick?.flag||emoji}</span>
-      <div><div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{pick?.name}</div><div style={{fontSize:12,color}}>{pick?.nation} · {pts} pts if correct</div></div>
-      <button onClick={()=>setLocked(false)} style={{marginLeft:"auto",padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>
-    </div>
+  ):(()=>{
+    const isCorrect=actualWinner&&pick?.name===actualWinner;
+    const isWrong=actualWinner&&pick?.name!==actualWinner;
+    const borderCol=isCorrect?C.green:isWrong?"#ef4444":color;
+    const bgCol=isCorrect?C.greenLt:isWrong?"#fef2f2":color+"11";
+    return(
+      <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:bgCol,border:`0.5px solid ${borderCol}`,borderRadius:10}}>
+        <span style={{fontSize:26}}>{pick?.flag||emoji}</span>
+        <div style={{flex:1}}>
+          <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{pick?.name}</div>
+          {actualWinner?(
+            <div style={{fontSize:12,color:isCorrect?C.green:"#ef4444",fontWeight:500}}>
+              {isCorrect?`✓ Correct! +${pts} pts`:`✗ Winner was ${actualWinner}`}
+            </div>
+          ):(
+            <div style={{fontSize:12,color}}>{pick?.nation} · {pts} pts if correct</div>
+          )}
+        </div>
+        {!actualWinner&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
+      </div>
+    );
+  })()
   );
 }
 
@@ -1025,6 +1113,7 @@ export default function App(){
   const [emailError,setEmailError]=useState("");
   const [agreeError,setAgreeError]=useState(false);
   const [waitlistEmail,setWaitlistEmail]=useState("");
+  const [tournamentAwards,setTournamentAwards]=useState({golden_boot:null,top_assist:null,golden_glove:null});
   const [actualResults,setActualResults]=useState({}); // {matchId: {home, away, status}}
   const [totalPoints,setTotalPoints]=useState(0);
   const [saveStatus,setSaveStatus]=useState(null); // null | 'saving' | 'saved' | 'error'
@@ -1236,6 +1325,11 @@ export default function App(){
   };
 
   // ── Load actual match results from DB ────────────────────────────────────
+  const loadTournamentAwards=async()=>{
+    const {data}=await supabase.from('tournament_awards').select('*').eq('id','wc2026').maybeSingle();
+    if(data) setTournamentAwards({golden_boot:data.golden_boot,top_assist:data.top_assist,golden_glove:data.golden_glove});
+  };
+
   const loadActualResults=async()=>{
     const {data}=await supabase.from('matches').select('id,home_team,away_team,actual_home,actual_away,status,stage,group_name,match_day');
     if(data){
@@ -1339,7 +1433,10 @@ export default function App(){
 
   // Reload actual results whenever user logs in
   useEffect(()=>{
-    if(user?.id) loadActualResults();
+    if(user?.id){
+      loadActualResults();
+      loadTournamentAwards();
+    }
   },[user?.id]);
 
   // Load league members when active league changes
@@ -1419,6 +1516,35 @@ export default function App(){
 
 
 
+        // Get runner-up and 3rd place from predictions
+        const sfPreds=userPreds.filter(p=>p.match_id?.startsWith('KO-sf-'));
+        const runnerUpPred=userPreds.find(p=>p.match_id==='KO-final-0');
+        const thirdPred=userPreds.find(p=>p.match_id==='KO-third');
+        // Runner-up is the SF loser who made the final but lost
+        const runnerUpPick=runnerUpPred?.advancing_team?
+          (sfPreds.find(p=>p.advancing_team&&p.advancing_team!==runnerUpPred.advancing_team)?.advancing_team||null):null;
+
+        // Double-down matches
+        const doubleDowns=[];
+        if(bonus.double_down_r1){
+          const parts=bonus.double_down_r1.split('-');
+          const grp=parts[0],idx=parseInt(parts[1]);
+          const teams=GROUPS[grp];
+          if(teams){const m2=generateGroupMatches(teams)[idx];if(m2)doubleDowns.push(`MD1: ${m2.home} vs ${m2.away}`);}
+        }
+        if(bonus.double_down_r2){
+          const parts=bonus.double_down_r2.split('-');
+          const grp=parts[0],idx=parseInt(parts[1]);
+          const teams=GROUPS[grp];
+          if(teams){const m2=generateGroupMatches(teams)[idx];if(m2)doubleDowns.push(`MD2: ${m2.home} vs ${m2.away}`);}
+        }
+        if(bonus.double_down_r3){
+          const parts=bonus.double_down_r3.split('-');
+          const grp=parts[0],idx=parseInt(parts[1]);
+          const teams=GROUPS[grp];
+          if(teams){const m2=generateGroupMatches(teams)[idx];if(m2)doubleDowns.push(`MD3: ${m2.home} vs ${m2.away}`);}
+        }
+
         return{
           id:m.user_id,
           name:profile.name||"Unknown",
@@ -1428,9 +1554,12 @@ export default function App(){
           picks:{
             groupDone,
             champion:championPick,
+            runnerUp:runnerUpPick,
+            thirdPlace:thirdPred?.advancing_team||null,
             goldenBoot:bonus.golden_boot_player||null,
             topAssist:bonus.top_assist_player||null,
             goldenGlove:bonus.golden_glove_player||null,
+            doubleDowns,
           },
           isMe:m.user_id===user?.id,
         };
@@ -1445,29 +1574,56 @@ export default function App(){
   };
 
   // ── Shared match card for knockout ──
-  function KOCard({home,away,picked,onPick,label,gold=false}){
+  function KOCard({home,away,picked,onPick,label,gold=false,actualWinner=null,roundKey=null}){
+    const isFinished=actualWinner!==null;
+    const pickedCorrect=isFinished&&picked&&picked===actualWinner;
+    const pickedWrong=isFinished&&picked&&picked!==actualWinner;
+    const ptMap={r32:12,r16:14,qf:16,sf:18,final:25,third:12};
+    const ptsEarned=pickedCorrect?(ptMap[roundKey]||0):0;
+    const borderColor=pickedCorrect?C.green:pickedWrong?"#ef4444":picked?C.blue:gold?C.gold:"var(--color-border-tertiary)";
     return(
-      <div style={{background:"var(--color-background-primary)",border:`${gold?"2px":"1.5px"} solid ${picked?C.blue:gold?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,overflow:"hidden",width:"100%"}}>
-        {label&&<div style={{padding:"2px 7px",background:"var(--color-background-secondary)",borderBottom:"0.5px solid var(--color-border-tertiary)",fontSize:9,color:"var(--color-text-tertiary)",fontWeight:500}}>{label}</div>}
-        {[home,away].map((team,ti)=>(
-          <div key={ti} onClick={()=>team!=="TBD"&&onPick&&onPick(team)}
-            style={{padding:"5px 7px",display:"flex",alignItems:"center",gap:5,
-              cursor:team!=="TBD"&&onPick?"pointer":"default",
-              background:picked===team?(gold?C.goldLt:C.blueLt):"transparent",
-              borderBottom:ti===0?"0.5px solid var(--color-border-tertiary)":"none"}}>
-            <span style={{fontSize:13}}>{FLAGS[team]||"❓"}</span>
-            <span style={{flex:1,fontSize:10,fontWeight:picked===team?600:400,
-              color:picked===team?(gold?"#7a5c10":C.blue):"var(--color-text-primary)",
-              overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{team}</span>
-            {picked===team&&!SEEDED.has(team)&&team!=="TBD"&&<span style={{fontSize:8,color:C.gold}}>★</span>}
-            {picked===team&&<span style={{fontSize:9,color:gold?"#7a5c10":C.blue,fontWeight:700}}>✓</span>}
-          </div>
-        ))}
+      <div style={{background:"var(--color-background-primary)",border:`${gold?"2px":"1.5px"} solid ${borderColor}`,borderRadius:8,overflow:"hidden",width:"100%"}}>
+        {label&&<div style={{padding:"2px 7px",background:pickedCorrect?C.greenLt:pickedWrong?"#fef2f2":"var(--color-background-secondary)",borderBottom:"0.5px solid var(--color-border-tertiary)",fontSize:9,color:pickedCorrect?C.green:pickedWrong?"#ef4444":"var(--color-text-tertiary)",fontWeight:500,display:"flex",justifyContent:"space-between"}}>
+          <span>{label}</span>
+          {isFinished&&picked&&<span style={{fontWeight:500}}>{pickedCorrect?"+"+ptsEarned+" pts ✓":"0 pts ✗"}</span>}
+        </div>}
+        {[home,away].map((team,ti)=>{
+          const isWinner=isFinished&&team===actualWinner;
+          const isLoser=isFinished&&team!==actualWinner&&team!=="TBD";
+          return(
+            <div key={ti} onClick={()=>!isFinished&&team!=="TBD"&&onPick&&onPick(team)}
+              style={{padding:"5px 7px",display:"flex",alignItems:"center",gap:5,
+                cursor:!isFinished&&team!=="TBD"&&onPick?"pointer":"default",
+                background:picked===team?(gold?C.goldLt:C.blueLt):"transparent",
+                borderBottom:ti===0?"0.5px solid var(--color-border-tertiary)":"none",
+                opacity:isLoser?0.45:1}}>
+              <span style={{fontSize:13}}>{FLAGS[team]||"❓"}</span>
+              <span style={{flex:1,fontSize:10,fontWeight:picked===team||isWinner?600:400,
+                color:isWinner?C.green:picked===team?(gold?"#7a5c10":C.blue):"var(--color-text-primary)",
+                overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{team}</span>
+              {isWinner&&<span style={{fontSize:9,color:C.green,fontWeight:700}}>✓</span>}
+              {picked===team&&!isFinished&&!SEEDED.has(team)&&team!=="TBD"&&<span style={{fontSize:8,color:C.gold}}>★</span>}
+              {picked===team&&!isFinished&&<span style={{fontSize:9,color:gold?"#7a5c10":C.blue,fontWeight:700}}>✓</span>}
+            </div>
+          );
+        })}
       </div>
     );
   }
 
   const r32AllTBD=r32Bracket.every(m=>m.home==="TBD"&&m.away==="TBD");
+
+  // Get actual winner for a KO match from Supabase matches table
+  const getKOWinner=(home,away)=>{
+    if(home==="TBD"||away==="TBD")return null;
+    const actual=Object.values(actualResults).find(r=>
+      ((r.home_team===home&&r.away_team===away)||(r.home_team===away&&r.away_team===home))
+      &&r.stage!=='group'&&r.status==='finished'
+    );
+    if(!actual||actual.actual_home===null||actual.actual_away===null)return null;
+    return actual.actual_home>actual.actual_away?actual.home_team:
+           actual.actual_away>actual.actual_home?actual.away_team:null;
+  };
 
   return(
     <div style={{minHeight:"100vh",background:"var(--color-background-tertiary)",fontFamily:"'DM Sans',system-ui,sans-serif"}}>
@@ -1894,7 +2050,15 @@ export default function App(){
                 <span style={{fontFamily:"monospace",color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>{koPicked}/31 picks</span>
               </div>
             </div>
-            <button onClick={()=>setPage("predict")} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer",flexShrink:0}}>← Group stage</button>
+            <div style={{display:"flex",gap:8,flexShrink:0}}>
+              <button onClick={()=>{
+                const simKO=simulateKnockout(r32Bracket,simulateStyle);
+                setKoPicks(simKO);
+              }} style={{padding:"8px 14px",border:`0.5px solid ${C.blue}`,borderRadius:8,background:C.blueLt,fontSize:12,color:C.blue,cursor:"pointer"}}>
+                Simulate {adventInfo.emoji||"↻"}
+              </button>
+              <button onClick={()=>setPage("predict")} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer"}}>← Group stage</button>
+            </div>
           </div>
 
           {r32AllTBD&&(
@@ -1919,7 +2083,7 @@ export default function App(){
                 <div key={col} style={{display:"flex",flexDirection:"column",gap:5}}>
                   {r32Bracket.slice(col*4,(col+1)*4).map((match,j)=>{
                     const i=col*4+j;
-                    return <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`M${match.matchId}`}/>;
+                    return <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`M${match.matchId}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>;
                   })}
                 </div>
               ))}
@@ -1936,7 +2100,7 @@ export default function App(){
               <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Round of 16</div>
                 {r16Matchups.slice(0,4).map((m,i)=>(
-                  <KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={`R16 ${i+1}`}/>
+                  <KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={`R16 ${i+1}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>
                 ))}
               </div>
 
@@ -1948,7 +2112,7 @@ export default function App(){
               <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0,padding:"22px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Quarter-finals</div>
                 {qfMatchups.slice(0,2).map((m,i)=>(
-                  <KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={`QF ${i+1}`}/>
+                  <KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={`QF ${i+1}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>
                 ))}
               </div>
 
@@ -1959,7 +2123,7 @@ export default function App(){
               {/* LEFT SF */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:132,flexShrink:0,padding:"80px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
-                <KOCard home={sfMatchups[0]?.home||"TBD"} away={sfMatchups[0]?.away||"TBD"} picked={koPicks.sf[0]} onPick={t=>pickKO("sf",0,t)} label="SF 1"/>
+                <KOCard home={sfMatchups[0]?.home||"TBD"} away={sfMatchups[0]?.away||"TBD"} picked={koPicks.sf[0]} onPick={t=>pickKO("sf",0,t)} label="SF 1" actualWinner={getKOWinner(sfMatchups[0]?.home,sfMatchups[0]?.away)} roundKey="sf"/>
               </div>
 
               <div style={{width:14,flexShrink:0,display:"flex",alignItems:"center"}}>
@@ -1969,7 +2133,7 @@ export default function App(){
               {/* FINAL */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",width:144,flexShrink:0,gap:8}}>
                 <div style={{fontSize:10,fontWeight:500,color:C.gold,textTransform:"uppercase",letterSpacing:"0.06em"}}>Final</div>
-                <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true}/>
+                <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final"/>
                 {champion!=="TBD"&&(
                   <div style={{padding:"10px 12px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:8,textAlign:"center",width:"100%"}}>
                     <div style={{fontSize:18,marginBottom:2}}>🏆</div>
@@ -1978,7 +2142,7 @@ export default function App(){
                 )}
                 <div style={{marginTop:16,width:"100%"}}>
                   <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>3rd place match</div>
-                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>setKoPicks(prev=>({...prev,third:t}))} label="3rd place"/>
+                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>setKoPicks(prev=>({...prev,third:t}))} label="3rd place" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
                   {koPicks.third&&koPicks.third!=="TBD"&&(
                     <div style={{marginTop:4,padding:"6px 10px",background:"var(--color-background-secondary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,textAlign:"center"}}>
                       <div style={{fontSize:10,color:"var(--color-text-secondary)"}}>🥉 {koPicks.third}</div>
@@ -1994,7 +2158,7 @@ export default function App(){
               {/* RIGHT SF */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:132,flexShrink:0,padding:"80px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
-                <KOCard home={sfMatchups[1]?.home||"TBD"} away={sfMatchups[1]?.away||"TBD"} picked={koPicks.sf[1]} onPick={t=>pickKO("sf",1,t)} label="SF 2"/>
+                <KOCard home={sfMatchups[1]?.home||"TBD"} away={sfMatchups[1]?.away||"TBD"} picked={koPicks.sf[1]} onPick={t=>pickKO("sf",1,t)} label="SF 2" actualWinner={getKOWinner(sfMatchups[1]?.home,sfMatchups[1]?.away)} roundKey="sf"/>
               </div>
 
               <div style={{width:14,flexShrink:0,display:"flex",flexDirection:"column",justifyContent:"space-around",padding:"60px 0"}}>
@@ -2005,7 +2169,7 @@ export default function App(){
               <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0,padding:"22px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Quarter-finals</div>
                 {qfMatchups.slice(2,4).map((m,i)=>(
-                  <KOCard key={i+2} home={m.home} away={m.away} picked={koPicks.qf[i+2]} onPick={t=>pickKO("qf",i+2,t)} label={`QF ${i+3}`}/>
+                  <KOCard key={i+2} home={m.home} away={m.away} picked={koPicks.qf[i+2]} onPick={t=>pickKO("qf",i+2,t)} label={`QF ${i+3}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>
                 ))}
               </div>
 
@@ -2017,7 +2181,7 @@ export default function App(){
               <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Round of 16</div>
                 {r16Matchups.slice(4,8).map((m,i)=>(
-                  <KOCard key={i+4} home={m.home} away={m.away} picked={koPicks.r16[i+4]} onPick={t=>pickKO("r16",i+4,t)} label={`R16 ${i+5}`}/>
+                  <KOCard key={i+4} home={m.home} away={m.away} picked={koPicks.r16[i+4]} onPick={t=>pickKO("r16",i+4,t)} label={`R16 ${i+5}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>
                 ))}
               </div>
 
@@ -2062,17 +2226,23 @@ export default function App(){
                     {eligible.map(m=>{
                       const mid=`${m.g}-${m.idx}`;const sel=val===mid;const other=val&&val!==mid;
                       if(m.hasSeeded) return null;
-                      return(<button key={mid} onClick={()=>setDouble(rk,m.g,m.idx)} disabled={!!other}
-                        style={{padding:"9px 12px",border:`0.5px solid ${sel?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,
-                          background:sel?C.goldLt:"var(--color-background-secondary)",cursor:other?"not-allowed":"pointer",
+                      const actual=Object.values(actualResults).find(r=>r.home_team===m.home&&r.away_team===m.away&&r.status==="finished");
+                      const ddPts=actual&&sel?calcMatchPoints(m.homeScore,m.awayScore,actual.actual_home,actual.actual_away)*2:null;
+                      const ddCol=ddPts===null?C.gold:ddPts>0?C.green:"#ef4444";
+                      return(<button key={mid} onClick={()=>!actual&&setDouble(rk,m.g,m.idx)} disabled={!!other||!!actual}
+                        style={{padding:"9px 12px",border:`0.5px solid ${sel?ddCol:"var(--color-border-tertiary)"}`,borderRadius:8,
+                          background:sel?(ddPts>0?C.greenLt:ddPts===0?"#fef2f2":C.goldLt):"var(--color-background-secondary)",
+                          cursor:other||actual?"not-allowed":"pointer",
                           display:"flex",alignItems:"center",gap:10,opacity:other?0.4:1,textAlign:"left"}}>
                         <span style={{fontSize:16}}>{FLAGS[m.home]||"❓"}</span>
                         <span style={{fontSize:13,color:"var(--color-text-primary)",flex:1,fontWeight:500}}>{m.home}</span>
-                        {m.homeScore&&m.awayScore?<span style={{fontSize:12,fontFamily:"monospace",color:"var(--color-text-secondary)"}}>{m.homeScore}–{m.awayScore}</span>:null}
+                        {actual?<span style={{fontSize:12,fontFamily:"monospace",color:C.blue}}>{actual.actual_home}–{actual.actual_away}</span>:
+                         m.homeScore&&m.awayScore?<span style={{fontSize:12,fontFamily:"monospace",color:"var(--color-text-secondary)"}}>{m.homeScore}–{m.awayScore}</span>:null}
                         <span style={{fontSize:12,color:"var(--color-text-tertiary)"}}>vs</span>
                         <span style={{fontSize:13,color:"var(--color-text-primary)",flex:1,textAlign:"right",fontWeight:500}}>{m.away}</span>
                         <span style={{fontSize:16}}>{FLAGS[m.away]||"❓"}</span>
-                        {sel&&<span style={{fontSize:12,fontWeight:600,color:C.gold,flexShrink:0}}>×2 ⚡</span>}
+                        {sel&&ddPts!==null&&<span style={{fontSize:12,fontWeight:600,color:ddCol,flexShrink:0}}>{ddPts>0?"+"+ddPts+" pts ✓":"0 pts ✗"}</span>}
+                        {sel&&ddPts===null&&<span style={{fontSize:12,fontWeight:600,color:C.gold,flexShrink:0}}>×2 ⚡</span>}
                       </button>);
                     })}
                   </div>
@@ -2089,7 +2259,7 @@ export default function App(){
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top scorer.</p>
-              <PlayerSearch search={bootSearch} setSearch={setBootSearch} pick={goldenBootPick} setPick={setGoldenBootPick} filtered={filteredBoot} label="Player" pts={15} color={C.green} locked={goldenBootLocked} setLocked={(v)=>{setGoldenBootLocked(v);if(v&&goldenBootPick)saveBonusPicks({golden_boot_player:goldenBootPick.name,golden_boot_locked:true});}} emoji="⚽"/>
+              <PlayerSearch search={bootSearch} setSearch={setBootSearch} pick={goldenBootPick} setPick={setGoldenBootPick} filtered={filteredBoot} label="Player" pts={15} color={C.green} locked={goldenBootLocked} setLocked={(v)=>{setGoldenBootLocked(v);if(v&&goldenBootPick)saveBonusPicks({golden_boot_player:goldenBootPick.name,golden_boot_locked:true});}} emoji="⚽" actualWinner={tournamentAwards.golden_boot}/>
             </div>
           </div>
 
@@ -2101,7 +2271,7 @@ export default function App(){
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top assist provider.</p>
-              <PlayerSearch search={assistSearch} setSearch={setAssistSearch} pick={topAssistPick} setPick={setTopAssistPick} filtered={filteredAssist} label="Player" pts={15} color={C.blue} locked={topAssistLocked} setLocked={(v)=>{setTopAssistLocked(v);if(v&&topAssistPick)saveBonusPicks({top_assist_player:topAssistPick.name,top_assist_locked:true});}} emoji="🎯"/>
+              <PlayerSearch search={assistSearch} setSearch={setAssistSearch} pick={topAssistPick} setPick={setTopAssistPick} filtered={filteredAssist} label="Player" pts={15} color={C.blue} locked={topAssistLocked} setLocked={(v)=>{setTopAssistLocked(v);if(v&&topAssistPick)saveBonusPicks({top_assist_player:topAssistPick.name,top_assist_locked:true});}} emoji="🎯" actualWinner={tournamentAwards.top_assist}/>
             </div>
           </div>
 
@@ -2113,7 +2283,7 @@ export default function App(){
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's best goalkeeper.</p>
-              <PlayerSearch search={gloveSearch} setSearch={setGloveSearch} pick={goldenGlovePick} setPick={setGoldenGlovePick} filtered={filteredGlove} label="Goalkeeper" pts={15} color={C.gold} locked={goldenGloveLocked} setLocked={(v)=>{setGoldenGloveLocked(v);if(v&&goldenGlovePick)saveBonusPicks({golden_glove_player:goldenGlovePick.name,golden_glove_locked:true});}} emoji="🧤"/>
+              <PlayerSearch search={gloveSearch} setSearch={setGloveSearch} pick={goldenGlovePick} setPick={setGoldenGlovePick} filtered={filteredGlove} label="Goalkeeper" pts={15} color={C.gold} locked={goldenGloveLocked} setLocked={(v)=>{setGoldenGloveLocked(v);if(v&&goldenGlovePick)saveBonusPicks({golden_glove_player:goldenGlovePick.name,golden_glove_locked:true});}} emoji="🧤" actualWinner={tournamentAwards.golden_glove}/>
             </div>
           </div>
         </div>
@@ -2146,19 +2316,35 @@ export default function App(){
               </div>
               <div style={card}>
                 {[
-                  {label:"Champion",val:viewingUser.picks.champion,emoji:"🏆"},
-                  {label:"Golden Boot",val:viewingUser.picks.goldenBoot,emoji:"⚽"},
-                  {label:"Top Assist",val:viewingUser.picks.topAssist,emoji:"🎯"},
-                  {label:"Golden Glove",val:viewingUser.picks.goldenGlove,emoji:"🧤"},
-                ].map(({label,val,emoji},i,arr)=>(
-                  <div key={label} style={{padding:"12px 16px",borderBottom:i<arr.length-1?"0.5px solid var(--color-border-tertiary)":"none",display:"flex",alignItems:"center",gap:12}}>
-                    <span style={{fontSize:20}}>{val?FLAGS[val]||emoji:emoji}</span>
-                    <div>
-                      <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginBottom:2}}>{label}</div>
-                      <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{val||"Not picked yet"}</div>
+                  {label:"Champion",val:viewingUser.picks.champion,emoji:"🏆",pts:"25 pts"},
+                  {label:"Runner-up",val:viewingUser.picks.runnerUp,emoji:"🥈",pts:"20 pts"},
+                  {label:"3rd place",val:viewingUser.picks.thirdPlace,emoji:"🥉",pts:"12 pts"},
+                  {label:"Golden Boot",val:viewingUser.picks.goldenBoot,emoji:"⚽",pts:"15 pts"},
+                  {label:"Top Assist",val:viewingUser.picks.topAssist,emoji:"🎯",pts:"15 pts"},
+                  {label:"Golden Glove",val:viewingUser.picks.goldenGlove,emoji:"🧤",pts:"15 pts"},
+                ].map(({label,val,emoji,pts},i,arr)=>(
+                  <div key={label} style={{padding:"10px 16px",borderBottom:i<arr.length-1?"0.5px solid var(--color-border-tertiary)":"none",display:"flex",alignItems:"center",gap:12}}>
+                    <span style={{fontSize:18}}>{val?FLAGS[val]||emoji:emoji}</span>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginBottom:1}}>{label}</div>
+                      <div style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>{val||"Not picked yet"}</div>
                     </div>
+                    <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>{pts}</span>
                   </div>
                 ))}
+                {viewingUser.picks.doubleDowns?.length>0&&(
+                  <div style={{padding:"10px 16px",borderTop:"0.5px solid var(--color-border-tertiary)"}}>
+                    <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginBottom:6}}>Double-down picks</div>
+                    <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                      {viewingUser.picks.doubleDowns.map((d,i)=>(
+                        <div key={i} style={{fontSize:12,color:"var(--color-text-primary)",display:"flex",alignItems:"center",gap:6}}>
+                          <span style={{color:C.gold,fontWeight:500}}>⚡</span>
+                          <span>{d}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               <div style={{marginTop:"0.75rem",padding:"10px 14px",background:"var(--color-background-secondary)",borderRadius:8,display:"flex",gap:16}}>
                 <div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:600,color:C.blue,fontFamily:"monospace"}}>{viewingUser.pts}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>points</div></div>
