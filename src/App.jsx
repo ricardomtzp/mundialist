@@ -1237,10 +1237,8 @@ export default function App(){
 
   // ── Load actual match results from DB ────────────────────────────────────
   const loadActualResults=async()=>{
-    console.log("loadActualResults called");
     const {data}=await supabase.from('matches').select('id,home_team,away_team,actual_home,actual_away,status,stage,group_name,match_day');
     if(data){
-      console.log("matches loaded:", data.length, data.filter(m=>m.status==="finished"));
       const map={};
       data.forEach(m=>{map[m.id]=m;});
       setActualResults(map);
@@ -1311,7 +1309,7 @@ export default function App(){
       }
       // Load bonus picks
       const {data:bonus}=await supabase.from('bonus_picks')
-        .select('*').eq('user_id',userId).single();
+        .select('*').eq('user_id',userId).maybeSingle();
       if(bonus){
         if(bonus.golden_boot_player){setGoldenBootPick({name:bonus.golden_boot_player,nation:'',flag:'⚽'});setGoldenBootLocked(bonus.golden_boot_locked||false);}
         if(bonus.top_assist_player){setTopAssistPick({name:bonus.top_assist_player,nation:'',flag:'🎯'});setTopAssistLocked(bonus.top_assist_locked||false);}
