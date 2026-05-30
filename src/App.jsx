@@ -1337,6 +1337,11 @@ export default function App(){
     });
   },[]);
 
+  // Reload actual results whenever user logs in
+  useEffect(()=>{
+    if(user?.id) loadActualResults();
+  },[user?.id]);
+
   const filteredBoot=bootSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(bootSearch.toLowerCase())||p.nation.toLowerCase().includes(bootSearch.toLowerCase())):[];
   const filteredAssist=assistSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(assistSearch.toLowerCase())||p.nation.toLowerCase().includes(assistSearch.toLowerCase())):[];
   const filteredGlove=gloveSearch.length>1?GOLDEN_GLOVE_PLAYERS.filter(p=>p.name.toLowerCase().includes(gloveSearch.toLowerCase())||p.nation.toLowerCase().includes(gloveSearch.toLowerCase())):[];
@@ -1696,7 +1701,7 @@ export default function App(){
                       </div>
                       <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,flexShrink:0}}>
                         {(()=>{
-                          const actual=Object.values(actualResults).find(r=>r.home_team===match.home&&r.away_team===match.away&&r.status==="finished");
+                          const actual=Object.values(actualResults).find(r=>(r.home_team===match.home||r.home_team===match.away)&&(r.away_team===match.away||r.away_team===match.home)&&r.status==="finished");
                           if(actual){
                             const pts=calcMatchPoints(match.homeScore,match.awayScore,actual.actual_home,actual.actual_away)*(isMyDouble?2:1);
                             const col=pts>=10?C.green:pts>=6?C.blue:pts>0?C.gold:"#888";
