@@ -1237,8 +1237,10 @@ export default function App(){
 
   // ── Load actual match results from DB ────────────────────────────────────
   const loadActualResults=async()=>{
+    console.log("loadActualResults called");
     const {data}=await supabase.from('matches').select('id,home_team,away_team,actual_home,actual_away,status,stage,group_name,match_day');
     if(data){
+      console.log("matches loaded:", data.length, data.filter(m=>m.status==="finished"));
       const map={};
       data.forEach(m=>{map[m.id]=m;});
       setActualResults(map);
