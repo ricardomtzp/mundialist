@@ -1641,13 +1641,10 @@ export default function App(){
     const ptsEarned=pickedCorrect?(ptMap[roundKey]||0):0;
     const borderColor=pickedCorrect?C.green:pickedWrong?"#ef4444":picked?C.blue:gold?C.gold:"var(--color-border-tertiary)";
     return(
-      <div style={{background:"var(--color-background-primary)",border:`${gold?"2px":"1.5px"} solid ${borderColor}`,borderRadius:8,overflow:"hidden",width:"100%"}}>
-        {label&&<div style={{padding:"2px 7px",background:pickedCorrect?C.greenLt:pickedWrong?"#fef2f2":"var(--color-background-secondary)",borderBottom:"0.5px solid var(--color-border-tertiary)",fontSize:9,color:pickedCorrect?C.green:pickedWrong?"#ef4444":"var(--color-text-tertiary)",fontWeight:500,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:2}}>
-          <div style={{display:"flex",flexDirection:"column",gap:1}}>
-            <span>{label}</span>
-            {venue&&<span style={{fontSize:8,color:"var(--color-text-tertiary)",fontWeight:400}}>{venue} · {city}</span>}
-          </div>
-          {isFinished&&picked&&<span style={{fontWeight:500}}>{pickedCorrect?"+"+ptsEarned+" pts ✓":"0 pts ✗"}</span>}
+      <div style={{background:"var(--color-background-primary)",border:`${gold?"2px":"1.5px"} solid ${borderColor}`,borderRadius:8,overflow:"hidden",width:"100%",boxShadow:"0 1px 3px rgba(0,0,0,0.06)"}}>
+        {label&&<div style={{padding:"3px 8px",background:pickedCorrect?C.greenLt:pickedWrong?"#fef2f2":"var(--color-background-secondary)",borderBottom:"0.5px solid var(--color-border-tertiary)",fontSize:9,color:pickedCorrect?C.green:pickedWrong?"#ef4444":"var(--color-text-tertiary)",fontWeight:500,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <span>{label}{venue?` · ${venue}, ${city}`:""}</span>
+          {isFinished&&picked&&<span style={{fontWeight:600}}>{pickedCorrect?"+"+ptsEarned+" pts ✓":"0 pts ✗"}</span>}
         </div>}
         {[home,away].map((team,ti)=>{
           const isWinner=isFinished&&team===actualWinner;
@@ -2313,7 +2310,7 @@ export default function App(){
                       const actual=Object.values(actualResults).find(r=>r.home_team===m.home&&r.away_team===m.away&&r.status==="finished");
                       const ddPts=actual&&sel?calcMatchPoints(m.homeScore,m.awayScore,actual.actual_home,actual.actual_away)*2:null;
                       const ddCol=ddPts===null?C.gold:ddPts>0?C.green:"#ef4444";
-                      return(<button key={mid} onClick={()=>!actual&&setDouble(rk,m.g,m.idx)} disabled={!!other||!!actual}
+                      return(<button key={mid} onClick={()=>!actual&&!other&&setDouble(rk,m.g,m.idx)} disabled={!!other}
                         style={{padding:"9px 12px",border:`0.5px solid ${sel?ddCol:"var(--color-border-tertiary)"}`,borderRadius:8,
                           background:sel?(ddPts>0?C.greenLt:ddPts===0?"#fef2f2":C.goldLt):"var(--color-background-secondary)",
                           cursor:other||actual?"not-allowed":"pointer",
