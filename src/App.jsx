@@ -1767,8 +1767,9 @@ export default function App(){
   };
 
   return(
-    <div style={{minHeight:"100vh",background:"var(--color-background-tertiary)",fontFamily:"'DM Sans',system-ui,sans-serif",isolation:"isolate"}}>
+    <div style={{minHeight:"100vh",background:"var(--color-background-tertiary)",fontFamily:"'DM Sans',system-ui,sans-serif"}}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+      <style>{`html,body{height:100%;margin:0;padding:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}*{box-sizing:border-box;}`}</style>
 
       {/* ── Save toast ── */}
       {saveStatus&&(
@@ -1846,7 +1847,7 @@ export default function App(){
         </>
       )}
 
-      <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?"calc(56px + env(safe-area-inset-bottom))":0,minHeight:"100vh",WebkitOverflowScrolling:"touch"}}>
+      <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?"calc(56px + env(safe-area-inset-bottom))":0,minHeight:"100vh"}}>
 
       {/* ══ HOME ══ */}
       {page==="home"&&(
