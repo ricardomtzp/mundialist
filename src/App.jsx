@@ -1156,6 +1156,9 @@ export default function App(){
   const [emailError,setEmailError]=useState("");
   const [agreeError,setAgreeError]=useState(false);
   const [waitlistEmail,setWaitlistEmail]=useState("");
+  const [matchdayView,setMatchdayView]=useState(false);
+  const [matchdayData,setMatchdayData]=useState([]);
+  const [matchdayLoading,setMatchdayLoading]=useState(false);
   const [tournamentAwards,setTournamentAwards]=useState({golden_boot:null,top_assist:null,golden_glove:null});
   const [actualResults,setActualResults]=useState({}); // {matchId: {home, away, status}}
   const [totalPoints,setTotalPoints]=useState(0);
@@ -1498,9 +1501,79 @@ export default function App(){
     }
   },[user?.id]);
 
+  // ── Load matchday picks ──────────────────────────────────────────────────
+  const loadMatchdayPicks=async(leagueId)=>{
+    setMatchdayLoading(true);
+    try{
+      const lid=leagueId==='global'?'00000000-0000-0000-0000-000000000001':leagueId;
+      const {data:members}=await supabase.from('league_members').select('user_id').eq('league_id',lid);
+      if(!members?.length){setMatchdayData([]);return;}
+      const memberIds=members.map(m=>m.user_id);
+
+      // Get today's matches from DB
+      const today=new Date().toISOString().split('T')[0];
+      const {data:todayMatches}=await supabase.from('matches')
+        .select('id,home_team,away_team,actual_home,actual_away,status,stage,group_name,venue,city,kickoff')
+        .eq('stage','group')
+        .gte('kickoff',today+'T00:00:00Z')
+        .lte('kickoff',today+'T23:59:59Z')
+        .order('kickoff');
+
+      // Fallback: if no matches today use all group matches that are finished or upcoming
+      const matches=todayMatches?.length?todayMatches:
+        Object.values(actualResults).filter(r=>r.stage==='group').slice(0,4);
+
+      // Get all predictions for these members
+      const [{data:profiles},{data:preds}]=await Promise.all([
+        supabase.from('users').select('id,name,handle,avatar_letter').in('id',memberIds),
+        supabase.from('predictions').select('user_id,match_id,home_score,away_score,is_double_down')
+          .in('user_id',memberIds),
+      ]);
+
+      const profileMap={};
+      (profiles||[]).forEach(p=>{profileMap[p.id]=p;});
+      const predMap={};
+      (preds||[]).forEach(p=>{
+        if(!predMap[p.user_id])predMap[p.user_id]={};
+        predMap[p.user_id][p.match_id]={home:p.home_score,away:p.away_score,dd:p.is_double_down};
+      });
+
+      // Build member rows with their picks for today's matches
+      const rows=memberIds.map(uid=>{
+        const profile=profileMap[uid]||{};
+        const picks={};
+        (matches||[]).forEach((m,i)=>{
+          // Find match ID in predictions
+          const grp=m.group_name;
+          const teams=GROUPS[grp]||[];
+          const gMatches=generateGroupMatches(teams);
+          const idx=gMatches.findIndex(gm=>gm.home===m.home_team&&gm.away===m.away_team);
+          const matchId=idx>=0?`GS-${grp}-${idx}`:null;
+          picks[i]=matchId&&predMap[uid]?.[matchId]?predMap[uid][matchId]:null;
+        });
+        return{
+          id:uid,
+          name:profile.name||'Unknown',
+          handle:'@'+(profile.handle||'?'),
+          avatar:profile.avatar_letter||profile.name?.[0]?.toUpperCase()||'?',
+          isMe:uid===user?.id,
+          picks,
+        };
+      }).sort((a,b)=>a.isMe?-1:b.isMe?1:0);
+
+      setMatchdayData({matches:matches||[],rows});
+    }catch(e){
+      console.error('loadMatchdayPicks error:',e);
+    }finally{
+      setMatchdayLoading(false);
+    }
+  };
+
   // Load league members when active league changes
   useEffect(()=>{
-    if(activeLeague?.id&&Object.keys(actualResults).length>=0) loadLeagueMembers(activeLeague.id);
+    if(activeLeague?.id&&Object.keys(actualResults).length>=0){
+      loadLeagueMembers(activeLeague.id);
+    }
   },[activeLeague?.id, JSON.stringify(Object.keys(actualResults))]);
 
   const filteredBoot=bootSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(bootSearch.toLowerCase())||p.nation.toLowerCase().includes(bootSearch.toLowerCase())):[];
@@ -2044,7 +2117,7 @@ export default function App(){
                         {!SEEDED.has(match.away)&&awayQualifies&&<span style={{fontSize:10,color:C.gold}}>★</span>}
                         <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500}}>{match.away}</span>
                       </div>
-                      {GROUP_VENUES[activeGroup]?.[idx]&&<span style={{fontSize:9,color:"var(--color-text-tertiary)",flexShrink:0,whiteSpace:"nowrap"}}>📍 {GROUP_VENUES[activeGroup][idx].city}</span>}
+                      {GROUP_VENUES[activeGroup]?.[idx]&&<span style={{fontSize:9,color:"var(--color-text-tertiary)",flexShrink:0,whiteSpace:"nowrap"}}>📍 {GROUP_VENUES[activeGroup][idx].venue}, {GROUP_VENUES[activeGroup][idx].city}</span>}
                       {!isSeeded?(
                         <button onClick={()=>canDouble&&setDouble(roundKey,activeGroup,idx)}
                           title={isMyDouble?"Remove double":roundHasDouble?"Already used this matchday":"Double your points for this match"}
@@ -2458,10 +2531,14 @@ export default function App(){
           {/* League detail + member predictions */}
           {!viewingUser&&activeLeague&&(
             <div>
-              <button onClick={()=>setActiveLeague(null)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← My leagues</button>
-              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem"}}>
+              <button onClick={()=>{setActiveLeague(null);setMatchdayView(false);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← My leagues</button>
+              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem",flexWrap:"wrap"}}>
                 <div style={{flex:1}}><div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)"}}>{activeLeague.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{activeLeague.members?.toLocaleString()} members</div></div>
                 {activeLeague.code&&<span style={{fontFamily:"monospace",fontSize:11,color:"var(--color-text-tertiary)",background:"var(--color-background-secondary)",padding:"5px 10px",borderRadius:99,border:"0.5px solid var(--color-border-tertiary)"}}>{activeLeague.code}</span>}
+                <div style={{display:"flex",background:"var(--color-background-secondary)",borderRadius:8,padding:3,gap:2}}>
+                  <button onClick={()=>setMatchdayView(false)} style={{padding:"5px 12px",borderRadius:6,border:"none",fontSize:12,cursor:"pointer",background:!matchdayView?"var(--color-background-primary)":"transparent",color:!matchdayView?"var(--color-text-primary)":"var(--color-text-secondary)",fontWeight:!matchdayView?500:400}}>Standings</button>
+                  <button onClick={()=>{setMatchdayView(true);loadMatchdayPicks(activeLeague.id);}} style={{padding:"5px 12px",borderRadius:6,border:"none",fontSize:12,cursor:"pointer",background:matchdayView?"var(--color-background-primary)":"transparent",color:matchdayView?"var(--color-text-primary)":"var(--color-text-secondary)",fontWeight:matchdayView?500:400}}>Matchday picks</button>
+                </div>
               </div>
               <div style={card}>
                 <div style={{padding:"10px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",gap:12}}>
@@ -2489,7 +2566,74 @@ export default function App(){
                   </div>
                 ))}
               </div>
-              <p style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:"0.75rem"}}>Tap any player to see their champion pick. Full predictions visible after June 11.</p>
+              {!matchdayView&&<p style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:"0.75rem"}}>Tap any player to see their full picks.</p>}
+
+              {matchdayView&&(
+                matchdayLoading?(
+                  <div style={{padding:"2rem",textAlign:"center",color:"var(--color-text-tertiary)",fontSize:13}}>Loading picks...</div>
+                ):!matchdayData?.matches?.length?(
+                  <div style={{padding:"2rem",textAlign:"center",color:"var(--color-text-tertiary)",fontSize:13}}>No matches scheduled today</div>
+                ):(
+                  <div style={{overflowX:"auto",marginTop:"0.75rem"}}>
+                    <table style={{width:"100%",borderCollapse:"collapse",fontSize:12,minWidth:400}}>
+                      <thead>
+                        <tr style={{background:"var(--color-background-secondary)"}}>
+                          <th style={{padding:"8px 12px",textAlign:"left",fontWeight:500,color:"var(--color-text-secondary)",borderBottom:"0.5px solid var(--color-border-tertiary)",minWidth:120}}>Member</th>
+                          {(matchdayData.matches||[]).map((m,i)=>(
+                            <th key={i} style={{padding:"8px 10px",textAlign:"center",borderBottom:"0.5px solid var(--color-border-tertiary)",minWidth:100,borderLeft:"0.5px solid var(--color-border-tertiary)"}}>
+                              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+                                <div style={{display:"flex",alignItems:"center",gap:4}}>
+                                  <span style={{fontSize:14}}>{FLAGS[m.home_team]||"❓"}</span>
+                                  <span style={{fontSize:9,color:"var(--color-text-tertiary)"}}>vs</span>
+                                  <span style={{fontSize:14}}>{FLAGS[m.away_team]||"❓"}</span>
+                                </div>
+                                <span style={{fontSize:10,fontWeight:500,color:"var(--color-text-primary)"}}>{m.home_team?.split(" ")[0]} v {m.away_team?.split(" ")[0]}</span>
+                                {m.status==="finished"&&m.actual_home!==null&&<span style={{fontSize:9,color:C.green,fontWeight:500}}>{m.actual_home}–{m.actual_away} FT</span>}
+                                {m.city&&<span style={{fontSize:9,color:"var(--color-text-tertiary)"}}>📍 {m.city}</span>}
+                              </div>
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(matchdayData.rows||[]).map((row,ri)=>(
+                          <tr key={row.id} style={{borderBottom:"0.5px solid var(--color-border-tertiary)",background:row.isMe?C.blueLt:"transparent"}}>
+                            <td style={{padding:"10px 12px",borderRight:"0.5px solid var(--color-border-tertiary)"}}>
+                              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                                <div style={{width:24,height:24,borderRadius:"50%",background:[C.blue,C.red,C.green,C.gold,C.purple][ri%5],display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:500,color:"#fff",flexShrink:0}}>{row.avatar}</div>
+                                <div>
+                                  <div style={{fontSize:12,fontWeight:500,color:"var(--color-text-primary)"}}>{row.name}</div>
+                                  <div style={{fontSize:10,color:"var(--color-text-tertiary)"}}>{row.handle}</div>
+                                </div>
+                              </div>
+                            </td>
+                            {(matchdayData.matches||[]).map((m,i)=>{
+                              const pick=row.picks[i];
+                              const isFinished=m.status==="finished"&&m.actual_home!==null;
+                              const pts=isFinished&&pick?calcMatchPoints(pick.home,pick.away,m.actual_home,m.actual_away)*(pick.dd?2:1):null;
+                              const bgCol=pts===null?"transparent":pts>=10?C.greenLt:pts>=6?"#EEF4FF":pts>0?C.goldLt:"#fef2f2";
+                              const txCol=pts===null?"var(--color-text-primary)":pts>=10?C.green:pts>=6?C.blue:pts>0?C.gold:"#ef4444";
+                              return(
+                                <td key={i} style={{padding:"10px",textAlign:"center",background:bgCol,borderLeft:"0.5px solid var(--color-border-tertiary)"}}>
+                                  {pick?(
+                                    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+                                      <span style={{fontFamily:"monospace",fontWeight:500,fontSize:13,color:isFinished?txCol:"var(--color-text-primary)"}}>{pick.home}–{pick.away}</span>
+                                      {pts!==null&&<span style={{fontSize:10,fontWeight:500,color:txCol}}>{pts>0?"+"+pts:"0"} pts</span>}
+                                      {pick.dd&&<span style={{fontSize:9,color:C.gold}}>⚡×2</span>}
+                                    </div>
+                                  ):(
+                                    <span style={{color:"var(--color-text-tertiary)",fontSize:11}}>—</span>
+                                  )}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )
+              )}
             </div>
           )}
 
