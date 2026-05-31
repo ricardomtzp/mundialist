@@ -44,7 +44,7 @@ const getRank=t=>FIFA_RANK[t]||50;
 const STRONG=new Set(["Brazil","France","Germany","Spain","England","Argentina","Portugal","Netherlands","USA","Mexico","Belgium","Morocco"]);
 
 const FLAGS={
-  Mexico:"🇲🇽","South Africa":"🇿🇦","South Korea":"🇰🇷",Czechia:"🇨🇿",
+  Mexico:"🇲🇽","South Africa":"🇿🇦","South Korea":"🇰🇷",Czechia:"🇨🇿","Czech Republic":"🇨🇿","Czechia ":"🇨🇿",
   Canada:"🇨🇦",Switzerland:"🇨🇭",Qatar:"🇶🇦","Bosnia and Herzegovina":"🇧🇦",
   Brazil:"🇧🇷",Morocco:"🇲🇦",Haiti:"🇭🇹",Scotland:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",
   USA:"🇺🇸",Paraguay:"🇵🇾",Australia:"🇦🇺","Türkiye":"🇹🇷",
@@ -678,151 +678,108 @@ const R32_TO_R16 = [
 const ANNEX_IDX={"1A":0,"1B":1,"1D":2,"1E":3,"1G":4,"1I":5,"1K":6,"1L":7};
 
 
-// FIFA WC2026 match venues — verified from official FIFA schedule
-// Match order: [MD1 match1, MD1 match2, MD2 match1, MD2 match2, MD3 match1, MD3 match2]
+// FIFA WC2026 match venues — verified from NBC Sports/Al Jazeera official schedule May 2026
+// FIFA renamed all venues: AT&T Stadium → Dallas Stadium, SoFi → Los Angeles Stadium, etc.
+// Match order per group: [MD1 m1, MD1 m2, MD2 m1, MD2 m2, MD3 m1, MD3 m2]
 const GROUP_VENUES={
-  A:[ // Mexico, South Africa, South Korea, Czechia
-    {venue:"Mexico City Stadium",city:"Mexico City, Mexico"},      // Mexico vs South Africa
-    {venue:"Estadio Guadalajara",city:"Zapopan, Mexico"},          // South Korea vs Czechia
-    {venue:"Estadio Guadalajara",city:"Zapopan, Mexico"},          // Mexico vs South Korea
-    {venue:"Atlanta Stadium",city:"Atlanta, USA"},                 // Czechia vs South Africa
-    {venue:"Mexico City Stadium",city:"Mexico City, Mexico"},      // Czechia vs Mexico
-    {venue:"Estadio Monterrey",city:"Guadalupe, Mexico"},          // South Africa vs South Korea
+  A:[ // Mexico vs South Africa, South Korea vs Czechia
+    {venue:"Estadio Azteca",city:"Mexico City"},        // Mexico vs South Africa — Jun 11
+    {venue:"Estadio Guadalajara",city:"Guadalajara"},   // South Korea vs Czechia — Jun 11
+    {venue:"Estadio Guadalajara",city:"Guadalajara"},   // Mexico vs South Korea — Jun 17
+    {venue:"Atlanta Stadium",city:"Atlanta"},           // South Africa vs Czechia — Jun 17
+    {venue:"Estadio Azteca",city:"Mexico City"},        // Czechia vs Mexico — Jun 26
+    {venue:"Estadio BBVA",city:"Monterrey"},            // South Africa vs South Korea — Jun 26
   ],
-  B:[ // Canada, Switzerland, Qatar, Bosnia and Herzegovina
-    {venue:"Toronto Stadium",city:"Toronto, Canada"},              // Canada vs Bosnia
-    {venue:"San Francisco Bay Area Stadium",city:"San Francisco, USA"}, // Qatar vs Switzerland
-    {venue:"BC Place",city:"Vancouver, Canada"},                   // Canada vs Qatar
-    {venue:"Los Angeles Stadium",city:"Los Angeles, USA"},         // Switzerland vs Bosnia
-    {venue:"BC Place",city:"Vancouver, Canada"},                   // Switzerland vs Canada
-    {venue:"Seattle Stadium",city:"Seattle, USA"},                 // Bosnia vs Qatar
+  B:[ // Canada vs Bosnia, Qatar vs Switzerland
+    {venue:"Toronto Stadium",city:"Toronto"},           // Canada vs Bosnia — Jun 12
+    {venue:"San Francisco Bay Area Stadium",city:"San Francisco"}, // Qatar vs Switzerland — Jun 12
+    {venue:"Toronto Stadium",city:"Toronto"},           // Canada vs Qatar — Jun 18
+    {venue:"Los Angeles Stadium",city:"Los Angeles"},   // Switzerland vs Bosnia — Jun 18
+    {venue:"BC Place",city:"Vancouver"},                // Switzerland vs Canada — Jun 26
+    {venue:"Seattle Stadium",city:"Seattle"},           // Bosnia vs Qatar — Jun 26
   ],
-  C:[ // Brazil, Morocco, Haiti, Scotland
-    {venue:"New York New Jersey Stadium",city:"New Jersey, USA"},  // Brazil vs Morocco
-    {venue:"Boston Stadium",city:"Boston, USA"},                   // Haiti vs Scotland
-    {venue:"Philadelphia Stadium",city:"Philadelphia, USA"},       // Brazil vs Haiti
-    {venue:"Boston Stadium",city:"Boston, USA"},                   // Scotland vs Morocco
-    {venue:"Miami Stadium",city:"Miami, USA"},                     // Scotland vs Brazil
-    {venue:"Atlanta Stadium",city:"Atlanta, USA"},                 // Morocco vs Haiti
+  C:[ // Brazil vs Morocco, Haiti vs Scotland
+    {venue:"New York New Jersey Stadium",city:"New Jersey"}, // Brazil vs Morocco — Jun 13
+    {venue:"Boston Stadium",city:"Boston"},             // Haiti vs Scotland — Jun 13
+    {venue:"Philadelphia Stadium",city:"Philadelphia"}, // Brazil vs Haiti — Jun 19
+    {venue:"Boston Stadium",city:"Boston"},             // Scotland vs Morocco — Jun 19
+    {venue:"Miami Stadium",city:"Miami"},               // Scotland vs Brazil — Jun 27
+    {venue:"Atlanta Stadium",city:"Atlanta"},           // Morocco vs Haiti — Jun 27
   ],
-  D:[ // USA, Paraguay, Australia, Türkiye
-    {venue:"Los Angeles Stadium",city:"Los Angeles, USA"},         // USA vs Paraguay
-    {venue:"BC Place",city:"Vancouver, Canada"},                   // Australia vs Türkiye
-    {venue:"Seattle Stadium",city:"Seattle, USA"},                 // USA vs Australia
-    {venue:"San Francisco Bay Area Stadium",city:"San Francisco, USA"}, // Türkiye vs Paraguay
-    {venue:"Los Angeles Stadium",city:"Los Angeles, USA"},         // Türkiye vs USA
-    {venue:"San Francisco Bay Area Stadium",city:"San Francisco, USA"}, // Paraguay vs Australia
+  D:[ // USA vs Paraguay, Australia vs Türkiye
+    {venue:"Los Angeles Stadium",city:"Los Angeles"},   // USA vs Paraguay — Jun 12
+    {venue:"BC Place",city:"Vancouver"},                // Australia vs Türkiye — Jun 12
+    {venue:"Seattle Stadium",city:"Seattle"},           // USA vs Australia — Jun 19
+    {venue:"San Francisco Bay Area Stadium",city:"San Francisco"}, // Türkiye vs Paraguay — Jun 19
+    {venue:"Los Angeles Stadium",city:"Los Angeles"},   // Türkiye vs USA — Jun 25
+    {venue:"San Francisco Bay Area Stadium",city:"San Francisco"}, // Paraguay vs Australia — Jun 25
   ],
-  E:[ // Germany, Curaçao, Ivory Coast, Ecuador
-    {venue:"Houston Stadium",city:"Houston, USA"},                 // Germany vs Curaçao
-    {venue:"Philadelphia Stadium",city:"Philadelphia, USA"},       // Ivory Coast vs Ecuador
-    {venue:"Toronto Stadium",city:"Toronto, Canada"},              // Germany vs Ivory Coast
-    {venue:"Kansas City Stadium",city:"Kansas City, USA"},         // Ecuador vs Curaçao
-    {venue:"New York New Jersey Stadium",city:"New Jersey, USA"},  // Ecuador vs Germany
-    {venue:"Philadelphia Stadium",city:"Philadelphia, USA"},       // Curaçao vs Ivory Coast
+  E:[ // Germany vs Curaçao, Ivory Coast vs Ecuador
+    {venue:"Houston Stadium",city:"Houston"},           // Germany vs Curaçao — Jun 14
+    {venue:"Philadelphia Stadium",city:"Philadelphia"}, // Ivory Coast vs Ecuador — Jun 14
+    {venue:"Toronto Stadium",city:"Toronto"},           // Germany vs Ivory Coast — Jun 20
+    {venue:"Kansas City Stadium",city:"Kansas City"},   // Ecuador vs Curaçao — Jun 20
+    {venue:"New York New Jersey Stadium",city:"New Jersey"}, // Ecuador vs Germany — Jun 25
+    {venue:"Philadelphia Stadium",city:"Philadelphia"}, // Curaçao vs Ivory Coast — Jun 25
   ],
-  F:[ // Netherlands, Japan, Sweden, Tunisia
-    {venue:"Dallas Stadium",city:"Dallas, USA"},                   // Netherlands vs Japan
-    {venue:"Estadio Monterrey",city:"Guadalupe, Mexico"},          // Sweden vs Tunisia
-    {venue:"Houston Stadium",city:"Houston, USA"},                 // Netherlands vs Sweden
-    {venue:"Estadio Monterrey",city:"Guadalupe, Mexico"},          // Tunisia vs Japan
-    {venue:"Dallas Stadium",city:"Dallas, USA"},                   // Japan vs Sweden
-    {venue:"Kansas City Stadium",city:"Kansas City, USA"},         // Tunisia vs Netherlands
+  F:[ // Netherlands vs Japan, Sweden vs Tunisia
+    {venue:"Dallas Stadium",city:"Dallas"},             // Netherlands vs Japan — Jun 14
+    {venue:"Estadio BBVA",city:"Monterrey"},            // Sweden vs Tunisia — Jun 14
+    {venue:"Houston Stadium",city:"Houston"},           // Netherlands vs Sweden — Jun 20
+    {venue:"Estadio BBVA",city:"Monterrey"},            // Tunisia vs Japan — Jun 20
+    {venue:"Dallas Stadium",city:"Dallas"},             // Japan vs Sweden — Jun 27
+    {venue:"Kansas City Stadium",city:"Kansas City"},   // Tunisia vs Netherlands — Jun 27
   ],
-  G:[ // Belgium, Egypt, Iran, New Zealand
-    {venue:"BC Place",city:"Vancouver, Canada"},                   // Belgium vs Egypt
-    {venue:"Los Angeles Stadium",city:"Los Angeles, USA"},         // Iran vs New Zealand
-    {venue:"Los Angeles Stadium",city:"Los Angeles, USA"},         // Belgium vs Iran
-    {venue:"BC Place",city:"Vancouver, Canada"},                   // New Zealand vs Egypt
-    {venue:"Seattle Stadium",city:"Seattle, USA"},                 // Egypt vs Iran
-    {venue:"BC Place",city:"Vancouver, Canada"},                   // New Zealand vs Belgium
+  G:[ // Belgium vs Egypt, Iran vs New Zealand
+    {venue:"Seattle Stadium",city:"Seattle"},           // Belgium vs Egypt — Jun 15
+    {venue:"Los Angeles Stadium",city:"Los Angeles"},   // Iran vs New Zealand — Jun 15
+    {venue:"Los Angeles Stadium",city:"Los Angeles"},   // Belgium vs Iran — Jun 21
+    {venue:"BC Place",city:"Vancouver"},                // New Zealand vs Egypt — Jun 21
+    {venue:"Seattle Stadium",city:"Seattle"},           // Egypt vs Iran — Jun 27
+    {venue:"BC Place",city:"Vancouver"},                // New Zealand vs Belgium — Jun 27
   ],
-  H:[ // Spain, Cape Verde, Saudi Arabia, Uruguay
-    {venue:"Atlanta Stadium",city:"Atlanta, USA"},                 // Spain vs Cape Verde
-    {venue:"Miami Stadium",city:"Miami, USA"},                     // Saudi Arabia vs Uruguay
-    {venue:"Atlanta Stadium",city:"Atlanta, USA"},                 // Spain vs Saudi Arabia
-    {venue:"Miami Stadium",city:"Miami, USA"},                     // Uruguay vs Cape Verde
-    {venue:"Houston Stadium",city:"Houston, USA"},                 // Cape Verde vs Saudi Arabia
-    {venue:"Estadio Guadalajara",city:"Zapopan, Mexico"},          // Uruguay vs Spain
+  H:[ // Spain vs Cape Verde, Saudi Arabia vs Uruguay
+    {venue:"Atlanta Stadium",city:"Atlanta"},           // Spain vs Cape Verde — Jun 15
+    {venue:"Miami Stadium",city:"Miami"},               // Saudi Arabia vs Uruguay — Jun 15
+    {venue:"Atlanta Stadium",city:"Atlanta"},           // Spain vs Saudi Arabia — Jun 21
+    {venue:"Miami Stadium",city:"Miami"},               // Uruguay vs Cape Verde — Jun 21
+    {venue:"Houston Stadium",city:"Houston"},           // Cape Verde vs Saudi Arabia — Jun 27
+    {venue:"Estadio Guadalajara",city:"Guadalajara"},   // Uruguay vs Spain — Jun 27
   ],
-  I:[ // France, Senegal, Norway, Iraq
-    {venue:"New York New Jersey Stadium",city:"New Jersey, USA"},  // France vs Senegal
-    {venue:"Boston Stadium",city:"Boston, USA"},                   // Iraq vs Norway
-    {venue:"Philadelphia Stadium",city:"Philadelphia, USA"},       // France vs Iraq
-    {venue:"New York New Jersey Stadium",city:"New Jersey, USA"},  // Norway vs Senegal
-    {venue:"Boston Stadium",city:"Boston, USA"},                   // Norway vs France
-    {venue:"Toronto Stadium",city:"Toronto, Canada"},              // Senegal vs Iraq
+  I:[ // France vs Senegal, Iraq vs Norway
+    {venue:"New York New Jersey Stadium",city:"New Jersey"}, // France vs Senegal — Jun 16
+    {venue:"Boston Stadium",city:"Boston"},             // Iraq vs Norway — Jun 16
+    {venue:"Philadelphia Stadium",city:"Philadelphia"}, // France vs Iraq — Jun 22
+    {venue:"New York New Jersey Stadium",city:"New Jersey"}, // Norway vs Senegal — Jun 22
+    {venue:"Boston Stadium",city:"Boston"},             // Norway vs France — Jun 26
+    {venue:"Toronto Stadium",city:"Toronto"},           // Senegal vs Iraq — Jun 26
   ],
-  J:[ // Argentina, Algeria, Austria, Jordan
-    {venue:"Kansas City Stadium",city:"Kansas City, USA"},         // Argentina vs Algeria
-    {venue:"San Francisco Bay Area Stadium",city:"San Francisco, USA"}, // Austria vs Jordan
-    {venue:"Dallas Stadium",city:"Dallas, USA"},                   // Argentina vs Austria
-    {venue:"San Francisco Bay Area Stadium",city:"San Francisco, USA"}, // Jordan vs Algeria
-    {venue:"Kansas City Stadium",city:"Kansas City, USA"},         // Algeria vs Austria
-    {venue:"Dallas Stadium",city:"Dallas, USA"},                   // Jordan vs Argentina
+  J:[ // Argentina vs Algeria, Austria vs Jordan
+    {venue:"Kansas City Stadium",city:"Kansas City"},   // Argentina vs Algeria — Jun 16
+    {venue:"San Francisco Bay Area Stadium",city:"San Francisco"}, // Austria vs Jordan — Jun 16
+    {venue:"Dallas Stadium",city:"Dallas"},             // Argentina vs Austria — Jun 22
+    {venue:"San Francisco Bay Area Stadium",city:"San Francisco"}, // Jordan vs Algeria — Jun 22
+    {venue:"Kansas City Stadium",city:"Kansas City"},   // Algeria vs Austria — Jun 26
+    {venue:"Dallas Stadium",city:"Dallas"},             // Jordan vs Argentina — Jun 26
   ],
-  K:[ // Portugal, DR Congo, Uzbekistan, Colombia
-    {venue:"Houston Stadium",city:"Houston, USA"},                 // Portugal vs DR Congo
-    {venue:"Estadio Guadalajara",city:"Zapopan, Mexico"},          // Uzbekistan vs Colombia
-    {venue:"Houston Stadium",city:"Houston, USA"},                 // Portugal vs Uzbekistan
-    {venue:"Estadio Guadalajara",city:"Zapopan, Mexico"},          // Colombia vs DR Congo
-    {venue:"Miami Stadium",city:"Miami, USA"},                     // Colombia vs Portugal
-    {venue:"Atlanta Stadium",city:"Atlanta, USA"},                 // DR Congo vs Uzbekistan
+  K:[ // Portugal vs DR Congo, Uzbekistan vs Colombia
+    {venue:"Houston Stadium",city:"Houston"},           // Portugal vs DR Congo — Jun 17
+    {venue:"Estadio Guadalajara",city:"Guadalajara"},   // Uzbekistan vs Colombia — Jun 17
+    {venue:"Houston Stadium",city:"Houston"},           // Portugal vs Uzbekistan — Jun 23
+    {venue:"Estadio Guadalajara",city:"Guadalajara"},   // Colombia vs DR Congo — Jun 23
+    {venue:"Miami Stadium",city:"Miami"},               // Colombia vs Portugal — Jun 27
+    {venue:"Atlanta Stadium",city:"Atlanta"},           // DR Congo vs Uzbekistan — Jun 27
   ],
-  L:[ // England, Croatia, Ghana, Panama
-    {venue:"Dallas Stadium",city:"Dallas, USA"},                   // England vs Croatia
-    {venue:"Toronto Stadium",city:"Toronto, Canada"},              // Ghana vs Panama
-    {venue:"Boston Stadium",city:"Boston, USA"},                   // England vs Ghana
-    {venue:"Toronto Stadium",city:"Toronto, Canada"},              // Panama vs Croatia
-    {venue:"New York New Jersey Stadium",city:"New Jersey, USA"},  // Panama vs England
-    {venue:"Philadelphia Stadium",city:"Philadelphia, USA"},       // Croatia vs Ghana
+  L:[ // England vs Croatia, Ghana vs Panama
+    {venue:"Dallas Stadium",city:"Dallas"},             // England vs Croatia — Jun 17
+    {venue:"Toronto Stadium",city:"Toronto"},           // Ghana vs Panama — Jun 17
+    {venue:"Boston Stadium",city:"Boston"},             // England vs Ghana — Jun 23
+    {venue:"Toronto Stadium",city:"Toronto"},           // Panama vs Croatia — Jun 23
+    {venue:"New York New Jersey Stadium",city:"New Jersey"}, // Panama vs England — Jun 27
+    {venue:"Philadelphia Stadium",city:"Philadelphia"}, // Croatia vs Ghana — Jun 27
   ],
 };
 
-
-// Knockout stage venues — FIFA WC2026 official schedule
-const KO_VENUES={
-  r32:[
-    {venue:"MetLife Stadium",city:"New York/New Jersey"},
-    {venue:"AT&T Stadium",city:"Dallas"},
-    {venue:"SoFi Stadium",city:"Los Angeles"},
-    {venue:"Levi's Stadium",city:"San Francisco"},
-    {venue:"Estadio Azteca",city:"Mexico City"},
-    {venue:"Hard Rock Stadium",city:"Miami"},
-    {venue:"Mercedes-Benz Stadium",city:"Atlanta"},
-    {venue:"Lumen Field",city:"Seattle"},
-    {venue:"NRG Stadium",city:"Houston"},
-    {venue:"BC Place",city:"Vancouver"},
-    {venue:"Estadio BBVA",city:"Monterrey"},
-    {venue:"Arrowhead Stadium",city:"Kansas City"},
-    {venue:"AT&T Stadium",city:"Dallas"},
-    {venue:"MetLife Stadium",city:"New York/New Jersey"},
-    {venue:"SoFi Stadium",city:"Los Angeles"},
-    {venue:"Estadio Azteca",city:"Mexico City"},
-  ],
-  r16:[
-    {venue:"MetLife Stadium",city:"New York/New Jersey"},
-    {venue:"AT&T Stadium",city:"Dallas"},
-    {venue:"SoFi Stadium",city:"Los Angeles"},
-    {venue:"Hard Rock Stadium",city:"Miami"},
-    {venue:"Estadio Azteca",city:"Mexico City"},
-    {venue:"Lumen Field",city:"Seattle"},
-    {venue:"Mercedes-Benz Stadium",city:"Atlanta"},
-    {venue:"NRG Stadium",city:"Houston"},
-  ],
-  qf:[
-    {venue:"MetLife Stadium",city:"New York/New Jersey"},
-    {venue:"AT&T Stadium",city:"Dallas"},
-    {venue:"SoFi Stadium",city:"Los Angeles"},
-    {venue:"Hard Rock Stadium",city:"Miami"},
-  ],
-  sf:[
-    {venue:"MetLife Stadium",city:"New York/New Jersey"},
-    {venue:"AT&T Stadium",city:"Dallas"},
-  ],
-  final:{venue:"MetLife Stadium",city:"New York/New Jersey"},
-  third:{venue:"Hard Rock Stadium",city:"Miami"},
-};
 const ROUND_INDICES = [[0,1],[2,3],[4,5]];
 
 
