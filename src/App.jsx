@@ -2037,18 +2037,14 @@ export default function App(){
                             </div>
                           );
                         })()}
-                        {GROUP_VENUES[activeGroup]?.[idx]&&(
-                          <div style={{fontSize:9,color:"var(--color-text-tertiary)",textAlign:"center",lineHeight:1.3}}>
-                            <div>{GROUP_VENUES[activeGroup][idx].venue}</div>
-                            <div style={{color:"var(--color-text-secondary)",fontSize:9}}>{GROUP_VENUES[activeGroup][idx].city}</div>
-                          </div>
-                        )}
+
                       </div>
                       <div style={{flex:1,display:"flex",alignItems:"center",gap:8}}>
                         <span style={{fontSize:22}}>{FLAGS[match.away]||"❓"}</span>
                         {!SEEDED.has(match.away)&&awayQualifies&&<span style={{fontSize:10,color:C.gold}}>★</span>}
                         <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500}}>{match.away}</span>
                       </div>
+                      {GROUP_VENUES[activeGroup]?.[idx]&&<span style={{fontSize:9,color:"var(--color-text-tertiary)",flexShrink:0,whiteSpace:"nowrap"}}>📍 {GROUP_VENUES[activeGroup][idx].city}</span>}
                       {!isSeeded?(
                         <button onClick={()=>canDouble&&setDouble(roundKey,activeGroup,idx)}
                           title={isMyDouble?"Remove double":roundHasDouble?"Already used this matchday":"Double your points for this match"}
@@ -2175,10 +2171,10 @@ export default function App(){
 
           {/* Centre-out bracket R16 → Final */}
           <div style={{overflowX:"auto",paddingBottom:8}}>
-            <div style={{display:"flex",alignItems:"stretch",minWidth:900,gap:0}}>
+            <div style={{display:"flex",alignItems:"stretch",minWidth:1050,gap:0}}>
 
               {/* LEFT R16 */}
-              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0}}>
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:160,flexShrink:0}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Round of 16</div>
                 {r16Matchups.slice(0,4).map((m,i)=>(
                   <KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={`R16 ${i+1}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16" venue={KO_VENUES.r16[i]?.venue} city={KO_VENUES.r16[i]?.city}/>
@@ -2190,7 +2186,7 @@ export default function App(){
               </div>
 
               {/* LEFT QF */}
-              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0,padding:"22px 0"}}>
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:160,flexShrink:0,padding:"22px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Quarter-finals</div>
                 {qfMatchups.slice(0,2).map((m,i)=>(
                   <KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={`QF ${i+1}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf" venue={KO_VENUES.qf[i]?.venue} city={KO_VENUES.qf[i]?.city}/>
@@ -2202,7 +2198,7 @@ export default function App(){
               </div>
 
               {/* LEFT SF */}
-              <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:132,flexShrink:0,padding:"80px 0"}}>
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:160,flexShrink:0,padding:"80px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
                 <KOCard home={sfMatchups[0]?.home||"TBD"} away={sfMatchups[0]?.away||"TBD"} picked={koPicks.sf[0]} onPick={t=>pickKO("sf",0,t)} label="SF 1" actualWinner={getKOWinner(sfMatchups[0]?.home,sfMatchups[0]?.away)} roundKey="sf" venue={KO_VENUES.sf[0]?.venue} city={KO_VENUES.sf[0]?.city}/>
               </div>
@@ -2212,9 +2208,9 @@ export default function App(){
               </div>
 
               {/* FINAL */}
-              <div style={{display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",width:144,flexShrink:0,gap:8}}>
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",width:172,flexShrink:0,gap:8}}>
                 <div style={{fontSize:10,fontWeight:500,color:C.gold,textTransform:"uppercase",letterSpacing:"0.06em"}}>Final</div>
-                <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final" venue={KO_VENUES.final?.venue} city={KO_VENUES.final?.city}/>
+                <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final" label="Final" venue={KO_VENUES.final?.venue} city={KO_VENUES.final?.city}/>
                 {champion!=="TBD"&&(
                   <div style={{padding:"10px 12px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:8,textAlign:"center",width:"100%"}}>
                     <div style={{fontSize:18,marginBottom:2}}>🏆</div>
@@ -2237,7 +2233,7 @@ export default function App(){
               </div>
 
               {/* RIGHT SF */}
-              <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:132,flexShrink:0,padding:"80px 0"}}>
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:160,flexShrink:0,padding:"80px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
                 <KOCard home={sfMatchups[1]?.home||"TBD"} away={sfMatchups[1]?.away||"TBD"} picked={koPicks.sf[1]} onPick={t=>pickKO("sf",1,t)} label="SF 2" actualWinner={getKOWinner(sfMatchups[1]?.home,sfMatchups[1]?.away)} roundKey="sf" venue={KO_VENUES.sf[1]?.venue} city={KO_VENUES.sf[1]?.city}/>
               </div>
@@ -2247,7 +2243,7 @@ export default function App(){
               </div>
 
               {/* RIGHT QF */}
-              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0,padding:"22px 0"}}>
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:160,flexShrink:0,padding:"22px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Quarter-finals</div>
                 {qfMatchups.slice(2,4).map((m,i)=>(
                   <KOCard key={i+2} home={m.home} away={m.away} picked={koPicks.qf[i+2]} onPick={t=>pickKO("qf",i+2,t)} label={`QF ${i+3}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf" venue={KO_VENUES.qf[i+2]?.venue} city={KO_VENUES.qf[i+2]?.city}/>
@@ -2259,7 +2255,7 @@ export default function App(){
               </div>
 
               {/* RIGHT R16 */}
-              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:132,flexShrink:0}}>
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:160,flexShrink:0}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Round of 16</div>
                 {r16Matchups.slice(4,8).map((m,i)=>(
                   <KOCard key={i+4} home={m.home} away={m.away} picked={koPicks.r16[i+4]} onPick={t=>pickKO("r16",i+4,t)} label={`R16 ${i+5}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16" venue={KO_VENUES.r16[i+4]?.venue} city={KO_VENUES.r16[i+4]?.city}/>
