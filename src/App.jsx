@@ -1829,11 +1829,11 @@ export default function App(){
           {mobile&&(
             <nav style={{background:"var(--color-background-primary)",borderTop:"0.5px solid var(--color-border-tertiary)",position:"fixed",bottom:0,left:0,right:0,zIndex:200,height:60,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)"}}>
               {[
-                {p:"home",icon:"⚽",label:"Home"},
-                {p:"predict",icon:"📋",label:"Groups"},
+                {p:"predict",icon:"⚽",label:"Groups"},
                 {p:"bracket",icon:"🏆",label:"Knockout"},
                 {p:"bonuses",icon:"⭐",label:"Bonuses"},
                 {p:"league",icon:"👥",label:"League"},
+                {p:"points",icon:"📖",label:"Rules"},
               ].map(({p,icon,label})=>(
                 <button key={p} onClick={()=>setPage(p)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"4px 0"}}>
                   <span style={{fontSize:20,lineHeight:1}}>{icon}</span>
@@ -1846,7 +1846,7 @@ export default function App(){
         </>
       )}
 
-      <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?60:0}}>
+      <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?"calc(56px + env(safe-area-inset-bottom))":0}}>
 
       {/* ══ HOME ══ */}
       {page==="home"&&(
@@ -2108,7 +2108,7 @@ export default function App(){
               return(<div key={ri}>
                 <div style={{padding:"7px 18px",background:"var(--color-background-secondary)",borderTop:ri>0?"0.5px solid var(--color-border-tertiary)":undefined,borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                   <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.05em"}}>Matchday {ri+1}</span>
-                  {currentDouble&&<span style={{fontSize:11,color:C.gold,fontWeight:500}}>⚡ Double active</span>}
+                  {currentDouble&&currentDouble.startsWith(activeGroup+"-")&&<span style={{fontSize:11,color:C.gold,fontWeight:500}}>⚡ Double active</span>}
                 </div>
                 {indices.map(idx=>{
                   const match=groupMatches[activeGroup][idx];
@@ -2494,7 +2494,7 @@ export default function App(){
                       const actual=Object.values(actualResults).find(r=>r.home_team===m.home&&r.away_team===m.away&&r.status==="finished");
                       const ddPts=actual&&sel?calcMatchPoints(m.homeScore,m.awayScore,actual.actual_home,actual.actual_away)*2:null;
                       const ddCol=ddPts===null?C.gold:ddPts>0?C.green:"#ef4444";
-                      return(<button key={mid} onClick={()=>!actual&&!other&&setDouble(rk,m.g,m.idx)} disabled={!!other}
+                      return(<button key={mid} onClick={()=>!actual&&setDouble(rk,m.g,m.idx)} disabled={false}
                         style={{padding:"9px 12px",border:`0.5px solid ${sel?ddCol:"var(--color-border-tertiary)"}`,borderRadius:8,
                           background:sel?(ddPts>0?C.greenLt:ddPts===0?"#fef2f2":C.goldLt):"var(--color-background-secondary)",
                           cursor:other||actual?"not-allowed":"pointer",
