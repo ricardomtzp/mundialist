@@ -2824,10 +2824,20 @@ export default function App(){
                 <span style={{flex:1,fontFamily:"monospace",fontSize:16,fontWeight:500,letterSpacing:"0.08em",color:"var(--color-text-primary)"}}>{createdCode}</span>
                 <button onClick={()=>navigator.clipboard?.writeText(createdCode)} style={{padding:"5px 10px",background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:12,cursor:"pointer",color:"var(--color-text-secondary)"}}>Copy</button>
               </div>
-              <button onClick={()=>{
-                const nl={id:createdCode,name:leagueName||"My Mundialist League",members:1,rank:1,code:createdCode};
-                setJoinedLeagues(p=>[...p.filter(l=>l.id!==createdCode),nl]);
+              <button onClick={async()=>{
+                if(!leagueName.trim())return;
+                showSaving();
+                const {data,error}=await supabase.from("leagues").insert({
+                  name:leagueName,
+                  invite_code:createdCode,
+                  admin_id:user.id,
+                }).select().single();
+                if(error){showError();console.error(error);return;}
+                await supabase.from("league_members").insert({league_id:data.id,user_id:user.id,total_points:0});
+                const nl={id:data.id,name:data.name,members:1,rank:1,code:createdCode};
+                setJoinedLeagues(p=>[...p.filter(l=>l.id!==data.id),nl]);
                 setActiveLeague(nl);setLeagueStep("overview");
+                showSaved();
               }} style={{width:"100%",padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:"pointer"}}>Create & go to league →</button>
             </div>
           )}
