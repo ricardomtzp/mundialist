@@ -780,49 +780,6 @@ const GROUP_VENUES={
   ],
 };
 
-
-const KO_VENUES={
-  r32:[
-    {venue:"Estadio Azteca",city:"Mexico City"},
-    {venue:"Dallas Stadium",city:"Dallas"},
-    {venue:"Los Angeles Stadium",city:"Los Angeles"},
-    {venue:"San Francisco Bay Area Stadium",city:"San Francisco"},
-    {venue:"Estadio Azteca",city:"Mexico City"},
-    {venue:"Miami Stadium",city:"Miami"},
-    {venue:"Atlanta Stadium",city:"Atlanta"},
-    {venue:"Seattle Stadium",city:"Seattle"},
-    {venue:"Houston Stadium",city:"Houston"},
-    {venue:"BC Place",city:"Vancouver"},
-    {venue:"Estadio BBVA",city:"Monterrey"},
-    {venue:"Kansas City Stadium",city:"Kansas City"},
-    {venue:"Dallas Stadium",city:"Dallas"},
-    {venue:"New York New Jersey Stadium",city:"New Jersey"},
-    {venue:"Los Angeles Stadium",city:"Los Angeles"},
-    {venue:"Estadio Azteca",city:"Mexico City"},
-  ],
-  r16:[
-    {venue:"New York New Jersey Stadium",city:"New Jersey"},
-    {venue:"Dallas Stadium",city:"Dallas"},
-    {venue:"Los Angeles Stadium",city:"Los Angeles"},
-    {venue:"Miami Stadium",city:"Miami"},
-    {venue:"Estadio Azteca",city:"Mexico City"},
-    {venue:"Seattle Stadium",city:"Seattle"},
-    {venue:"Atlanta Stadium",city:"Atlanta"},
-    {venue:"Houston Stadium",city:"Houston"},
-  ],
-  qf:[
-    {venue:"New York New Jersey Stadium",city:"New Jersey"},
-    {venue:"Dallas Stadium",city:"Dallas"},
-    {venue:"Los Angeles Stadium",city:"Los Angeles"},
-    {venue:"Miami Stadium",city:"Miami"},
-  ],
-  sf:[
-    {venue:"Atlanta Stadium",city:"Atlanta"},
-    {venue:"Dallas Stadium",city:"Dallas"},
-  ],
-  final:{venue:"New York New Jersey Stadium",city:"New Jersey"},
-  third:{venue:"Miami Stadium",city:"Miami"},
-};
 const ROUND_INDICES = [[0,1],[2,3],[4,5]];
 
 
@@ -1744,6 +1701,15 @@ export default function App(){
   }
 
   const r32AllTBD=r32Bracket.every(m=>m.home==="TBD"&&m.away==="TBD");
+  const isMobile=typeof window!=="undefined"&&window.innerWidth<768;
+  const [windowWidth,setWindowWidth]=useState(typeof window!=="undefined"?window.innerWidth:1200);
+  useEffect(()=>{
+    const handle=()=>setWindowWidth(window.innerWidth);
+    window.addEventListener('resize',handle);
+    return()=>window.removeEventListener('resize',handle);
+  },[]);
+  const mobile=windowWidth<768;
+  const [koRound,setKoRound]=useState("r16");
 
   // Get actual winner for a KO match from Supabase matches table
   const getKOWinner=(home,away)=>{
@@ -1774,33 +1740,70 @@ export default function App(){
 
       {/* ── Fixed Nav ── */}
       {user&&(
-        <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:56}}>
-          <div style={{maxWidth:1280,margin:"0 auto",padding:"0 1.5rem",display:"flex",alignItems:"center",gap:"1rem",height:"100%"}}>
-            <span style={{fontSize:18,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer",marginRight:"auto"}} onClick={()=>setPage("home")}>Mundialist</span>
-            {NAV.map(({label,page:p})=>(
-              <button key={p} onClick={()=>setPage(p)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,
-                fontWeight:page===p?600:400,color:page===p?C.blue:"var(--color-text-secondary)",
-                borderBottom:page===p?`2px solid ${C.blue}`:"2px solid transparent",
-                padding:"17px 2px",whiteSpace:"nowrap"}}>
-                {label}
-              </button>
-            ))}
-            <div style={{display:"flex",alignItems:"center",gap:8,marginLeft:4,flexShrink:0}}>
-              <div style={{width:30,height:30,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#fff"}}>{user.avatar}</div>
-              <div style={{display:"flex",flexDirection:"column"}}>
-                <span style={{fontSize:12,color:"var(--color-text-primary)",fontWeight:500}}>{user.handle}</span>
-                <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{totalPredicted}/72 · {koPicked}/32{totalPoints>0?" · "+totalPoints+"pts":""}</span>
+        <>
+          {/* Desktop nav */}
+          {!mobile&&(
+            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:56}}>
+              <div style={{maxWidth:1280,margin:"0 auto",padding:"0 1.5rem",display:"flex",alignItems:"center",gap:"1rem",height:"100%"}}>
+                <span style={{fontSize:18,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer",marginRight:"auto"}} onClick={()=>setPage("home")}>Mundialist</span>
+                {NAV.map(({label,page:p})=>(
+                  <button key={p} onClick={()=>setPage(p)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,
+                    fontWeight:page===p?600:400,color:page===p?C.blue:"var(--color-text-secondary)",
+                    borderBottom:page===p?`2px solid ${C.blue}`:"2px solid transparent",
+                    padding:"17px 2px",whiteSpace:"nowrap"}}>
+                    {label}
+                  </button>
+                ))}
+                <div style={{display:"flex",alignItems:"center",gap:8,marginLeft:4,flexShrink:0}}>
+                  <div style={{width:30,height:30,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#fff"}}>{user.avatar}</div>
+                  <div style={{display:"flex",flexDirection:"column"}}>
+                    <span style={{fontSize:12,color:"var(--color-text-primary)",fontWeight:500}}>{user.handle}</span>
+                    <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{totalPredicted}/72 · {koPicked}/32{totalPoints>0?" · "+totalPoints+"pts":""}</span>
+                  </div>
+                  <button onClick={async()=>{await supabase.auth.signOut();setUser(null);setPage("home");}}
+                    style={{padding:"4px 8px",background:"none",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:11,color:"var(--color-text-tertiary)",cursor:"pointer",marginLeft:4}}>
+                    Sign out
+                  </button>
+                </div>
               </div>
-              <button onClick={async()=>{await supabase.auth.signOut();setUser(null);setPage("home");}}
-                style={{padding:"4px 8px",background:"none",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:11,color:"var(--color-text-tertiary)",cursor:"pointer",marginLeft:4}}>
-                Sign out
-              </button>
-            </div>
-          </div>
-        </nav>
+            </nav>
+          )}
+
+          {/* Mobile top bar */}
+          {mobile&&(
+            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:48}}>
+              <div style={{padding:"0 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",height:"100%"}}>
+                <span style={{fontSize:16,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer"}} onClick={()=>setPage("home")}>Mundialist</span>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  {totalPoints>0&&<span style={{fontSize:11,fontWeight:500,color:C.green,background:C.greenLt,padding:"2px 8px",borderRadius:99,fontFamily:"monospace"}}>{totalPoints}pts</span>}
+                  <div style={{width:28,height:28,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"#fff"}}>{user.avatar}</div>
+                </div>
+              </div>
+            </nav>
+          )}
+
+          {/* Mobile bottom tab bar */}
+          {mobile&&(
+            <nav style={{background:"var(--color-background-primary)",borderTop:"0.5px solid var(--color-border-tertiary)",position:"fixed",bottom:0,left:0,right:0,zIndex:200,height:60,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)"}}>
+              {[
+                {p:"home",icon:"⚽",label:"Home"},
+                {p:"predict",icon:"📋",label:"Groups"},
+                {p:"bracket",icon:"🏆",label:"Knockout"},
+                {p:"bonuses",icon:"⭐",label:"Bonuses"},
+                {p:"league",icon:"👥",label:"League"},
+              ].map(({p,icon,label})=>(
+                <button key={p} onClick={()=>setPage(p)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"4px 0"}}>
+                  <span style={{fontSize:20,lineHeight:1}}>{icon}</span>
+                  <span style={{fontSize:9,fontWeight:page===p?600:400,color:page===p?C.blue:"var(--color-text-tertiary)"}}>{label}</span>
+                  {page===p&&<div style={{width:4,height:4,borderRadius:"50%",background:C.blue,marginTop:1}}/>}
+                </button>
+              ))}
+            </nav>
+          )}
+        </>
       )}
 
-      <div style={{paddingTop:user?56:0}}>
+      <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?60:0}}>
 
       {/* ══ HOME ══ */}
       {page==="home"&&(
@@ -2030,17 +2033,21 @@ export default function App(){
           </div>
 
           {/* Group tabs */}
-          <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:6,marginBottom:"1.25rem"}}>
+          {/* Group tabs - 2 row grid on mobile, 6-col grid on desktop */}
+          <div style={{display:"grid",gridTemplateColumns:mobile?"repeat(6,1fr)":"repeat(6,1fr)",gap:mobile?4:6,marginBottom:"1.25rem"}}>
             {Object.keys(GROUPS).map(g=>{
               const done=groupMatches[g].filter(m=>m.homeScore!==""&&m.awayScore!=="").length;
               const complete=done===6,active=activeGroup===g;
               return(<button key={g} onClick={()=>setActiveGroup(g)}
-                style={{padding:"9px 4px",borderRadius:8,cursor:"pointer",
+                style={{padding:mobile?"7px 2px":"9px 4px",borderRadius:8,cursor:"pointer",
                   border:`0.5px solid ${active?C.blue:complete?C.green:"var(--color-border-tertiary)"}`,
                   background:active?C.blueLt:complete?C.greenLt:"var(--color-background-primary)",
-                  display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-                <span style={{fontSize:13,fontWeight:500,color:active?C.blue:complete?C.green:"var(--color-text-primary)"}}>Group {g}</span>
-                <span style={{fontSize:10,color:complete?C.green:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{done}/6{complete?" ✓":""}</span>
+                  display:"flex",flexDirection:"column",alignItems:"center",gap:mobile?1:2}}>
+                <span style={{fontSize:mobile?11:13,fontWeight:500,color:active?C.blue:complete?C.green:"var(--color-text-primary)"}}>
+                  {mobile?g:`Group ${g}`}
+                </span>
+                {!mobile&&<span style={{fontSize:10,color:complete?C.green:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{done}/6{complete?" ✓":""}</span>}
+                {mobile&&complete&&<span style={{fontSize:8,color:C.green}}>✓</span>}
               </button>);
             })}
           </div>
@@ -2228,21 +2235,68 @@ export default function App(){
               <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em"}}>Round of 32</span>
               <span style={{fontSize:11,fontFamily:"monospace",color:C.blue,background:C.blueLt,padding:"2px 8px",borderRadius:99}}>{Object.keys(koPicks.r32).length}/16</span>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
-              {[0,1,2,3].map(col=>(
-                <div key={col} style={{display:"flex",flexDirection:"column",gap:5}}>
-                  {r32Bracket.slice(col*4,(col+1)*4).map((match,j)=>{
-                    const i=col*4+j;
-                    return <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`M${match.matchId}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32" venue={KO_VENUES.r32[i]?.venue} city={KO_VENUES.r32[i]?.city}/>;
-                  })}
-                </div>
+            <div style={{display:"grid",gridTemplateColumns:mobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:mobile?6:8}}>
+              {r32Bracket.map((match,i)=>(
+                <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`M${match.matchId}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32" venue={mobile?null:KO_VENUES.r32[i]?.venue} city={mobile?KO_VENUES.r32[i]?.city:KO_VENUES.r32[i]?.city}/>
               ))}
             </div>
           </div>
 
           <div style={{borderTop:"0.5px solid var(--color-border-tertiary)",marginBottom:"1.5rem"}}/>
 
-          {/* Centre-out bracket R16 → Final */}
+          {/* Mobile: tabbed rounds */}
+          {mobile&&(
+            <div>
+              <div style={{display:"flex",background:"var(--color-background-secondary)",borderRadius:10,padding:3,gap:2,marginBottom:"1rem"}}>
+                {["r16","qf","sf","final"].map(r=>(
+                  <button key={r} onClick={()=>setKoRound(r)}
+                    style={{flex:1,padding:"7px 4px",borderRadius:7,border:"none",fontSize:11,cursor:"pointer",
+                      fontWeight:koRound===r?500:400,
+                      background:koRound===r?"var(--color-background-primary)":"transparent",
+                      color:koRound===r?"var(--color-text-primary)":"var(--color-text-tertiary)"}}>
+                    {r==="r16"?"R16":r==="qf"?"QF":r==="sf"?"SF":"Final"}
+                  </button>
+                ))}
+              </div>
+              {koRound==="r16"&&(
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Round of 16 · {Object.keys(koPicks.r16).length}/8</div>
+                  {r16Matchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={`R16 ${i+1} · ${KO_VENUES.r16[i]?.city||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>)}
+                </div>
+              )}
+              {koRound==="qf"&&(
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Quarter-finals · {Object.keys(koPicks.qf).length}/4</div>
+                  {qfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={`QF ${i+1} · ${KO_VENUES.qf[i]?.city||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>)}
+                </div>
+              )}
+              {koRound==="sf"&&(
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Semi-finals · {Object.keys(koPicks.sf).length}/2</div>
+                  {sfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.sf[i]} onPick={t=>pickKO("sf",i,t)} label={`SF ${i+1} · ${KO_VENUES.sf[i]?.city||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="sf"/>)}
+                </div>
+              )}
+              {koRound==="final"&&(
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  <div style={{fontSize:11,fontWeight:500,color:C.gold,marginBottom:4}}>Final · New York New Jersey Stadium</div>
+                  <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final" venue={KO_VENUES.final?.venue} city={KO_VENUES.final?.city}/>
+                  {champion!=="TBD"&&(
+                    <div style={{padding:"10px 12px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:8,textAlign:"center"}}>
+                      <div style={{fontSize:22,marginBottom:2}}>🏆</div>
+                      <div style={{fontSize:13,color:"#7a5c10",fontWeight:500}}>{champion}</div>
+                    </div>
+                  )}
+                  <div style={{marginTop:8}}>
+                    <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>3rd place match</div>
+                    <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label={`3rd place · ${KO_VENUES.third?.city||""}`} actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Desktop: Centre-out bracket R16 → Final */}
+          {!mobile&&(
           <div style={{overflowX:"auto",paddingBottom:8}}>
             <div style={{display:"flex",alignItems:"stretch",minWidth:1050,gap:0}}>
 
@@ -2337,7 +2391,8 @@ export default function App(){
 
             </div>
           </div>
-          <p style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:"1.5rem"}}>★ dark horse — non-seeded team advancing earns bonus pts: QF +3, SF +5, Final +8. R32 pairings use FIFA's official Annex C.</p>
+          )}
+          <p style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:"1.5rem"}}>★ dark horse — non-seeded team advancing earns bonus pts: QF +5, SF +10, Final +15. R32 pairings use FIFA's official Annex C.</p>
         </div>
       )}
 
