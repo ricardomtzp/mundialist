@@ -1834,7 +1834,6 @@ export default function App(){
                 {p:"bonuses",icon:"⭐",label:"Bonuses"},
                 {p:"league",icon:"👥",label:"League"},
                 {p:"points",icon:"📖",label:"Rules"},
-                {p:"points",icon:"📖",label:"Rules"},
               ].map(({p,icon,label})=>(
                 <button key={p} onClick={()=>setPage(p)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"4px 0"}}>
                   <span style={{fontSize:20,lineHeight:1}}>{icon}</span>
