@@ -780,6 +780,49 @@ const GROUP_VENUES={
   ],
 };
 
+
+const KO_VENUES={
+  r32:[
+    {venue:"Estadio Azteca",city:"Mexico City"},
+    {venue:"Dallas Stadium",city:"Dallas"},
+    {venue:"Los Angeles Stadium",city:"Los Angeles"},
+    {venue:"San Francisco Bay Area Stadium",city:"San Francisco"},
+    {venue:"Estadio Azteca",city:"Mexico City"},
+    {venue:"Miami Stadium",city:"Miami"},
+    {venue:"Atlanta Stadium",city:"Atlanta"},
+    {venue:"Seattle Stadium",city:"Seattle"},
+    {venue:"Houston Stadium",city:"Houston"},
+    {venue:"BC Place",city:"Vancouver"},
+    {venue:"Estadio BBVA",city:"Monterrey"},
+    {venue:"Kansas City Stadium",city:"Kansas City"},
+    {venue:"Dallas Stadium",city:"Dallas"},
+    {venue:"New York New Jersey Stadium",city:"New Jersey"},
+    {venue:"Los Angeles Stadium",city:"Los Angeles"},
+    {venue:"Estadio Azteca",city:"Mexico City"},
+  ],
+  r16:[
+    {venue:"New York New Jersey Stadium",city:"New Jersey"},
+    {venue:"Dallas Stadium",city:"Dallas"},
+    {venue:"Los Angeles Stadium",city:"Los Angeles"},
+    {venue:"Miami Stadium",city:"Miami"},
+    {venue:"Estadio Azteca",city:"Mexico City"},
+    {venue:"Seattle Stadium",city:"Seattle"},
+    {venue:"Atlanta Stadium",city:"Atlanta"},
+    {venue:"Houston Stadium",city:"Houston"},
+  ],
+  qf:[
+    {venue:"New York New Jersey Stadium",city:"New Jersey"},
+    {venue:"Dallas Stadium",city:"Dallas"},
+    {venue:"Los Angeles Stadium",city:"Los Angeles"},
+    {venue:"Miami Stadium",city:"Miami"},
+  ],
+  sf:[
+    {venue:"Atlanta Stadium",city:"Atlanta"},
+    {venue:"Dallas Stadium",city:"Dallas"},
+  ],
+  final:{venue:"New York New Jersey Stadium",city:"New Jersey"},
+  third:{venue:"Miami Stadium",city:"Miami"},
+};
 const ROUND_INDICES = [[0,1],[2,3],[4,5]];
 
 
