@@ -2537,13 +2537,17 @@ export default function App(){
                           background:sel?(ddPts>0?C.greenLt:ddPts===0?"#fef2f2":C.goldLt):"var(--color-background-secondary)",
                           cursor:other||actual?"not-allowed":"pointer",
                           display:"flex",alignItems:"center",gap:10,opacity:other?0.4:1,textAlign:"left"}}>
-                        <span style={{fontSize:16}}>{FLAGS[m.home]||"❓"}</span>
-                        <span style={{fontSize:13,color:"var(--color-text-primary)",flex:1,fontWeight:500}}>{m.home}</span>
-                        {actual?<span style={{fontSize:12,fontFamily:"monospace",color:C.blue}}>{actual.actual_home}–{actual.actual_away}</span>:
-                         m.homeScore&&m.awayScore?<span style={{fontSize:12,fontFamily:"monospace",color:"var(--color-text-secondary)"}}>{m.homeScore}–{m.awayScore}</span>:null}
-                        <span style={{fontSize:12,color:"var(--color-text-tertiary)"}}>vs</span>
-                        <span style={{fontSize:13,color:"var(--color-text-primary)",flex:1,textAlign:"right",fontWeight:500}}>{m.away}</span>
-                        <span style={{fontSize:16}}>{FLAGS[m.away]||"❓"}</span>
+                        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,flexShrink:0}}>
+                          <span style={{fontSize:20}}>{FLAGS[m.home]||"❓"}</span>
+                          <span style={{fontSize:9,color:"var(--color-text-primary)",fontWeight:500,textAlign:"center",maxWidth:60,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.home}</span>
+                        </div>
+                        {actual?<span style={{fontSize:12,fontFamily:"monospace",color:C.blue,flex:1,textAlign:"center"}}>{actual.actual_home}–{actual.actual_away}</span>:
+                         m.homeScore&&m.awayScore?<span style={{fontSize:12,fontFamily:"monospace",color:"var(--color-text-secondary)",flex:1,textAlign:"center"}}>{m.homeScore}–{m.awayScore}</span>:
+                         <span style={{flex:1,textAlign:"center",fontSize:11,color:"var(--color-text-tertiary)"}}>vs</span>}
+                        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,flexShrink:0}}>
+                          <span style={{fontSize:20}}>{FLAGS[m.away]||"❓"}</span>
+                          <span style={{fontSize:9,color:"var(--color-text-primary)",fontWeight:500,textAlign:"center",maxWidth:60,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.away}</span>
+                        </div>
                         {sel&&ddPts!==null&&<span style={{fontSize:12,fontWeight:600,color:ddCol,flexShrink:0}}>{ddPts>0?"+"+ddPts+" pts ✓":"0 pts ✗"}</span>}
                         {sel&&ddPts===null&&<span style={{fontSize:12,fontWeight:600,color:C.gold,flexShrink:0}}>×2 ⚡</span>}
                       </button>);
