@@ -1767,7 +1767,7 @@ export default function App(){
   };
 
   return(
-    <div style={{minHeight:"100vh",background:"var(--color-background-tertiary)",fontFamily:"'DM Sans',system-ui,sans-serif"}}>
+    <div style={{minHeight:"100vh",background:"var(--color-background-tertiary)",fontFamily:"'DM Sans',system-ui,sans-serif",isolation:"isolate"}}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 
       {/* ── Save toast ── */}
@@ -1786,7 +1786,7 @@ export default function App(){
         <>
           {/* Desktop nav */}
           {!mobile&&(
-            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:56,WebkitTransform:"translateZ(0)",transform:"translateZ(0)"}}>
+            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:56}}>
               <div style={{maxWidth:1280,margin:"0 auto",padding:"0 1.5rem",display:"flex",alignItems:"center",gap:"1rem",height:"100%"}}>
                 <span style={{fontSize:18,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer",marginRight:"auto"}} onClick={()=>setPage("home")}>Mundialist</span>
                 {NAV.map(({label,page:p})=>(
@@ -1814,7 +1814,7 @@ export default function App(){
 
           {/* Mobile top bar */}
           {mobile&&(
-            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:48,WebkitTransform:"translateZ(0)",transform:"translateZ(0)"}}>
+            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:48}}>
               <div style={{padding:"0 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",height:"100%"}}>
                 <span style={{fontSize:16,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer"}} onClick={()=>setPage("home")}>Mundialist</span>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -1827,7 +1827,7 @@ export default function App(){
 
           {/* Mobile bottom tab bar */}
           {mobile&&(
-            <nav style={{background:"var(--color-background-primary)",borderTop:"0.5px solid var(--color-border-tertiary)",position:"fixed",bottom:0,left:0,right:0,zIndex:200,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)",minHeight:56,WebkitTransform:"translateZ(0)",transform:"translateZ(0)"}}>
+            <nav style={{background:"var(--color-background-primary)",borderTop:"0.5px solid var(--color-border-tertiary)",position:"fixed",bottom:0,left:0,right:0,zIndex:200,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)",minHeight:56}}>
               {[
                 {p:"predict",icon:"⚽",label:"Groups"},
                 {p:"bracket",icon:"🏆",label:"Knockout"},
@@ -1846,7 +1846,7 @@ export default function App(){
         </>
       )}
 
-      <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?"calc(56px + env(safe-area-inset-bottom))":0}}>
+      <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?"calc(56px + env(safe-area-inset-bottom))":0,minHeight:"100vh",WebkitOverflowScrolling:"touch"}}>
 
       {/* ══ HOME ══ */}
       {page==="home"&&(
