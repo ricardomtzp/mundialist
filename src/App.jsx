@@ -1104,7 +1104,10 @@ function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,lo
     const bgCol=isCorrect?C.greenLt:isWrong?"#fef2f2":color+"11";
     return(
       <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",background:bgCol,border:`0.5px solid ${borderCol}`,borderRadius:10}}>
-        <span style={{fontSize:26}}>{pick?.flag||emoji}</span>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,flexShrink:0}}>
+          <span style={{fontSize:28}}>{pick?.flag||emoji}</span>
+          <span style={{fontSize:9,color:"var(--color-text-tertiary)",textAlign:"center"}}>{pick?.nation}</span>
+        </div>
         <div style={{flex:1}}>
           <div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{pick?.name}</div>
           {actualWinner?(
@@ -2695,7 +2698,7 @@ export default function App(){
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",flex:1}}>Player</span>
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:60,textAlign:"center"}}>Pts</span>
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:80,textAlign:"center"}}>Champion</span>
-                  <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:50,textAlign:"center"}}>Picks</span>
+                  
                 </div>
                 {leagueMembers.map((m,i)=>(
                   <div key={i} onClick={()=>setViewingUser(m)}
