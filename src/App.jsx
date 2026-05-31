@@ -1651,7 +1651,7 @@ export default function App(){
         // Get champion, runner-up and 3rd place from KO predictions
         const finalPred2=userPreds.find(p=>p.match_id==='KO-final-0');
         const championPick2=finalPred2?.advancing_team||null;
-        const thirdPred=userPreds.find(p=>p.match_id==='KO-third');
+        const thirdPred=userPreds.find(p=>p.match_id==='KO-third'||p.match_id==='KO-third-0');
         // Runner-up: both SF winners go to final, the one who doesn't win is runner-up
         const sfWinners=userPreds.filter(p=>p.match_id?.startsWith('KO-sf-')&&p.advancing_team).map(p=>p.advancing_team);
         const runnerUpPick=championPick2&&sfWinners.length===2?sfWinners.find(t=>t!==championPick2)||null:null;
@@ -2120,7 +2120,7 @@ export default function App(){
                   return(
                     <div key={idx} style={{padding:"12px 18px",borderBottom:"0.5px solid var(--color-border-tertiary)",background:isMyDouble?C.goldLt:done?"#f8faff":"transparent",display:"flex",alignItems:"center",gap:14}}>
                       <div style={{flex:1,display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end"}}>
-                        <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500}}>{match.home}</span>
+                        <span style={{fontSize:mobile?11:14,color:"var(--color-text-primary)",fontWeight:500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:mobile?70:120}}>{match.home}</span>
                         {!SEEDED.has(match.home)&&homeQualifies&&<span style={{fontSize:10,color:C.gold}}>★</span>}
                         <span style={{fontSize:22}}>{FLAGS[match.home]||"❓"}</span>
                       </div>
@@ -2164,7 +2164,7 @@ export default function App(){
                       <div style={{flex:1,display:"flex",alignItems:"center",gap:8}}>
                         <span style={{fontSize:22}}>{FLAGS[match.away]||"❓"}</span>
                         {!SEEDED.has(match.away)&&awayQualifies&&<span style={{fontSize:10,color:C.gold}}>★</span>}
-                        <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500}}>{match.away}</span>
+                        <span style={{fontSize:mobile?11:14,color:"var(--color-text-primary)",fontWeight:500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:mobile?70:120}}>{match.away}</span>
                       </div>
                       {GROUP_VENUES[activeGroup]?.[idx]&&<span style={{fontSize:9,color:"var(--color-text-tertiary)",flexShrink:0,whiteSpace:"nowrap"}}>📍 {GROUP_VENUES[activeGroup][idx].venue}, {GROUP_VENUES[activeGroup][idx].city}</span>}
                       {!isSeeded?(
