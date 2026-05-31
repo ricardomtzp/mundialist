@@ -1827,18 +1827,18 @@ export default function App(){
 
           {/* Mobile bottom tab bar */}
           {mobile&&(
-            <nav style={{background:"var(--color-background-primary)",borderTop:"0.5px solid var(--color-border-tertiary)",position:"fixed",bottom:0,left:0,right:0,zIndex:200,height:60,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)"}}>
+            <nav style={{background:"var(--color-background-primary)",borderTop:"0.5px solid var(--color-border-tertiary)",position:"fixed",bottom:0,left:0,right:0,zIndex:200,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)",minHeight:56}}>
               {[
-                {p:"home",icon:"⚽",label:"Home"},
-                {p:"predict",icon:"📋",label:"Groups"},
+                {p:"predict",icon:"⚽",label:"Groups"},
                 {p:"bracket",icon:"🏆",label:"Knockout"},
                 {p:"bonuses",icon:"⭐",label:"Bonuses"},
                 {p:"league",icon:"👥",label:"League"},
+                {p:"points",icon:"📖",label:"Rules"},
               ].map(({p,icon,label})=>(
-                <button key={p} onClick={()=>setPage(p)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"4px 0"}}>
-                  <span style={{fontSize:20,lineHeight:1}}>{icon}</span>
+                <button key={p} onClick={()=>setPage(p)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"8px 0"}}>
+                  <span style={{fontSize:22,lineHeight:1}}>{icon}</span>
                   <span style={{fontSize:9,fontWeight:page===p?600:400,color:page===p?C.blue:"var(--color-text-tertiary)"}}>{label}</span>
-                  {page===p&&<div style={{width:4,height:4,borderRadius:"50%",background:C.blue,marginTop:1}}/>}
+                  {page===p&&<div style={{width:20,height:2,borderRadius:99,background:C.blue,marginTop:2}}/>}
                 </button>
               ))}
             </nav>
@@ -1846,7 +1846,7 @@ export default function App(){
         </>
       )}
 
-      <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?60:0}}>
+      <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?"calc(56px + env(safe-area-inset-bottom))":0}}>
 
       {/* ══ HOME ══ */}
       {page==="home"&&(
@@ -2097,10 +2097,7 @@ export default function App(){
 
           {/* Match card */}
           <div style={card}>
-            <div style={{padding:"12px 18px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <span style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>Group {activeGroup}</span>
-              <span style={{fontSize:12,color:"var(--color-text-tertiary)"}}>{GROUPS[activeGroup].join(" · ")}</span>
-            </div>
+
             {ROUND_INDICES.map((indices,ri)=>{
               const roundKey=["r1","r2","r3"][ri];
               const currentDouble=doubleDown[roundKey];
@@ -2108,7 +2105,7 @@ export default function App(){
               return(<div key={ri}>
                 <div style={{padding:"7px 18px",background:"var(--color-background-secondary)",borderTop:ri>0?"0.5px solid var(--color-border-tertiary)":undefined,borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                   <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.05em"}}>Matchday {ri+1}</span>
-                  {currentDouble&&<span style={{fontSize:11,color:C.gold,fontWeight:500}}>⚡ Double active</span>}
+                  {currentDouble&&currentDouble.startsWith(activeGroup+"-")&&<span style={{fontSize:11,color:C.gold,fontWeight:500}}>⚡ Double active</span>}
                 </div>
                 {indices.map(idx=>{
                   const match=groupMatches[activeGroup][idx];
@@ -2120,68 +2117,105 @@ export default function App(){
                   // Only show dark horse label if team is picked to qualify
                   const homeQualifies=allStandings[activeGroup]?.slice(0,2).some(r=>r.team===match.home);
                   const awayQualifies=allStandings[activeGroup]?.slice(0,2).some(r=>r.team===match.away);
+                  const actual=Object.values(actualResults).find(r=>(r.home_team===match.home||r.home_team===match.away)&&(r.away_team===match.away||r.away_team===match.home)&&r.status==="finished");
+                  const pts=actual?calcMatchPoints(match.homeScore,match.awayScore,actual.actual_home,actual.actual_away)*(isMyDouble?2:1):null;
+                  const ptCol=pts===null?C.gold:pts>=10?C.green:pts>=6?C.blue:pts>0?C.gold:"#888";
                   return(
-                    <div key={idx} style={{padding:"12px 18px",borderBottom:"0.5px solid var(--color-border-tertiary)",background:isMyDouble?C.goldLt:done?"#f8faff":"transparent",display:"flex",alignItems:"center",gap:14}}>
-                      <div style={{flex:1,display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end"}}>
-                        <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500}}>{match.home}</span>
-                        {!SEEDED.has(match.home)&&homeQualifies&&<span style={{fontSize:10,color:C.gold}}>★</span>}
-                        <span style={{fontSize:22}}>{FLAGS[match.home]||"❓"}</span>
-                      </div>
-                      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,flexShrink:0}}>
-                        {(()=>{
-                          const actual=Object.values(actualResults).find(r=>(r.home_team===match.home||r.home_team===match.away)&&(r.away_team===match.away||r.away_team===match.home)&&r.status==="finished");
-                          if(actual){
-                            const pts=calcMatchPoints(match.homeScore,match.awayScore,actual.actual_home,actual.actual_away)*(isMyDouble?2:1);
-                            const col=pts>=10?C.green:pts>=6?C.blue:pts>0?C.gold:"#888";
-                            return(
-                              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                                <div style={{display:"flex",gap:16,alignItems:"center"}}>
-                                  <div style={{textAlign:"center"}}>
-                                    <div style={{fontSize:9,color:"var(--color-text-tertiary)",marginBottom:2}}>your pick</div>
-                                    <span style={{fontSize:18,fontWeight:600,fontFamily:"monospace",color:"var(--color-text-primary)"}}>{match.homeScore||"–"} – {match.awayScore||"–"}</span>
-                                  </div>
-                                  <div style={{width:1,height:32,background:"var(--color-border-tertiary)"}}/>
-                                  <div style={{textAlign:"center"}}>
-                                    <div style={{fontSize:9,color:C.blue,marginBottom:2}}>actual</div>
-                                    <span style={{fontSize:18,fontWeight:600,fontFamily:"monospace",color:C.blue}}>{actual.actual_home} – {actual.actual_away}</span>
-                                  </div>
-                                </div>
-                                <span style={{padding:"2px 10px",borderRadius:99,fontSize:11,fontWeight:500,background:col+"22",color:col}}>{pts>0?"+"+pts+" pts":"0 pts"}</span>
-                              </div>
-                            );
-                          }
-                          return(
-                            <div style={{display:"flex",alignItems:"center",gap:8}}>
-                              <input type="number" min="0" max="99" value={match.homeScore} onChange={e=>updateScore(activeGroup,idx,"homeScore",e.target.value)}
-                                style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
-                              <span style={{fontSize:14,color:"var(--color-text-tertiary)"}}>–</span>
-                              <input type="number" min="0" max="99" value={match.awayScore} onChange={e=>updateScore(activeGroup,idx,"awayScore",e.target.value)}
-                                style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                    <div key={idx} style={{padding:mobile?"8px 10px":"12px 18px",borderBottom:"0.5px solid var(--color-border-tertiary)",background:isMyDouble?C.goldLt:actual?"#f8faff":"transparent"}}>
+                      {/* Scoreboard layout - mobile: flag above name, desktop: inline */}
+                      {mobile?(
+                        <div style={{display:"flex",alignItems:"center",gap:6}}>
+                          {/* Home team column */}
+                          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,flex:1,minWidth:0}}>
+                            <span style={{fontSize:24}}>{FLAGS[match.home]||"❓"}</span>
+                            <span style={{fontSize:10,fontWeight:500,color:"var(--color-text-primary)",textAlign:"center",whiteSpace:"nowrap"}}>{match.home}{!SEEDED.has(match.home)&&homeQualifies?" ★":""}</span>
+                          </div>
+                          {/* Score centre */}
+                          {actual?(
+                            <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
+                              <span style={{fontSize:20,fontWeight:600,fontFamily:"monospace",color:"var(--color-text-primary)"}}>{match.homeScore||"–"}</span>
+                              <span style={{fontSize:12,color:"var(--color-text-tertiary)"}}>–</span>
+                              <span style={{fontSize:20,fontWeight:600,fontFamily:"monospace",color:"var(--color-text-primary)"}}>{match.awayScore||"–"}</span>
                             </div>
-                          );
-                        })()}
-
-                      </div>
-                      <div style={{flex:1,display:"flex",alignItems:"center",gap:8}}>
-                        <span style={{fontSize:22}}>{FLAGS[match.away]||"❓"}</span>
-                        {!SEEDED.has(match.away)&&awayQualifies&&<span style={{fontSize:10,color:C.gold}}>★</span>}
-                        <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500}}>{match.away}</span>
-                      </div>
-                      {GROUP_VENUES[activeGroup]?.[idx]&&<span style={{fontSize:9,color:"var(--color-text-tertiary)",flexShrink:0,whiteSpace:"nowrap"}}>📍 {GROUP_VENUES[activeGroup][idx].venue}, {GROUP_VENUES[activeGroup][idx].city}</span>}
-                      {!isSeeded?(
-                        <button onClick={()=>canDouble&&setDouble(roundKey,activeGroup,idx)}
-                          title={isMyDouble?"Remove double":roundHasDouble?"Already used this matchday":"Double your points for this match"}
-                          style={{padding:"6px 11px",borderRadius:7,fontSize:12,fontWeight:isMyDouble?600:400,
-                            cursor:canDouble?"pointer":"not-allowed",
-                            border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,
-                            background:isMyDouble?C.goldLt:"transparent",
-                            color:isMyDouble?C.gold:!canDouble?"var(--color-text-tertiary)":"var(--color-text-secondary)",
-                            opacity:!canDouble&&!isMyDouble?0.3:1,flexShrink:0}}>
-                          {isMyDouble?"⚡ ×2":"×2"}
-                        </button>
+                          ):(
+                            <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
+                              <input type="number" min="0" max="9" value={match.homeScore} onChange={e=>updateScore(activeGroup,idx,"homeScore",e.target.value)}
+                                onClick={e=>e.target.select()}
+                                style={{width:38,textAlign:"center",padding:"7px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:7,fontSize:18,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                              <span style={{fontSize:13,color:"var(--color-text-tertiary)"}}>–</span>
+                              <input type="number" min="0" max="9" value={match.awayScore} onChange={e=>updateScore(activeGroup,idx,"awayScore",e.target.value)}
+                                onClick={e=>e.target.select()}
+                                style={{width:38,textAlign:"center",padding:"7px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:7,fontSize:18,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                            </div>
+                          )}
+                          {/* Away team column */}
+                          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,flex:1,minWidth:0}}>
+                            <span style={{fontSize:24}}>{FLAGS[match.away]||"❓"}</span>
+                            <span style={{fontSize:10,fontWeight:500,color:"var(--color-text-primary)",textAlign:"center",whiteSpace:"nowrap"}}>{!SEEDED.has(match.away)&&awayQualifies?"★ ":""}{match.away}</span>
+                          </div>
+                        </div>
                       ):(
-                        <span style={{padding:"6px 11px",fontSize:12,color:"var(--color-text-tertiary)",opacity:0.2,flexShrink:0}}>×2</span>
+                        /* Desktop inline layout */
+                        <div style={{display:"flex",alignItems:"center",gap:8}}>
+                          <span style={{fontSize:20,flexShrink:0}}>{FLAGS[match.home]||"❓"}</span>
+                          <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500,flex:1}}>{match.home}{!SEEDED.has(match.home)&&homeQualifies?" ★":""}</span>
+                          {actual?(
+                            <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
+                              <span style={{fontSize:18,fontWeight:600,fontFamily:"monospace"}}>{match.homeScore||"–"}</span>
+                              <span style={{fontSize:13,color:"var(--color-text-tertiary)"}}>–</span>
+                              <span style={{fontSize:18,fontWeight:600,fontFamily:"monospace"}}>{match.awayScore||"–"}</span>
+                            </div>
+                          ):(
+                            <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
+                              <input type="number" min="0" max="9" value={match.homeScore} onChange={e=>updateScore(activeGroup,idx,"homeScore",e.target.value)}
+                                onClick={e=>e.target.select()}
+                                style={{width:48,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                              <span style={{fontSize:14,color:"var(--color-text-tertiary)"}}>–</span>
+                              <input type="number" min="0" max="9" value={match.awayScore} onChange={e=>updateScore(activeGroup,idx,"awayScore",e.target.value)}
+                                onClick={e=>e.target.select()}
+                                style={{width:48,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                            </div>
+                          )}
+                          <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500,flex:1,textAlign:"right"}}>{!SEEDED.has(match.away)&&awayQualifies?"★ ":""}{match.away}</span>
+                          <span style={{fontSize:20,flexShrink:0}}>{FLAGS[match.away]||"❓"}</span>
+                          {!isSeeded&&(
+                            <button onClick={()=>canDouble&&setDouble(roundKey,activeGroup,idx)}
+                              style={{padding:"6px 10px",borderRadius:7,fontSize:12,fontWeight:isMyDouble?600:400,
+                                cursor:canDouble?"pointer":"not-allowed",flexShrink:0,
+                                border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,
+                                background:isMyDouble?C.goldLt:"transparent",
+                                color:isMyDouble?C.gold:!canDouble?"var(--color-text-tertiary)":"var(--color-text-secondary)",
+                                opacity:!canDouble&&!isMyDouble?0.3:1}}>
+                              {isMyDouble?"⚡ ×2":"×2"}
+                            </button>
+                          )}
+                        </div>
                       )}
+                      {/* Actual result row - Option A */}
+                      {actual&&(
+                        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginTop:mobile?4:6}}>
+                          <span style={{fontSize:9,color:"var(--color-text-tertiary)"}}>Actual:</span>
+                          <span style={{fontSize:mobile?13:14,fontWeight:600,fontFamily:"monospace",color:C.gold}}>{actual.actual_home}–{actual.actual_away}</span>
+                          <span style={{fontSize:10,fontWeight:500,padding:"1px 8px",borderRadius:99,background:ptCol+"22",color:ptCol}}>{pts>0?"+"+pts+" pts":"0 pts"}</span>
+                          {isMyDouble&&<span style={{fontSize:9,color:C.gold}}>⚡×2</span>}
+                        </div>
+                      )}
+                      {/* Mobile double-down + venue */}
+                      {mobile&&(
+                        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:4}}>
+                          {GROUP_VENUES[activeGroup]?.[idx]?<span style={{fontSize:8,color:"var(--color-text-tertiary)"}}>📍 {GROUP_VENUES[activeGroup][idx].venue}</span>:<span/>}
+                          {!isSeeded&&<button onClick={()=>!actual&&setDouble(roundKey,activeGroup,idx)}
+                            style={{padding:"3px 8px",borderRadius:6,fontSize:10,fontWeight:isMyDouble?600:400,
+                              cursor:actual?"not-allowed":"pointer",
+                              border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,
+                              background:isMyDouble?C.goldLt:"transparent",
+                              color:isMyDouble?C.gold:"var(--color-text-secondary)",
+                              opacity:actual&&!isMyDouble?0.3:1}}>
+                            {isMyDouble?"⚡ ×2":"×2"}
+                          </button>}
+                        </div>
+                      )}
+                      {!mobile&&GROUP_VENUES[activeGroup]?.[idx]&&<div style={{fontSize:9,color:"var(--color-text-tertiary)",marginTop:4}}>📍 {GROUP_VENUES[activeGroup][idx].venue}, {GROUP_VENUES[activeGroup][idx].city}</div>}
                     </div>
                   );
                 })}
@@ -2494,7 +2528,7 @@ export default function App(){
                       const actual=Object.values(actualResults).find(r=>r.home_team===m.home&&r.away_team===m.away&&r.status==="finished");
                       const ddPts=actual&&sel?calcMatchPoints(m.homeScore,m.awayScore,actual.actual_home,actual.actual_away)*2:null;
                       const ddCol=ddPts===null?C.gold:ddPts>0?C.green:"#ef4444";
-                      return(<button key={mid} onClick={()=>!actual&&!other&&setDouble(rk,m.g,m.idx)} disabled={!!other}
+                      return(<button key={mid} onClick={()=>!actual&&setDouble(rk,m.g,m.idx)} disabled={false}
                         style={{padding:"9px 12px",border:`0.5px solid ${sel?ddCol:"var(--color-border-tertiary)"}`,borderRadius:8,
                           background:sel?(ddPts>0?C.greenLt:ddPts===0?"#fef2f2":C.goldLt):"var(--color-background-secondary)",
                           cursor:other||actual?"not-allowed":"pointer",
@@ -2672,12 +2706,14 @@ export default function App(){
                       <div style={{width:28,height:28,borderRadius:"50%",background:[C.blue,C.red,C.green,C.gold,C.purple][i%5],display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:600,color:"#fff"}}>{m.avatar}</div>
                       <div><div style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>{m.name}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>{m.handle}</div></div>
                     </div>
-                    <span style={{fontFamily:"monospace",fontWeight:600,fontSize:14,color:"var(--color-text-primary)",width:60,textAlign:"center"}}>{m.pts}</span>
-                    <div style={{width:80,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
-                      <span style={{fontSize:16}}>{FLAGS[m.picks.champion]||"❓"}</span>
-                      <span style={{fontSize:10,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:50}}>{m.picks.champion||"—"}</span>
+                    <span style={{fontFamily:"monospace",fontWeight:600,fontSize:14,color:m.isMe?C.blue:"var(--color-text-primary)",width:45,textAlign:"center",flexShrink:0}}>{m.pts}</span>
+                    <div style={{width:80,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:3,flexShrink:0}}>
+                      <span style={{fontSize:14}}>{FLAGS[m.picks.champion]||"—"}</span>
+                      <span style={{fontSize:10,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:mobile?35:50}}>{m.picks.champion||""}</span>
                     </div>
-                    <span style={{fontSize:11,color:"var(--color-text-tertiary)",fontFamily:"monospace",width:50,textAlign:"center"}}>{m.picks.groupDone}/72</span>
+                    {!mobile&&<div style={{width:80,textAlign:"center",flexShrink:0}}>
+                      <span style={{fontSize:11,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"block"}}>{m.picks.goldenBoot||"—"}</span>
+                    </div>}
                   </div>
                 ))}
               </div>
