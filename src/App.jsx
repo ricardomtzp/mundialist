@@ -2272,35 +2272,52 @@ export default function App(){
             </div>
           )}
 
-          {/* R32 Grid */}
-          <div style={{marginBottom:"1.5rem"}}>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"0.75rem"}}>
-              <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em"}}>Round of 32</span>
-              <span style={{fontSize:11,fontFamily:"monospace",color:C.blue,background:C.blueLt,padding:"2px 8px",borderRadius:99}}>{Object.keys(koPicks.r32).length}/16</span>
-            </div>
+          {/* R32 Grid - desktop collapsible */}
+          {!mobile&&(()=>{
+            const [r32Open,setR32Open]=React.useState(false);
+            return(
+              <div style={{marginBottom:"1.5rem"}}>
+                <button onClick={()=>setR32Open(o=>!o)} style={{display:"flex",alignItems:"center",gap:10,marginBottom:"0.75rem",background:"none",border:"none",cursor:"pointer",padding:0,width:"100%"}}>
+                  <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em"}}>Round of 32</span>
+                  <span style={{fontSize:11,fontFamily:"monospace",color:C.blue,background:C.blueLt,padding:"2px 8px",borderRadius:99}}>{Object.keys(koPicks.r32).length}/16</span>
+                  <span style={{fontSize:11,color:"var(--color-text-tertiary)",marginLeft:"auto"}}>{r32Open?"▲ Hide":"▼ Show"}</span>
+                </button>
+                {r32Open&&(
             <div style={{display:"grid",gridTemplateColumns:mobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:mobile?6:8}}>
               {r32Bracket.map((match,i)=>(
                 <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`M${match.matchId}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32" venue={mobile?null:KO_VENUES.r32[i]?.venue} city={mobile?KO_VENUES.r32[i]?.city:KO_VENUES.r32[i]?.city}/>
               ))}
+              </div>
+              )}
             </div>
-          </div>
+          )})()}
 
           <div style={{borderTop:"0.5px solid var(--color-border-tertiary)",marginBottom:"1.5rem"}}/>
 
           {/* Mobile: tabbed rounds */}
           {mobile&&(
             <div>
-              <div style={{display:"flex",background:"var(--color-background-secondary)",borderRadius:10,padding:3,gap:2,marginBottom:"1rem"}}>
-                {["r16","qf","sf","final"].map(r=>(
+              <div style={{display:"flex",background:"var(--color-background-secondary)",borderRadius:10,padding:3,gap:2,marginBottom:"1rem",overflowX:"auto"}}>
+                {["r32","r16","qf","sf","final"].map(r=>(
                   <button key={r} onClick={()=>setKoRound(r)}
                     style={{flex:1,padding:"7px 4px",borderRadius:7,border:"none",fontSize:11,cursor:"pointer",
-                      fontWeight:koRound===r?500:400,
+                      fontWeight:koRound===r?500:400,whiteSpace:"nowrap",minWidth:40,
                       background:koRound===r?"var(--color-background-primary)":"transparent",
                       color:koRound===r?"var(--color-text-primary)":"var(--color-text-tertiary)"}}>
-                    {r==="r16"?"R16":r==="qf"?"QF":r==="sf"?"SF":"Final"}
+                    {r==="r32"?"R32":r==="r16"?"R16":r==="qf"?"QF":r==="sf"?"SF":"Final"}
                   </button>
                 ))}
               </div>
+              {koRound==="r32"&&(
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Round of 32 · {Object.keys(koPicks.r32).length}/16</div>
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:6}}>
+                    {r32Bracket.map((match,i)=>(
+                      <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`M${match.matchId}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
+                    ))}
+                  </div>
+                </div>
+              )}
               {koRound==="r16"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Round of 16 · {Object.keys(koPicks.r16).length}/8</div>
