@@ -2097,10 +2097,7 @@ export default function App(){
 
           {/* Match card */}
           <div style={card}>
-            <div style={{padding:"12px 18px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <span style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>Group {activeGroup}</span>
-              <span style={{fontSize:12,color:"var(--color-text-tertiary)"}}>{GROUPS[activeGroup].join(" · ")}</span>
-            </div>
+            
             {ROUND_INDICES.map((indices,ri)=>{
               const roundKey=["r1","r2","r3"][ri];
               const currentDouble=doubleDown[roundKey];
@@ -2142,8 +2139,8 @@ export default function App(){
                                   </div>
                                   <div style={{width:1,height:32,background:"var(--color-border-tertiary)"}}/>
                                   <div style={{textAlign:"center"}}>
-                                    <div style={{fontSize:9,color:"#E85D04",marginBottom:2}}>actual</div>
-                                    <span style={{fontSize:18,fontWeight:600,fontFamily:"monospace",color:"#E85D04"}}>{actual.actual_home} – {actual.actual_away}</span>
+                                    <div style={{fontSize:9,color:C.gold,marginBottom:2}}>actual</div>
+                                    <span style={{fontSize:18,fontWeight:600,fontFamily:"monospace",color:C.gold}}>{actual.actual_home} – {actual.actual_away}</span>
                                   </div>
                                 </div>
                                 <span style={{padding:"2px 10px",borderRadius:99,fontSize:11,fontWeight:500,background:col+"22",color:col}}>{pts>0?"+"+pts+" pts":"0 pts"}</span>
