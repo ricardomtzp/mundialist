@@ -1834,6 +1834,7 @@ export default function App(){
                 {p:"bonuses",icon:"⭐",label:"Bonuses"},
                 {p:"league",icon:"👥",label:"League"},
                 {p:"points",icon:"📖",label:"Rules"},
+                {p:"points",icon:"📖",label:"Rules"},
               ].map(({p,icon,label})=>(
                 <button key={p} onClick={()=>setPage(p)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"4px 0"}}>
                   <span style={{fontSize:20,lineHeight:1}}>{icon}</span>
@@ -2142,8 +2143,8 @@ export default function App(){
                                   </div>
                                   <div style={{width:1,height:32,background:"var(--color-border-tertiary)"}}/>
                                   <div style={{textAlign:"center"}}>
-                                    <div style={{fontSize:9,color:C.blue,marginBottom:2}}>actual</div>
-                                    <span style={{fontSize:18,fontWeight:600,fontFamily:"monospace",color:C.blue}}>{actual.actual_home} – {actual.actual_away}</span>
+                                    <div style={{fontSize:9,color:"#E85D04",marginBottom:2}}>actual</div>
+                                    <span style={{fontSize:18,fontWeight:600,fontFamily:"monospace",color:"#E85D04"}}>{actual.actual_home} – {actual.actual_away}</span>
                                   </div>
                                 </div>
                                 <span style={{padding:"2px 10px",borderRadius:99,fontSize:11,fontWeight:500,background:col+"22",color:col}}>{pts>0?"+"+pts+" pts":"0 pts"}</span>
@@ -2152,10 +2153,12 @@ export default function App(){
                           }
                           return(
                             <div style={{display:"flex",alignItems:"center",gap:8}}>
-                              <input type="number" min="0" max="99" value={match.homeScore} onChange={e=>updateScore(activeGroup,idx,"homeScore",e.target.value)}
+                              <input type="number" min="0" max="9" value={match.homeScore} onChange={e=>updateScore(activeGroup,idx,"homeScore",e.target.value)}
+                                onClick={e=>e.target.select()}
                                 style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
                               <span style={{fontSize:14,color:"var(--color-text-tertiary)"}}>–</span>
-                              <input type="number" min="0" max="99" value={match.awayScore} onChange={e=>updateScore(activeGroup,idx,"awayScore",e.target.value)}
+                              <input type="number" min="0" max="9" value={match.awayScore} onChange={e=>updateScore(activeGroup,idx,"awayScore",e.target.value)}
+                                onClick={e=>e.target.select()}
                                 style={{width:52,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
                             </div>
                           );
@@ -2677,7 +2680,7 @@ export default function App(){
                       <span style={{fontSize:16}}>{FLAGS[m.picks.champion]||"❓"}</span>
                       <span style={{fontSize:10,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:50}}>{m.picks.champion||"—"}</span>
                     </div>
-                    <span style={{fontSize:11,color:"var(--color-text-tertiary)",fontFamily:"monospace",width:50,textAlign:"center"}}>{m.picks.groupDone}/72</span>
+                    
                   </div>
                 ))}
               </div>
