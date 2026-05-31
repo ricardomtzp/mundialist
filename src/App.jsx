@@ -2659,7 +2659,6 @@ export default function App(){
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",flex:1}}>Player</span>
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:60,textAlign:"center"}}>Pts</span>
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:80,textAlign:"center"}}>Champion</span>
-                  <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:50,textAlign:"center"}}>Picks</span>
                 </div>
                 {leagueMembers.map((m,i)=>(
                   <div key={i} onClick={()=>setViewingUser(m)}
