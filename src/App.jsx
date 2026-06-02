@@ -2315,9 +2315,7 @@ export default function App(){
           )}
 
           {/* R32 Grid - desktop collapsible */}
-          {!mobile&&(()=>{
-            const [r32Open,setR32Open]=useState(false);
-            return(
+          {!mobile&&r32Section(
               <div style={{marginBottom:"1.5rem"}}>
                 <button onClick={()=>setR32Open(o=>!o)} style={{display:"flex",alignItems:"center",gap:10,marginBottom:"0.75rem",background:"none",border:"none",cursor:"pointer",padding:0,width:"100%"}}>
                   <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em"}}>Round of 32</span>
