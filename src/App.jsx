@@ -1220,9 +1220,25 @@ export default function App(){
       const isUnselect=prev[round][id]===team;
       const u={...prev,[round]:{...prev[round],[id]:isUnselect?undefined:team}};
       if(isUnselect){delete u[round][id];}
-      if(round==="r32"||isUnselect){u.r16={};u.qf={};u.sf={};u.final={};u.third=null;}
-      if(round==="r16"){u.qf={};u.sf={};u.final={};}
-      if(round==="qf"){u.sf={};u.final={};}
+      if(round==="r32"){u.r16={};u.qf={};u.sf={};u.final={};u.third=null;}
+      if(round==="r16"){
+        // Only clear the affected branch
+        const qfIdx=id<4?Math.floor(id/2):Math.floor((id-4)/2)+2;
+        const sfIdx=qfIdx<2?0:1;
+        const newQf={...prev.qf};
+        delete newQf[qfIdx];
+        // If the affected QF fed into SF, clear SF and Final too
+        const newSf={...prev.sf};
+        delete newSf[sfIdx];
+        u.qf=newQf;u.sf=newSf;u.final={};u.third=null;
+      }
+      if(round==="qf"){
+        // Only clear affected SF branch
+        const sfIdx=id<2?0:1;
+        const newSf={...prev.sf};
+        delete newSf[sfIdx];
+        u.sf=newSf;u.final={};u.third=null;
+      }
       if(round==="sf"){u.final={};u.third=null;}
       return u;
     });
