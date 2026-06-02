@@ -1220,25 +1220,9 @@ export default function App(){
       const isUnselect=prev[round][id]===team;
       const u={...prev,[round]:{...prev[round],[id]:isUnselect?undefined:team}};
       if(isUnselect){delete u[round][id];}
-      if(round==="r32"){u.r16={};u.qf={};u.sf={};u.final={};u.third=null;}
-      if(round==="r16"){
-        // Only clear the affected branch
-        const qfIdx=id<4?Math.floor(id/2):Math.floor((id-4)/2)+2;
-        const sfIdx=qfIdx<2?0:1;
-        const newQf={...prev.qf};
-        delete newQf[qfIdx];
-        // If the affected QF fed into SF, clear SF and Final too
-        const newSf={...prev.sf};
-        delete newSf[sfIdx];
-        u.qf=newQf;u.sf=newSf;u.final={};u.third=null;
-      }
-      if(round==="qf"){
-        // Only clear affected SF branch
-        const sfIdx=id<2?0:1;
-        const newSf={...prev.sf};
-        delete newSf[sfIdx];
-        u.sf=newSf;u.final={};u.third=null;
-      }
+      if(round==="r32"||isUnselect){u.r16={};u.qf={};u.sf={};u.final={};u.third=null;}
+      if(round==="r16"){u.qf={};u.sf={};u.final={};}
+      if(round==="qf"){u.sf={};u.final={};}
       if(round==="sf"){u.final={};u.third=null;}
       return u;
     });
@@ -1331,7 +1315,7 @@ export default function App(){
       }
       setUser({name:formName,handle:"@"+formHandle.replace("@",""),email:formEmail,avatar:formName[0].toUpperCase(),id:data.user?.id});
       setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
-      setPage("predict");
+      setPage("predict");window.scrollTo(0,0);
     } catch(err){
       setAuthError(err.message||"Sign up failed. Please try again.");
     } finally {
@@ -1676,7 +1660,7 @@ export default function App(){
         // Get champion, runner-up and 3rd place from KO predictions
         const finalPred2=userPreds.find(p=>p.match_id==='KO-final-0');
         const championPick2=finalPred2?.advancing_team||null;
-        const thirdPred=userPreds.find(p=>p.match_id==='KO-third'||p.match_id==='KO-third-0');
+        const thirdPred=userPreds.find(p=>p.match_id==='KO-third');
         // Runner-up: both SF winners go to final, the one who doesn't win is runner-up
         const sfWinners=userPreds.filter(p=>p.match_id?.startsWith('KO-sf-')&&p.advancing_team).map(p=>p.advancing_team);
         const runnerUpPick=championPick2&&sfWinners.length===2?sfWinners.find(t=>t!==championPick2)||null:null;
@@ -1840,7 +1824,7 @@ export default function App(){
 
           {/* Mobile top bar */}
           {mobile&&(
-            <nav style={{background:"#ffffff",borderBottom:"0.5px solid #e5e7eb",position:"fixed",top:0,left:0,right:0,zIndex:9999,height:48}}>
+            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:48}}>
               <div style={{padding:"0 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",height:"100%"}}>
                 <span style={{fontSize:16,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer"}} onClick={()=>setPage("home")}>Mundialist</span>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -1853,7 +1837,7 @@ export default function App(){
 
           {/* Mobile bottom tab bar */}
           {mobile&&(
-            <nav style={{background:"#ffffff",borderTop:"0.5px solid #e5e7eb",position:"fixed",bottom:0,left:0,right:0,zIndex:9999,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)",minHeight:56}}>
+            <nav style={{background:"var(--color-background-primary)",borderTop:"0.5px solid var(--color-border-tertiary)",position:"fixed",bottom:0,left:0,right:0,zIndex:200,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)",minHeight:56}}>
               {[
                 {p:"predict",icon:"⚽",label:"Groups"},
                 {p:"bracket",icon:"🏆",label:"Knockout"},
@@ -2164,11 +2148,11 @@ export default function App(){
                             </div>
                           ):(
                             <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
-                              <input type="number" min="0" max="9" value={match.homeScore} onChange={e=>updateScore(activeGroup,idx,"homeScore",e.target.value)}
+                              <input type="number" min="0" max="9" value={match.homeScore} onChange={e=>{const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"homeScore",v);}}
                                 onClick={e=>e.target.select()}
                                 style={{width:38,textAlign:"center",padding:"7px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:7,fontSize:18,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
                               <span style={{fontSize:13,color:"var(--color-text-tertiary)"}}>–</span>
-                              <input type="number" min="0" max="9" value={match.awayScore} onChange={e=>updateScore(activeGroup,idx,"awayScore",e.target.value)}
+                              <input type="number" min="0" max="9" value={match.awayScore} onChange={e=>{const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"awayScore",v);}}
                                 onClick={e=>e.target.select()}
                                 style={{width:38,textAlign:"center",padding:"7px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:7,fontSize:18,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
                             </div>
@@ -2192,11 +2176,11 @@ export default function App(){
                             </div>
                           ):(
                             <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
-                              <input type="number" min="0" max="9" value={match.homeScore} onChange={e=>updateScore(activeGroup,idx,"homeScore",e.target.value)}
+                              <input type="number" min="0" max="9" value={match.homeScore} onChange={e=>{const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"homeScore",v);}}
                                 onClick={e=>e.target.select()}
                                 style={{width:48,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
                               <span style={{fontSize:14,color:"var(--color-text-tertiary)"}}>–</span>
-                              <input type="number" min="0" max="9" value={match.awayScore} onChange={e=>updateScore(activeGroup,idx,"awayScore",e.target.value)}
+                              <input type="number" min="0" max="9" value={match.awayScore} onChange={e=>{const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"awayScore",v);}}
                                 onClick={e=>e.target.select()}
                                 style={{width:48,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
                             </div>
@@ -2228,7 +2212,7 @@ export default function App(){
                       {/* Mobile double-down + venue */}
                       {mobile&&(
                         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:4}}>
-                          {GROUP_VENUES[activeGroup]?.[idx]?<span style={{fontSize:8,color:"var(--color-text-tertiary)"}}>📍 {GROUP_VENUES[activeGroup][idx].city}</span>:<span/>}
+                          {GROUP_VENUES[activeGroup]?.[idx]?<span style={{fontSize:8,color:"var(--color-text-tertiary)"}}>📍 {GROUP_VENUES[activeGroup][idx].venue}</span>:<span/>}
                           {!isSeeded&&<button onClick={()=>!actual&&setDouble(roundKey,activeGroup,idx)}
                             style={{padding:"3px 8px",borderRadius:6,fontSize:10,fontWeight:isMyDouble?600:400,
                               cursor:actual?"not-allowed":"pointer",
@@ -2577,7 +2561,7 @@ export default function App(){
           <div style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${C.green}`,borderRadius:"0 12px 12px 0"}}>
             <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Golden Boot</span>
-              <span style={{fontSize:11,color:C.green,background:C.greenLt,padding:"2px 8px",borderRadius:99}}>12 pts if correct</span>
+              <span style={{fontSize:11,color:C.green,background:C.greenLt,padding:"2px 8px",borderRadius:99}}>15 pts if correct</span>
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top scorer.</p>
@@ -2589,7 +2573,7 @@ export default function App(){
           <div style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${C.blue}`,borderRadius:"0 12px 12px 0"}}>
             <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Top Assist</span>
-              <span style={{fontSize:11,color:C.blue,background:C.blueLt,padding:"2px 8px",borderRadius:99}}>8 pts if correct</span>
+              <span style={{fontSize:11,color:C.blue,background:C.blueLt,padding:"2px 8px",borderRadius:99}}>15 pts if correct</span>
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's top assist provider.</p>
@@ -2601,7 +2585,7 @@ export default function App(){
           <div style={{...card,borderLeft:`3px solid ${C.gold}`,borderRadius:"0 12px 12px 0"}}>
             <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <span style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>Golden Glove</span>
-              <span style={{fontSize:11,color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>8 pts if correct</span>
+              <span style={{fontSize:11,color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>15 pts if correct</span>
             </div>
             <div style={{padding:"1rem 16px"}}>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1rem",lineHeight:1.6}}>Pick the tournament's best goalkeeper.</p>
@@ -2634,7 +2618,7 @@ export default function App(){
               <button onClick={()=>setViewingUser(null)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← Back to league</button>
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem"}}>
                 <div style={{width:38,height:38,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:700,color:"#fff"}}>{viewingUser.avatar}</div>
-                <div><div style={{fontSize:16,fontWeight:500,color:"var(--color-text-primary)"}}>{viewingUser.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{viewingUser.handle} · {viewingUser.picks.groupDone}/72 group picks</div></div>
+                <div><div style={{fontSize:16,fontWeight:500,color:"var(--color-text-primary)"}}>{viewingUser.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{viewingUser.handle} · {viewingUser.picks.group picks</div></div>
               </div>
               <div style={card}>
                 {[
@@ -2670,7 +2654,7 @@ export default function App(){
               </div>
               <div style={{marginTop:"0.75rem",padding:"10px 14px",background:"var(--color-background-secondary)",borderRadius:8,display:"flex",gap:16}}>
                 <div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:600,color:C.blue,fontFamily:"monospace"}}>{viewingUser.pts}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>points</div></div>
-                <div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)",fontFamily:"monospace"}}>{viewingUser.picks.groupDone}/72</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>group picks</div></div>
+                <div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)",fontFamily:"monospace"}}>{viewingUser.picks.groupDone} picks</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>group picks</div></div>
               </div>
             </div>
           )}
@@ -2707,9 +2691,19 @@ export default function App(){
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem",flexWrap:"wrap"}}>
                 <div style={{flex:1}}><div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)"}}>{activeLeague.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{activeLeague.members?.toLocaleString()} members</div></div>
                 {activeLeague.code&&<span style={{fontFamily:"monospace",fontSize:11,color:"var(--color-text-tertiary)",background:"var(--color-background-secondary)",padding:"5px 10px",borderRadius:99,border:"0.5px solid var(--color-border-tertiary)"}}>{activeLeague.code}</span>}
-                <div style={{display:"flex",background:"var(--color-background-secondary)",borderRadius:8,padding:3,gap:2}}>
-                  <button onClick={()=>setMatchdayView(false)} style={{padding:"5px 12px",borderRadius:6,border:"none",fontSize:12,cursor:"pointer",background:!matchdayView?"var(--color-background-primary)":"transparent",color:!matchdayView?"var(--color-text-primary)":"var(--color-text-secondary)",fontWeight:!matchdayView?500:400}}>Standings</button>
-                  <button onClick={()=>{setMatchdayView(true);loadMatchdayPicks(activeLeague.id);}} style={{padding:"5px 12px",borderRadius:6,border:"none",fontSize:12,cursor:"pointer",background:matchdayView?"var(--color-background-primary)":"transparent",color:matchdayView?"var(--color-text-primary)":"var(--color-text-secondary)",fontWeight:matchdayView?500:400}}>Matchday picks</button>
+                <div style={{display:"flex",background:"#f1f5f9",borderRadius:10,padding:3,gap:2,boxShadow:"inset 0 1px 3px rgba(0,0,0,0.06)"}}>
+                  <button onClick={()=>setMatchdayView(false)} style={{flex:1,padding:"6px 14px",borderRadius:7,border:"none",fontSize:12,cursor:"pointer",
+                    background:!matchdayView?"#fff":"transparent",
+                    color:!matchdayView?C.blue:"var(--color-text-secondary)",
+                    fontWeight:!matchdayView?600:400,
+                    boxShadow:!matchdayView?"0 1px 3px rgba(0,0,0,0.12)":"none",
+                    transition:"all 0.15s"}}>Standings</button>
+                  <button onClick={()=>{setMatchdayView(true);loadMatchdayPicks(activeLeague.id);}} style={{flex:1,padding:"6px 14px",borderRadius:7,border:"none",fontSize:12,cursor:"pointer",
+                    background:matchdayView?"#fff":"transparent",
+                    color:matchdayView?C.blue:"var(--color-text-secondary)",
+                    fontWeight:matchdayView?600:400,
+                    boxShadow:matchdayView?"0 1px 3px rgba(0,0,0,0.12)":"none",
+                    transition:"all 0.15s"}}>Matchday picks</button>
                 </div>
               </div>
               <div style={card}>
@@ -2717,14 +2711,14 @@ export default function App(){
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",flex:1}}>Player</span>
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:60,textAlign:"center"}}>Pts</span>
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:80,textAlign:"center"}}>Champion</span>
-                  <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:50,textAlign:"center"}}>Picks</span>
+                  
                 </div>
                 {leagueMembers.map((m,i)=>(
                   <div key={i} onClick={()=>setViewingUser(m)}
                     style={{padding:"12px 16px",borderBottom:i<leagueMembers.length-1?"0.5px solid var(--color-border-tertiary)":"none",
                       display:"flex",alignItems:"center",gap:12,cursor:"pointer",
                       background:m.name===(user?.name||"You")?C.blueLt:"transparent"}}>
-                    <span style={{fontSize:13,fontWeight:600,color:i<3?C.blue:"var(--color-text-tertiary)",fontFamily:"monospace",width:24,flexShrink:0}}>{i===0?"🥇":i===1?"🥈":i===2?"🥉":i+1}</span>
+                    <span style={{fontSize:13,fontWeight:600,color:i<3?C.blue:"var(--color-text-tertiary)",fontFamily:"monospace",width:24,flexShrink:0}}>{i+1}</span>
                     <div style={{display:"flex",alignItems:"center",gap:8,flex:1}}>
                       <div style={{width:28,height:28,borderRadius:"50%",background:[C.blue,C.red,C.green,C.gold,C.purple][i%5],display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:600,color:"#fff"}}>{m.avatar}</div>
                       <div><div style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>{m.name}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>{m.handle}</div></div>
@@ -2954,7 +2948,7 @@ export default function App(){
       </div>
 
       {/* Footer */}
-      <footer style={{marginTop:"3rem",borderTop:"0.5px solid var(--color-border-tertiary)",background:"var(--color-background-primary)"}}>
+      <footer style={{marginTop:"3rem",borderTop:"0.5px solid var(--color-border-tertiary)",background:"var(--color-background-primary)",paddingBottom:mobile?"calc(72px + env(safe-area-inset-bottom))":"2rem"}}>
         <div style={{borderBottom:"0.5px solid var(--color-border-tertiary)",padding:"0.75rem 2rem",display:"flex",alignItems:"center",justifyContent:"center"}}>
           <div style={{width:"100%",height:52,background:"var(--color-background-secondary)",border:"0.5px dashed var(--color-border-tertiary)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center"}}>
             <span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Sponsor slot — sponsor@mundialist.com</span>
