@@ -1502,6 +1502,11 @@ export default function App(){
     });
   },[]);
 
+  // Scroll to top on every page change
+  useEffect(()=>{
+    window.scrollTo({top:0,behavior:"instant"});
+  },[page]);
+
   // Reload actual results whenever user logs in
   useEffect(()=>{
     if(user?.id){
