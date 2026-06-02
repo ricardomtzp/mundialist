@@ -1048,9 +1048,9 @@ function calcAdventurousness(groupMatches,allStandings){
 
 function adventLabel(pct){
   if(pct===null)return{label:"Fill in picks to see your style",color:"#888",emoji:"",width:0};
-  if(pct<20)return{label:"Cautious",color:C.blue,emoji:"🛡️",width:pct};
-  if(pct<40)return{label:"Balanced",color:C.green,emoji:"⚖️",width:pct};
-  if(pct<65)return{label:"Bold",color:C.gold,emoji:"🔥",width:pct};
+  if(pct<15)return{label:"Cautious",color:C.blue,emoji:"🛡️",width:pct};
+  if(pct<35)return{label:"Balanced",color:C.green,emoji:"⚖️",width:pct};
+  if(pct<55)return{label:"Bold",color:C.gold,emoji:"🔥",width:pct};
   return{label:"Maverick",color:C.red,emoji:"🚀",width:pct};
 }
 
@@ -2224,7 +2224,7 @@ export default function App(){
                           </button>}
                         </div>
                       )}
-                      {!mobile&&GROUP_VENUES[activeGroup]?.[idx]&&<div style={{fontSize:9,color:"var(--color-text-tertiary)",marginTop:4}}>📍 {GROUP_VENUES[activeGroup][idx].venue}, {GROUP_VENUES[activeGroup][idx].city}</div>}
+                      {!mobile&&GROUP_VENUES[activeGroup]?.[idx]&&<div style={{fontSize:9,color:"var(--color-text-tertiary)",marginTop:4}}>📍 {GROUP_VENUES[activeGroup][idx].city}</div>}
                     </div>
                   );
                 })}
@@ -2332,6 +2332,7 @@ export default function App(){
               )}
             </div>
           )}
+
           <div style={{borderTop:"0.5px solid var(--color-border-tertiary)",marginBottom:"1.5rem"}}/>
 
           {/* Mobile: tabbed rounds */}
@@ -2361,19 +2362,19 @@ export default function App(){
               {koRound==="r16"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Round of 16 · {Object.keys(koPicks.r16).length}/8</div>
-                  {r16Matchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={`R16 ${i+1} · ${KO_VENUES.r16[i]?.city||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>)}
+                  {r16Matchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={mobile?KO_VENUES.r16[i]?.city||"":(`R16 ${i+1} · ${KO_VENUES.r16[i]?.city||""}`)} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>)}
                 </div>
               )}
               {koRound==="qf"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Quarter-finals · {Object.keys(koPicks.qf).length}/4</div>
-                  {qfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={`QF ${i+1} · ${KO_VENUES.qf[i]?.city||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>)}
+                  {qfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={mobile?KO_VENUES.qf[i]?.city||"":(`QF ${i+1} · ${KO_VENUES.qf[i]?.city||""}`)} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>)}
                 </div>
               )}
               {koRound==="sf"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Semi-finals · {Object.keys(koPicks.sf).length}/2</div>
-                  {sfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.sf[i]} onPick={t=>pickKO("sf",i,t)} label={`SF ${i+1} · ${KO_VENUES.sf[i]?.city||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="sf"/>)}
+                  {sfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.sf[i]} onPick={t=>pickKO("sf",i,t)} label={mobile?KO_VENUES.sf[i]?.city||"":(`SF ${i+1} · ${KO_VENUES.sf[i]?.city||""}`)} actualWinner={getKOWinner(m.home,m.away)} roundKey="sf"/>)}
                 </div>
               )}
               {koRound==="final"&&(
