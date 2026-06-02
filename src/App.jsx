@@ -1495,7 +1495,7 @@ export default function App(){
             setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
             loadUserData(session.user.id);
             loadActualResults();
-            setTimeout(()=>window.scrollTo({top:0,behavior:'instant'}),50);
+            setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),200);
           }
         });
       }
