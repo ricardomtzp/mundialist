@@ -72,6 +72,10 @@ const GOLDEN_BOOT_PLAYERS=[
   {name:"Lionel Messi",         nation:"Argentina",    flag:"🇦🇷"},
   {name:"Cristiano Ronaldo",    nation:"Portugal",     flag:"🇵🇹"},
   {name:"Lamine Yamal",         nation:"Spain",        flag:"🇪🇸"},
+  {name:"Santiago Giménez",    nation:"Mexico",       flag:"🇲🇽"},
+  {name:"Raúl Jiménez",        nation:"Mexico",       flag:"🇲🇽"},
+  {name:"Hirving Lozano",      nation:"Mexico",       flag:"🇲🇽"},
+  {name:"Alexis Vega",         nation:"Mexico",       flag:"🇲🇽"},
   {name:"Vinicius Jr",          nation:"Brazil",       flag:"🇧🇷"},
   {name:"Mikel Oyarzabal",      nation:"Spain",        flag:"🇪🇸"},
   {name:"Florian Wirtz",        nation:"Germany",      flag:"🇩🇪"},
@@ -1115,7 +1119,7 @@ function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,lo
               {isCorrect?`✓ Correct! +${pts} pts`:`✗ Winner was ${actualWinner}`}
             </div>
           ):(
-            <div style={{fontSize:12,color}}>{pick?.nation} · {pts} pts if correct</div>
+            <div style={{fontSize:12,color}}>{pts} pts if correct</div>
           )}
         </div>
         {!actualWinner&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
@@ -1125,7 +1129,7 @@ function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,lo
   return(
     <div>
       <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={`Search ${label.toLowerCase()} name...`} style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,fontSize:14,background:"var(--color-background-primary)",color:"var(--color-text-primary)",outline:"none",marginBottom:8}}/>
-      {search.length>1&&(
+      {search.length>0&&(
         <div style={{background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:12,overflow:"hidden",marginBottom:10}}>
           {filtered.length>0?filtered.slice(0,6).map(p=>(
             <div key={p.name} onClick={()=>{setPick(p);setSearch(p.name);}} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",gap:10,background:pick?.name===p.name?color+"11":"transparent"}}>
@@ -1151,7 +1155,6 @@ const NAV=[{label:"Home",page:"home"},{label:"Group Stage",page:"predict"},{labe
 
 export default function App(){
   const [page,setPage]=useState("home");
-  const navigateTo=(p)=>{setPage(p);window.scrollTo({top:0,behavior:"instant"});};
   const [user,setUser]=useState(null);
   const [formName,setFormName]=useState("");
   const [formHandle,setFormHandle]=useState("");
@@ -1214,8 +1217,10 @@ export default function App(){
 
   const pickKO=(round,id,team)=>{
     setKoPicks(prev=>{
-      const u={...prev,[round]:{...prev[round],[id]:team}};
-      if(round==="r32"){u.r16={};u.qf={};u.sf={};u.final={};u.third=null;}
+      const isUnselect=prev[round][id]===team;
+      const u={...prev,[round]:{...prev[round],[id]:isUnselect?undefined:team}};
+      if(isUnselect){delete u[round][id];}
+      if(round==="r32"||isUnselect){u.r16={};u.qf={};u.sf={};u.final={};u.third=null;}
       if(round==="r16"){u.qf={};u.sf={};u.final={};}
       if(round==="qf"){u.sf={};u.final={};}
       if(round==="sf"){u.final={};u.third=null;}
@@ -1310,7 +1315,7 @@ export default function App(){
       }
       setUser({name:formName,handle:"@"+formHandle.replace("@",""),email:formEmail,avatar:formName[0].toUpperCase(),id:data.user?.id});
       setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
-      setPage("predict");window.scrollTo(0,0);window.scrollTo(0,0);
+      setPage("predict");
     } catch(err){
       setAuthError(err.message||"Sign up failed. Please try again.");
     } finally {
@@ -1334,7 +1339,7 @@ export default function App(){
         setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
         loadUserData(data.user.id);
         loadActualResults();
-        navigateTo("predict");
+        setPage("predict");
       }
     } catch(err){
       setAuthError(err.message||"Sign in failed. Please check your email and password.");
@@ -1756,7 +1761,7 @@ export default function App(){
     return()=>window.removeEventListener('resize',handle);
   },[]);
   const mobile=windowWidth<768;
-  const [koRound,setKoRound]=useState("r32");
+  const [koRound,setKoRound]=useState("r16");
 
   // Get actual winner for a KO match from Supabase matches table
   const getKOWinner=(home,away)=>{
@@ -1773,7 +1778,6 @@ export default function App(){
   return(
     <div style={{minHeight:"100vh",background:"var(--color-background-tertiary)",fontFamily:"'DM Sans',system-ui,sans-serif"}}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-      <style>{`html,body{height:100%;margin:0;padding:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}*{box-sizing:border-box;}`}</style>
 
       {/* ── Save toast ── */}
       {saveStatus&&(
@@ -1791,11 +1795,11 @@ export default function App(){
         <>
           {/* Desktop nav */}
           {!mobile&&(
-            <nav style={{background:"#ffffff",borderBottom:"0.5px solid #e5e7eb",position:"fixed",top:0,left:0,right:0,zIndex:9999,height:56}}>
+            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:56}}>
               <div style={{maxWidth:1280,margin:"0 auto",padding:"0 1.5rem",display:"flex",alignItems:"center",gap:"1rem",height:"100%"}}>
-                <span style={{fontSize:18,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer",marginRight:"auto"}} onClick={()=>{window.scrollTo(0,0);setPage("home");}}>Mundialist</span>
+                <span style={{fontSize:18,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer",marginRight:"auto"}} onClick={()=>setPage("home")}>Mundialist</span>
                 {NAV.map(({label,page:p})=>(
-                  <button key={p} onClick={()=>{window.scrollTo(0,0);setPage(p);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,
+                  <button key={p} onClick={()=>setPage(p)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,
                     fontWeight:page===p?600:400,color:page===p?C.blue:"var(--color-text-secondary)",
                     borderBottom:page===p?`2px solid ${C.blue}`:"2px solid transparent",
                     padding:"17px 2px",whiteSpace:"nowrap"}}>
@@ -1819,9 +1823,9 @@ export default function App(){
 
           {/* Mobile top bar */}
           {mobile&&(
-            <nav style={{background:"#ffffff",borderBottom:"0.5px solid #e5e7eb",position:"fixed",top:0,left:0,right:0,zIndex:9999,height:48}}>
+            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:48}}>
               <div style={{padding:"0 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",height:"100%"}}>
-                <span style={{fontSize:16,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer"}} onClick={()=>{window.scrollTo(0,0);setPage("home");}}>Mundialist</span>
+                <span style={{fontSize:16,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer"}} onClick={()=>setPage("home")}>Mundialist</span>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   {totalPoints>0&&<span style={{fontSize:11,fontWeight:500,color:C.green,background:C.greenLt,padding:"2px 8px",borderRadius:99,fontFamily:"monospace"}}>{totalPoints}pts</span>}
                   <div style={{width:28,height:28,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"#fff"}}>{user.avatar}</div>
@@ -1832,7 +1836,7 @@ export default function App(){
 
           {/* Mobile bottom tab bar */}
           {mobile&&(
-            <nav style={{background:"#ffffff",borderTop:"0.5px solid #e5e7eb",position:"fixed",bottom:0,left:0,right:0,zIndex:9999,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)",minHeight:56}}>
+            <nav style={{background:"var(--color-background-primary)",borderTop:"0.5px solid var(--color-border-tertiary)",position:"fixed",bottom:0,left:0,right:0,zIndex:200,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)",minHeight:56}}>
               {[
                 {p:"predict",icon:"⚽",label:"Groups"},
                 {p:"bracket",icon:"🏆",label:"Knockout"},
@@ -1840,7 +1844,7 @@ export default function App(){
                 {p:"league",icon:"👥",label:"League"},
                 {p:"points",icon:"📖",label:"Rules"},
               ].map(({p,icon,label})=>(
-                <button key={p} onClick={()=>{window.scrollTo(0,0);setPage(p);}} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"8px 0"}}>
+                <button key={p} onClick={()=>setPage(p)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"8px 0"}}>
                   <span style={{fontSize:22,lineHeight:1}}>{icon}</span>
                   <span style={{fontSize:9,fontWeight:page===p?600:400,color:page===p?C.blue:"var(--color-text-tertiary)"}}>{label}</span>
                   {page===p&&<div style={{width:20,height:2,borderRadius:99,background:C.blue,marginTop:2}}/>}
@@ -1881,7 +1885,7 @@ export default function App(){
                   </div>
                 ))}
                 <div style={{display:"flex",alignItems:"center",padding:"0 4px"}}>
-                  <button onClick={()=>{window.scrollTo(0,0);setPage("points");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.5)",textDecoration:"underline"}}>see all scoring →</button>
+                  <button onClick={()=>setPage("points")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.5)",textDecoration:"underline"}}>see all scoring →</button>
                 </div>
               </div>
 
@@ -1912,8 +1916,8 @@ export default function App(){
 
                       {/* League CTAs */}
                       <div style={{display:"flex",gap:8,marginBottom:"1.25rem"}}>
-                        <button onClick={()=>{navigateTo("league");setLeagueStep("create");}} style={{flex:1,padding:"9px",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:8,background:"rgba(255,255,255,0.06)",color:"rgba(255,255,255,0.8)",fontSize:12,cursor:"pointer"}}>🏆 Start a league</button>
-                        <button onClick={()=>{navigateTo("league");setLeagueStep("join");}} style={{flex:1,padding:"9px",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:8,background:"rgba(255,255,255,0.06)",color:"rgba(255,255,255,0.8)",fontSize:12,cursor:"pointer"}}>🔑 I have an invite code</button>
+                        <button onClick={()=>{setPage("league");setLeagueStep("create");}} style={{flex:1,padding:"9px",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:8,background:"rgba(255,255,255,0.06)",color:"rgba(255,255,255,0.8)",fontSize:12,cursor:"pointer"}}>🏆 Start a league</button>
+                        <button onClick={()=>{setPage("league");setLeagueStep("join");}} style={{flex:1,padding:"9px",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:8,background:"rgba(255,255,255,0.06)",color:"rgba(255,255,255,0.8)",fontSize:12,cursor:"pointer"}}>🔑 I have an invite code</button>
                       </div>
 
                       <div style={{borderTop:"0.5px solid rgba(255,255,255,0.1)",paddingTop:"1rem"}}>
@@ -1983,7 +1987,7 @@ export default function App(){
                 <div style={{background:"rgba(255,255,255,0.1)",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:12,padding:"1rem 1.5rem",display:"flex",alignItems:"center",gap:12,maxWidth:460}}>
                   <div style={{width:40,height:40,borderRadius:"50%",background:C.gold,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:700,fontSize:16}}>{user.avatar}</div>
                   <div><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>{user.name}</div><div style={{fontSize:12,color:"rgba(255,255,255,0.6)"}}>{totalPredicted}/72 group · {koPicked}/31 knockout</div></div>
-                  <button onClick={()=>{window.scrollTo(0,0);setPage("predict");}} style={{marginLeft:"auto",padding:"8px 18px",background:C.gold,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap"}}>Continue →</button>
+                  <button onClick={()=>setPage("predict")} style={{marginLeft:"auto",padding:"8px 18px",background:C.gold,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap"}}>Continue →</button>
                 </div>
               )}
             </div>
@@ -2026,7 +2030,6 @@ export default function App(){
       {/* ══ GROUP STAGE ══ */}
       {page==="predict"&&(
         <div style={{maxWidth:800,margin:"0 auto",padding:"2rem 1.5rem"}}>
-          <AdSlot/>
           <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:16,marginBottom:"1.25rem",flexWrap:"wrap"}}>
             <div>
               <h1 style={{fontSize:22,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 4px",color:"var(--color-text-primary)"}}>Group Stage</h1>
@@ -2240,7 +2243,7 @@ export default function App(){
                           <span style={{fontSize:18}}>{FLAGS[row.team]||"❓"}</span>
                           <span style={{color:"var(--color-text-primary)",fontSize:14}}>{row.team}</span>
                           {SEEDED.has(row.team)&&<span style={{fontSize:9,background:C.goldLt,color:"#7a5c10",padding:"1px 6px",borderRadius:99}}>Seeded</span>}
-                          {!SEEDED.has(row.team)&&i<2&&<span style={{fontSize:9,background:"#fdf2f8",color:"#9d174d",padding:"1px 6px",borderRadius:99}}>★ dark horse</span>}
+                          {!SEEDED.has(row.team)&&i<2&&row.pts>0&&<span style={{fontSize:9,background:"#fdf2f8",color:"#9d174d",padding:"1px 6px",borderRadius:99}}>★ dark horse</span>}
                         </div>
                       </td>
                       {[row.played,row.won,row.drawn,row.lost,row.gd>0?"+"+row.gd:row.gd].map((v,j)=><td key={j} style={{padding:"9px 12px",textAlign:"center",color:"var(--color-text-secondary)",fontFamily:"monospace"}}>{v}</td>)}
@@ -2295,7 +2298,7 @@ export default function App(){
                 }} style={{padding:"8px 14px",border:`0.5px solid ${C.blue}`,borderRadius:8,background:C.blueLt,fontSize:12,color:C.blue,cursor:"pointer"}}>
                   Simulate ↻
                 </button>
-                <button onClick={()=>{window.scrollTo(0,0);setPage("predict");}} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer"}}>← Group stage</button>
+                <button onClick={()=>setPage("predict")} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer"}}>← Group stage</button>
               </div>
             </div>
           </div>
@@ -2307,13 +2310,13 @@ export default function App(){
                 <div style={{fontSize:14,fontWeight:500,color:C.blue,marginBottom:2}}>Fill in your group stage picks first</div>
                 <div style={{fontSize:13,color:"var(--color-text-secondary)"}}>Your R32 pairings are built automatically from your group predictions using FIFA's official Annex C bracket logic.</div>
               </div>
-              <button onClick={()=>{window.scrollTo(0,0);setPage("predict");}} style={{marginLeft:"auto",padding:"8px 16px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>Go to Group Stage →</button>
+              <button onClick={()=>setPage("predict")} style={{marginLeft:"auto",padding:"8px 16px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>Go to Group Stage →</button>
             </div>
           )}
 
           {/* R32 Grid - desktop collapsible */}
           {!mobile&&(()=>{
-            const [r32Open,setR32Open]=useState(false);
+            const [r32Open,setR32Open]=React.useState(false);
             return(
               <div style={{marginBottom:"1.5rem"}}>
                 <button onClick={()=>setR32Open(o=>!o)} style={{display:"flex",alignItems:"center",gap:10,marginBottom:"0.75rem",background:"none",border:"none",cursor:"pointer",padding:0,width:"100%"}}>
@@ -2699,7 +2702,7 @@ export default function App(){
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",flex:1}}>Player</span>
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:60,textAlign:"center"}}>Pts</span>
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:80,textAlign:"center"}}>Champion</span>
-                  
+                  <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:50,textAlign:"center"}}>Picks</span>
                 </div>
                 {leagueMembers.map((m,i)=>(
                   <div key={i} onClick={()=>setViewingUser(m)}
@@ -2802,12 +2805,18 @@ export default function App(){
               </div>
               <input value={leagueCode} onChange={e=>setLeagueCode(e.target.value.toUpperCase())} placeholder="MND26-XXXXX"
                 style={{...inp,fontFamily:"monospace",letterSpacing:"0.05em",marginBottom:10}}/>
-              <button onClick={()=>{
-                if(leagueCode.startsWith("MND26-")){
-                  const nl={id:leagueCode,name:"Friends League",members:12,rank:3,code:leagueCode};
-                  setJoinedLeagues(p=>[...p.filter(l=>l.id!==leagueCode),nl]);
-                  setActiveLeague(nl);setLeagueStep("overview");
-                }
+              <button onClick={async()=>{
+                if(!leagueCode.trim())return;
+                showSaving();
+                // Find league by invite code
+                const {data:league,error}=await supabase.from("leagues").select("*").eq("invite_code",leagueCode).single();
+                if(error||!league){showError();alert("League not found. Check the code and try again.");return;}
+                // Join league
+                await supabase.from("league_members").upsert({league_id:league.id,user_id:user.id,total_points:0},{onConflict:"league_id,user_id"});
+                const nl={id:league.id,name:league.name,members:0,rank:1,code:leagueCode};
+                setJoinedLeagues(p=>[...p.filter(l=>l.id!==league.id),nl]);
+                setActiveLeague(nl);setLeagueStep("overview");
+                showSaved();
               }} style={{width:"100%",padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:"pointer"}}>Join league →</button>
             </div>
           )}
@@ -2907,7 +2916,7 @@ export default function App(){
       {/* ══ TERMS ══ */}
       {page==="terms"&&(
         <div style={{maxWidth:640,margin:"0 auto",padding:"2rem 1.5rem"}}>
-          <button onClick={()=>{window.scrollTo(0,0);setPage("home");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← Back</button>
+          <button onClick={()=>setPage("home")} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← Back</button>
           <h1 style={{fontSize:22,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 1.5rem",color:"var(--color-text-primary)"}}>Terms & Conditions</h1>
           {[
             {title:"1. Service",body:"Mundialist is a free-to-play FIFA World Cup 2026 prediction game. No real money is involved."},
@@ -2930,7 +2939,7 @@ export default function App(){
       </div>
 
       {/* Footer */}
-      <footer style={{marginTop:"3rem",borderTop:"0.5px solid var(--color-border-tertiary)",background:"var(--color-background-primary)",paddingBottom:mobile?"calc(60px + env(safe-area-inset-bottom))":"env(safe-area-inset-bottom)"}}>
+      <footer style={{marginTop:"3rem",borderTop:"0.5px solid var(--color-border-tertiary)",background:"var(--color-background-primary)"}}>
         <div style={{borderBottom:"0.5px solid var(--color-border-tertiary)",padding:"0.75rem 2rem",display:"flex",alignItems:"center",justifyContent:"center"}}>
           <div style={{width:"100%",height:52,background:"var(--color-background-secondary)",border:"0.5px dashed var(--color-border-tertiary)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center"}}>
             <span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Sponsor slot — sponsor@mundialist.com</span>
@@ -2944,7 +2953,7 @@ export default function App(){
           <div style={{display:"flex",gap:"1.5rem"}}>
             <a href="mailto:sponsor@mundialist.com" style={{fontSize:12,color:"var(--color-text-tertiary)",textDecoration:"none"}}>Sponsor us</a>
             <a href="mailto:hello@mundialist.com" style={{fontSize:12,color:"var(--color-text-tertiary)",textDecoration:"none"}}>Contact</a>
-            <button onClick={()=>{window.scrollTo(0,0);setPage("terms");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"var(--color-text-tertiary)",padding:0}}>Terms</button>
+            <button onClick={()=>setPage("terms")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"var(--color-text-tertiary)",padding:0}}>Terms</button>
           </div>
         </div>
       </footer>
