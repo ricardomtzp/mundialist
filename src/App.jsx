@@ -74,7 +74,6 @@ const GOLDEN_BOOT_PLAYERS=[
   {name:"Lamine Yamal",         nation:"Spain",        flag:"🇪🇸"},
   {name:"Santiago Giménez",    nation:"Mexico",       flag:"🇲🇽"},
   {name:"Raúl Jiménez",        nation:"Mexico",       flag:"🇲🇽"},
-  {name:"Hirving Lozano",      nation:"Mexico",       flag:"🇲🇽"},
   {name:"Alexis Vega",         nation:"Mexico",       flag:"🇲🇽"},
   {name:"Vinicius Jr",          nation:"Brazil",       flag:"🇧🇷"},
   {name:"Mikel Oyarzabal",      nation:"Spain",        flag:"🇪🇸"},
@@ -1496,7 +1495,7 @@ export default function App(){
             setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
             loadUserData(session.user.id);
             loadActualResults();
-            setTimeout(()=>window.scrollTo(0,0),100);
+            setTimeout(()=>window.scrollTo({top:0,behavior:'instant'}),50);
           }
         });
       }
