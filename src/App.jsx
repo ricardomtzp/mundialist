@@ -2316,7 +2316,7 @@ export default function App(){
 
           {/* R32 Grid - desktop collapsible */}
           {!mobile&&(()=>{
-            const [r32Open,setR32Open]=React.useState(false);
+            const [r32Open,setR32Open]=useState(false);
             return(
               <div style={{marginBottom:"1.5rem"}}>
                 <button onClick={()=>setR32Open(o=>!o)} style={{display:"flex",alignItems:"center",gap:10,marginBottom:"0.75rem",background:"none",border:"none",cursor:"pointer",padding:0,width:"100%"}}>
