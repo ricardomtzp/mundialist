@@ -1761,7 +1761,8 @@ export default function App(){
     return()=>window.removeEventListener('resize',handle);
   },[]);
   const mobile=windowWidth<768;
-  const [koRound,setKoRound]=useState("r16");
+  const [koRound,setKoRound]=useState("r32");
+  const [r32Open,setR32Open]=useState(false);
 
   // Get actual winner for a KO match from Supabase matches table
   const getKOWinner=(home,away)=>{
