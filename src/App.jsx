@@ -1793,9 +1793,9 @@ export default function App(){
           {!mobile&&(
             <nav style={{background:"#ffffff",borderBottom:"0.5px solid #e5e7eb",position:"fixed",top:0,left:0,right:0,zIndex:9999,height:56}}>
               <div style={{maxWidth:1280,margin:"0 auto",padding:"0 1.5rem",display:"flex",alignItems:"center",gap:"1rem",height:"100%"}}>
-                <span style={{fontSize:18,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer",marginRight:"auto"}} onClick={()=>{window.scrollTo(0,0);setPage("home");}>Mundialist</span>
+                <span style={{fontSize:18,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer",marginRight:"auto"}} onClick={()=>{window.scrollTo(0,0);setPage("home");}}>Mundialist</span>
                 {NAV.map(({label,page:p})=>(
-                  <button key={p} onClick={()=>{window.scrollTo(0,0);setPage(p)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,
+                  <button key={p} onClick={()=>{window.scrollTo(0,0);setPage(p);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,
                     fontWeight:page===p?600:400,color:page===p?C.blue:"var(--color-text-secondary)",
                     borderBottom:page===p?`2px solid ${C.blue}`:"2px solid transparent",
                     padding:"17px 2px",whiteSpace:"nowrap"}}>
@@ -1821,7 +1821,7 @@ export default function App(){
           {mobile&&(
             <nav style={{background:"#ffffff",borderBottom:"0.5px solid #e5e7eb",position:"fixed",top:0,left:0,right:0,zIndex:9999,height:48}}>
               <div style={{padding:"0 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",height:"100%"}}>
-                <span style={{fontSize:16,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer"}} onClick={()=>{window.scrollTo(0,0);setPage("home");}>Mundialist</span>
+                <span style={{fontSize:16,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer"}} onClick={()=>{window.scrollTo(0,0);setPage("home");}}>Mundialist</span>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   {totalPoints>0&&<span style={{fontSize:11,fontWeight:500,color:C.green,background:C.greenLt,padding:"2px 8px",borderRadius:99,fontFamily:"monospace"}}>{totalPoints}pts</span>}
                   <div style={{width:28,height:28,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"#fff"}}>{user.avatar}</div>
@@ -1840,7 +1840,7 @@ export default function App(){
                 {p:"league",icon:"👥",label:"League"},
                 {p:"points",icon:"📖",label:"Rules"},
               ].map(({p,icon,label})=>(
-                <button key={p} onClick={()=>{window.scrollTo(0,0);setPage(p)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"8px 0"}}>
+                <button key={p} onClick={()=>{window.scrollTo(0,0);setPage(p);}} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"8px 0"}}>
                   <span style={{fontSize:22,lineHeight:1}}>{icon}</span>
                   <span style={{fontSize:9,fontWeight:page===p?600:400,color:page===p?C.blue:"var(--color-text-tertiary)"}}>{label}</span>
                   {page===p&&<div style={{width:20,height:2,borderRadius:99,background:C.blue,marginTop:2}}/>}
@@ -1881,7 +1881,7 @@ export default function App(){
                   </div>
                 ))}
                 <div style={{display:"flex",alignItems:"center",padding:"0 4px"}}>
-                  <button onClick={()=>{window.scrollTo(0,0);setPage("points")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.5)",textDecoration:"underline"}}>see all scoring →</button>
+                  <button onClick={()=>{window.scrollTo(0,0);setPage("points");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.5)",textDecoration:"underline"}}>see all scoring →</button>
                 </div>
               </div>
 
@@ -1983,7 +1983,7 @@ export default function App(){
                 <div style={{background:"rgba(255,255,255,0.1)",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:12,padding:"1rem 1.5rem",display:"flex",alignItems:"center",gap:12,maxWidth:460}}>
                   <div style={{width:40,height:40,borderRadius:"50%",background:C.gold,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:700,fontSize:16}}>{user.avatar}</div>
                   <div><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>{user.name}</div><div style={{fontSize:12,color:"rgba(255,255,255,0.6)"}}>{totalPredicted}/72 group · {koPicked}/31 knockout</div></div>
-                  <button onClick={()=>{window.scrollTo(0,0);setPage("predict")} style={{marginLeft:"auto",padding:"8px 18px",background:C.gold,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap"}}>Continue →</button>
+                  <button onClick={()=>{window.scrollTo(0,0);setPage("predict");}} style={{marginLeft:"auto",padding:"8px 18px",background:C.gold,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap"}}>Continue →</button>
                 </div>
               )}
             </div>
@@ -2295,7 +2295,7 @@ export default function App(){
                 }} style={{padding:"8px 14px",border:`0.5px solid ${C.blue}`,borderRadius:8,background:C.blueLt,fontSize:12,color:C.blue,cursor:"pointer"}}>
                   Simulate ↻
                 </button>
-                <button onClick={()=>{window.scrollTo(0,0);setPage("predict")} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer"}}>← Group stage</button>
+                <button onClick={()=>{window.scrollTo(0,0);setPage("predict");}} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer"}}>← Group stage</button>
               </div>
             </div>
           </div>
@@ -2307,7 +2307,7 @@ export default function App(){
                 <div style={{fontSize:14,fontWeight:500,color:C.blue,marginBottom:2}}>Fill in your group stage picks first</div>
                 <div style={{fontSize:13,color:"var(--color-text-secondary)"}}>Your R32 pairings are built automatically from your group predictions using FIFA's official Annex C bracket logic.</div>
               </div>
-              <button onClick={()=>{window.scrollTo(0,0);setPage("predict")} style={{marginLeft:"auto",padding:"8px 16px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>Go to Group Stage →</button>
+              <button onClick={()=>{window.scrollTo(0,0);setPage("predict");}} style={{marginLeft:"auto",padding:"8px 16px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>Go to Group Stage →</button>
             </div>
           )}
 
@@ -2907,7 +2907,7 @@ export default function App(){
       {/* ══ TERMS ══ */}
       {page==="terms"&&(
         <div style={{maxWidth:640,margin:"0 auto",padding:"2rem 1.5rem"}}>
-          <button onClick={()=>{window.scrollTo(0,0);setPage("home");} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← Back</button>
+          <button onClick={()=>{window.scrollTo(0,0);setPage("home");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← Back</button>
           <h1 style={{fontSize:22,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 1.5rem",color:"var(--color-text-primary)"}}>Terms & Conditions</h1>
           {[
             {title:"1. Service",body:"Mundialist is a free-to-play FIFA World Cup 2026 prediction game. No real money is involved."},
@@ -2944,7 +2944,7 @@ export default function App(){
           <div style={{display:"flex",gap:"1.5rem"}}>
             <a href="mailto:sponsor@mundialist.com" style={{fontSize:12,color:"var(--color-text-tertiary)",textDecoration:"none"}}>Sponsor us</a>
             <a href="mailto:hello@mundialist.com" style={{fontSize:12,color:"var(--color-text-tertiary)",textDecoration:"none"}}>Contact</a>
-            <button onClick={()=>{window.scrollTo(0,0);setPage("terms")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"var(--color-text-tertiary)",padding:0}}>Terms</button>
+            <button onClick={()=>{window.scrollTo(0,0);setPage("terms");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"var(--color-text-tertiary)",padding:0}}>Terms</button>
           </div>
         </div>
       </footer>
