@@ -2107,7 +2107,7 @@ export default function App(){
                 </div>
                 <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
                   <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>Your pick style: <strong style={{color:adventInfo.color}}>{adventInfo.emoji} {adventInfo.label}</strong></span>
-                  <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{adventScore}/100</span>
+                  
                 </div>
               </div>
             )}
@@ -2168,7 +2168,7 @@ export default function App(){
                           {/* Home team column */}
                           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,flex:1,minWidth:0}}>
                             <span style={{fontSize:24}}>{FLAGS[match.home]||"❓"}</span>
-                            <span style={{fontSize:10,fontWeight:500,color:"var(--color-text-primary)",textAlign:"center",whiteSpace:"nowrap"}}>{match.home}{!SEEDED.has(match.home)&&homeQualifies?" ★":""}</span>
+                            <span style={{fontSize:10,fontWeight:500,color:"var(--color-text-primary)",textAlign:"center",whiteSpace:"nowrap"}}>{match.home}</span>
                           </div>
                           {/* Score centre */}
                           {actual?(
@@ -2191,14 +2191,14 @@ export default function App(){
                           {/* Away team column */}
                           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,flex:1,minWidth:0}}>
                             <span style={{fontSize:24}}>{FLAGS[match.away]||"❓"}</span>
-                            <span style={{fontSize:10,fontWeight:500,color:"var(--color-text-primary)",textAlign:"center",whiteSpace:"nowrap"}}>{!SEEDED.has(match.away)&&awayQualifies?"★ ":""}{match.away}</span>
+                            <span style={{fontSize:10,fontWeight:500,color:"var(--color-text-primary)",textAlign:"center",whiteSpace:"nowrap"}}>{match.away}</span>
                           </div>
                         </div>
                       ):(
                         /* Desktop inline layout */
                         <div style={{display:"flex",alignItems:"center",gap:8}}>
                           <span style={{fontSize:20,flexShrink:0}}>{FLAGS[match.home]||"❓"}</span>
-                          <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500,flex:1}}>{match.home}{!SEEDED.has(match.home)&&homeQualifies?" ★":""}</span>
+                          <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500,flex:1}}>{match.home}</span>
                           {actual?(
                             <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
                               <span style={{fontSize:18,fontWeight:600,fontFamily:"monospace"}}>{match.homeScore||"–"}</span>
@@ -2216,7 +2216,7 @@ export default function App(){
                                 style={{width:48,textAlign:"center",padding:"10px 0",border:`1.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:isMyDouble?C.goldLt:"#f0f0f0",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace",boxShadow:"inset 0 1px 3px rgba(0,0,0,0.08)"}}/>
                             </div>
                           )}
-                          <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500,flex:1,textAlign:"right"}}>{!SEEDED.has(match.away)&&awayQualifies?"★ ":""}{match.away}</span>
+                          <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500,flex:1,textAlign:"right"}}>{match.away}</span>
                           <span style={{fontSize:20,flexShrink:0}}>{FLAGS[match.away]||"❓"}</span>
                           {(isMyDouble||canDouble)&&!isSeeded&&(
                             <button onClick={()=>canDouble&&setDouble(roundKey,activeGroup,idx)}
@@ -2274,7 +2274,7 @@ export default function App(){
                           <span style={{fontSize:18}}>{FLAGS[row.team]||"❓"}</span>
                           <span style={{color:"var(--color-text-primary)",fontSize:14}}>{row.team}</span>
                           {SEEDED.has(row.team)&&<span style={{fontSize:9,background:C.goldLt,color:"#7a5c10",padding:"1px 6px",borderRadius:99}}>Seeded</span>}
-                          {!SEEDED.has(row.team)&&i<2&&row.pts>0&&<span style={{fontSize:9,background:"#fdf2f8",color:"#9d174d",padding:"1px 6px",borderRadius:99}}>★ dark horse</span>}
+
                         </div>
                       </td>
                       {[row.played,row.won,row.drawn,row.lost,row.gd>0?"+"+row.gd:row.gd].map((v,j)=><td key={j} style={{padding:"9px 12px",textAlign:"center",color:"var(--color-text-secondary)",fontFamily:"monospace"}}>{v}</td>)}
@@ -2523,7 +2523,7 @@ export default function App(){
             </div>
           </div>
           )}
-          <p style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:"1.5rem"}}>★ dark horse — non-seeded team advancing earns bonus pts: QF +5, SF +10, Final +15. R32 pairings use FIFA's official Annex C.</p>
+          <p style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:"1.5rem"}}><span style={{color:C.gold}}>★</span> dark horse — non-seeded team advancing earns bonus pts: QF +5, SF +10, Final +15. R32 pairings use FIFA's official Annex C.</p>
         </div>
       )}
 
