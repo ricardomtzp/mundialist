@@ -68,55 +68,63 @@ const FLAGS={
 //   Griezmann (Fra - not selected), ter Stegen (Ger - not selected),
 //   Xavi Simons (Ned - injured), Italy/Poland/Cameroon did not qualify
 const GOLDEN_BOOT_PLAYERS=[
-  // FIFA top 10 — outfield stars
-  {name:"Kylian Mbappé",        nation:"France",       flag:"🇫🇷"},
-  {name:"Harry Kane",           nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Erling Haaland",       nation:"Norway",       flag:"🇳🇴"},
-  {name:"Lionel Messi",         nation:"Argentina",    flag:"🇦🇷"},
-  {name:"Cristiano Ronaldo",    nation:"Portugal",     flag:"🇵🇹"},
-  {name:"Lamine Yamal",         nation:"Spain",        flag:"🇪🇸"},
-  {name:"Santiago Giménez",    nation:"Mexico",       flag:"🇲🇽"},
-  {name:"Raúl Jiménez",        nation:"Mexico",       flag:"🇲🇽"},
-  {name:"Hirving Lozano",      nation:"Mexico",       flag:"🇲🇽"},
-  {name:"Alexis Vega",         nation:"Mexico",       flag:"🇲🇽"},
-  {name:"Vinicius Jr",          nation:"Brazil",       flag:"🇧🇷"},
-  {name:"Mikel Oyarzabal",      nation:"Spain",        flag:"🇪🇸"},
-  {name:"Florian Wirtz",        nation:"Germany",      flag:"🇩🇪"},
-  {name:"Jamal Musiala",        nation:"Germany",      flag:"🇩🇪"},
-  {name:"Jude Bellingham",      nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Bukayo Saka",          nation:"England",      flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
-  {name:"Ousmane Dembélé",      nation:"France",       flag:"🇫🇷"},
-  {name:"Marcus Thuram",        nation:"France",       flag:"🇫🇷"},
-  {name:"Raphinha",             nation:"Brazil",       flag:"🇧🇷"},
-  {name:"Neymar Jr",            nation:"Brazil",       flag:"🇧🇷"},
-  {name:"Kai Havertz",          nation:"Germany",      flag:"🇩🇪"},
-  {name:"Lautaro Martínez",     nation:"Argentina",    flag:"🇦🇷"},
-  {name:"Julián Álvarez",       nation:"Argentina",    flag:"🇦🇷"},
-  {name:"Pedri",                nation:"Spain",        flag:"🇪🇸"},
-  {name:"Rodri",                nation:"Spain",        flag:"🇪🇸"},
-  {name:"Bruno Fernandes",      nation:"Portugal",     flag:"🇵🇹"},
-  {name:"Bernardo Silva",       nation:"Portugal",     flag:"🇵🇹"},
-  {name:"Rafael Leão",          nation:"Portugal",     flag:"🇵🇹"},
-  {name:"Cody Gakpo",           nation:"Netherlands",  flag:"🇳🇱"},
-  {name:"Memphis Depay",        nation:"Netherlands",  flag:"🇳🇱"},
-  {name:"Achraf Hakimi",        nation:"Morocco",      flag:"🇲🇦"},
-  {name:"Brahim Díaz",          nation:"Morocco",      flag:"🇲🇦"},
-  {name:"Romelu Lukaku",        nation:"Belgium",      flag:"🇧🇪"},
-  {name:"Jeremy Doku",          nation:"Belgium",      flag:"🇧🇪"},
-  {name:"Sadio Mané",           nation:"Senegal",      flag:"🇸🇳"},
-  {name:"Martin Ødegaard",      nation:"Norway",       flag:"🇳🇴"},
-  {name:"Enzo Fernández",        nation:"Argentina",    flag:"🇦🇷"},
-  {name:"Son Heung-min",        nation:"South Korea",  flag:"🇰🇷"},
-  {name:"Darwin Núñez",         nation:"Uruguay",      flag:"🇺🇾"},
-  {name:"Nico Williams",        nation:"Spain",         flag:"🇪🇸"},
-  {name:"Nick Woltemade",       nation:"Germany",       flag:"🇩🇪"},
-  {name:"Jean-Philippe Mateta", nation:"France",        flag:"🇫🇷"},
-  {name:"Désiré Doué",          nation:"France",        flag:"🇫🇷"},
-  {name:"Gonçalo Ramos",        nation:"Portugal",      flag:"🇵🇹"},
-  {name:"Luis Díaz",            nation:"Colombia",      flag:"🇨🇴"},
-  {name:"Mohamed Salah",        nation:"Egypt",         flag:"🇪🇬"},
-  {name:"Deniz Undav",          nation:"Germany",       flag:"🇩🇪"},
-  {name:"Viktor Gyökeres",      nation:"Sweden",        flag:"🇸🇪"},
+  {name:"Kylian Mbappé",        nation:"France",      flag:"🇫🇷"},
+  {name:"Harry Kane",           nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Erling Haaland",       nation:"Norway",      flag:"🇳🇴"},
+  {name:"Lionel Messi",         nation:"Argentina",   flag:"🇦🇷"},
+  {name:"Mikel Oyarzabal",      nation:"Spain",       flag:"🇪🇸"},
+  {name:"Lamine Yamal",         nation:"Spain",       flag:"🇪🇸"},
+  {name:"Cristiano Ronaldo",    nation:"Portugal",    flag:"🇵🇹"},
+  {name:"Julian Alvarez",       nation:"Argentina",   flag:"🇦🇷"},
+  {name:"Raphinha",             nation:"Brazil",      flag:"🇧🇷"},
+  {name:"Lautaro Martinez",     nation:"Argentina",   flag:"🇦🇷"},
+  {name:"Vinicius Junior",      nation:"Brazil",      flag:"🇧🇷"},
+  {name:"Ousmane Dembele",      nation:"France",      flag:"🇫🇷"},
+  {name:"Kai Havertz",          nation:"Germany",     flag:"🇩🇪"},
+  {name:"Cody Gakpo",           nation:"Netherlands", flag:"🇳🇱"},
+  {name:"Florian Wirtz",        nation:"Germany",     flag:"🇩🇪"},
+  {name:"Ferran Torres",        nation:"Spain",       flag:"🇪🇸"},
+  {name:"Nick Woltemade",       nation:"Germany",     flag:"🇩🇪"},
+  {name:"Igor Thiago",          nation:"Belgium",     flag:"🇧🇪"},
+  {name:"Michael Olise",        nation:"France",      flag:"🇫🇷"},
+  {name:"Luis Diaz",            nation:"Colombia",    flag:"🇨🇴"},
+  {name:"Romelu Lukaku",        nation:"Belgium",     flag:"🇧🇪"},
+  {name:"Matheus Cunha",        nation:"Brazil",      flag:"🇧🇷"},
+  {name:"Jamal Musiala",        nation:"Germany",     flag:"🇩🇪"},
+  {name:"Ollie Watkins",        nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Bukayo Saka",          nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Bruno Fernandes",      nation:"Portugal",    flag:"🇵🇹"},
+  {name:"Jude Bellingham",      nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Memphis Depay",        nation:"Netherlands", flag:"🇳🇱"},
+  {name:"Desire Doue",          nation:"France",      flag:"🇫🇷"},
+  {name:"Neymar",               nation:"Brazil",      flag:"🇧🇷"},
+  {name:"Lennart Karl",         nation:"Germany",     flag:"🇩🇪"},
+  {name:"Charles De Ketelaere", nation:"Belgium",     flag:"🇧🇪"},
+  {name:"Brian Brobbey",        nation:"Netherlands", flag:"🇳🇱"},
+  {name:"Darwin Nunez",         nation:"Uruguay",     flag:"🇺🇾"},
+  {name:"Marcus Thuram",        nation:"France",      flag:"🇫🇷"},
+  {name:"Enner Valencia",       nation:"Ecuador",     flag:"🇪🇨"},
+  {name:"Jeremy Doku",          nation:"Belgium",     flag:"🇧🇪"},
+  {name:"Donyell Malen",        nation:"Netherlands", flag:"🇳🇱"},
+  {name:"Eberechi Eze",         nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Leroy Sane",           nation:"Germany",     flag:"🇩🇪"},
+  {name:"Pedro Neto",           nation:"Portugal",    flag:"🇵🇹"},
+  {name:"Alexander Sorloth",    nation:"Norway",      flag:"🇳🇴"},
+  {name:"Rafael Leao",          nation:"Portugal",    flag:"🇵🇹"},
+  {name:"Christian Pulisic",    nation:"USA",         flag:"🇺🇸"},
+  {name:"Sadio Mane",           nation:"Senegal",     flag:"🇸🇳"},
+  {name:"Goncalo Ramos",        nation:"Portugal",    flag:"🇵🇹"},
+  {name:"Mohamed Salah",        nation:"Egypt",       flag:"🇪🇬"},
+  {name:"Anthony Gordon",       nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Bradley Barcola",      nation:"France",      flag:"🇫🇷"},
+  {name:"Dani Olmo",            nation:"Spain",       flag:"🇪🇸"},
+  {name:"Kingsley Coman",       nation:"France",      flag:"🇫🇷"},
+  {name:"Marcus Rashford",      nation:"England",     flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {name:"Viktor Gyokeres",      nation:"Sweden",      flag:"🇸🇪"},
+  {name:"Alexander Isak",       nation:"Sweden",      flag:"🇸🇪"},
+  {name:"Santiago Giménez",     nation:"Mexico",      flag:"🇲🇽"},
+  {name:"Raúl Jiménez",         nation:"Mexico",      flag:"🇲🇽"},
+  {name:"Alexis Vega",          nation:"Mexico",      flag:"🇲🇽"},
 ];
 
 // ── GOLDEN GLOVE — verified May 2026 from confirmed WC2026 squads ────────────
@@ -830,6 +838,21 @@ const KO_VENUES={
   final:{venue:"New York New Jersey Stadium",city:"New Jersey"},
   third:{venue:"Miami Stadium",city:"Miami"},
 };
+
+const GROUP_DATES={
+  A:['Jun 11', 'Jun 11', 'Jun 17', 'Jun 17', 'Jun 26', 'Jun 26'],
+  B:['Jun 12', 'Jun 12', 'Jun 18', 'Jun 18', 'Jun 26', 'Jun 26'],
+  C:['Jun 13', 'Jun 13', 'Jun 19', 'Jun 19', 'Jun 27', 'Jun 27'],
+  D:['Jun 12', 'Jun 12', 'Jun 19', 'Jun 19', 'Jun 25', 'Jun 25'],
+  E:['Jun 14', 'Jun 14', 'Jun 20', 'Jun 20', 'Jun 25', 'Jun 25'],
+  F:['Jun 14', 'Jun 14', 'Jun 20', 'Jun 20', 'Jun 27', 'Jun 27'],
+  G:['Jun 15', 'Jun 15', 'Jun 21', 'Jun 21', 'Jun 27', 'Jun 27'],
+  H:['Jun 15', 'Jun 15', 'Jun 21', 'Jun 21', 'Jun 27', 'Jun 27'],
+  I:['Jun 16', 'Jun 16', 'Jun 22', 'Jun 22', 'Jun 26', 'Jun 26'],
+  J:['Jun 16', 'Jun 16', 'Jun 22', 'Jun 22', 'Jun 26', 'Jun 26'],
+  K:['Jun 17', 'Jun 17', 'Jun 23', 'Jun 23', 'Jun 27', 'Jun 27'],
+  L:['Jun 17', 'Jun 17', 'Jun 23', 'Jun 23', 'Jun 27', 'Jun 27'],
+};
 const ROUND_INDICES = [[0,1],[2,3],[4,5]];
 
 
@@ -1500,6 +1523,7 @@ export default function App(){
             setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
             loadUserData(session.user.id);
             loadActualResults();
+            setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),200);
           }
         });
       }
@@ -2108,6 +2132,11 @@ export default function App(){
             })}
           </div>
 
+          {/* Dark horse legend */}
+          <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:"0.75rem",padding:"6px 10px",background:C.goldLt,borderRadius:8}}>
+            <span style={{color:C.gold,fontWeight:600}}>★</span>
+            <span style={{color:"#7a5c10",fontSize:11}}>Dark horse — non-seeded team in top 2. Earns bonus pts in KO: QF +5, SF +10, Final +15</span>
+          </div>
           {/* Match card */}
           <div style={card}>
 
@@ -2127,9 +2156,10 @@ export default function App(){
                   const doubleId=`${activeGroup}-${idx}`;
                   const isMyDouble=currentDouble===doubleId;
                   const canDouble=!isSeeded&&(!roundHasDouble||isMyDouble);
-                  // Only show dark horse label if team is picked to qualify
-                  const homeQualifies=allStandings[activeGroup]?.slice(0,2).some(r=>r.team===match.home);
-                  const awayQualifies=allStandings[activeGroup]?.slice(0,2).some(r=>r.team===match.away);
+                  // Only show dark horse label if group has picks AND team qualifies to R16
+                  const groupHasPicks=groupMatches[activeGroup]?.some(m=>m.homeScore!==""&&m.awayScore!=="");
+                  const homeQualifies=groupHasPicks&&allStandings[activeGroup]?.slice(0,2).some(r=>r.team===match.home);
+                  const awayQualifies=groupHasPicks&&allStandings[activeGroup]?.slice(0,2).some(r=>r.team===match.away);
                   const actual=Object.values(actualResults).find(r=>(r.home_team===match.home||r.home_team===match.away)&&(r.away_team===match.away||r.away_team===match.home)&&r.status==="finished");
                   const pts=actual?calcMatchPoints(match.homeScore,match.awayScore,actual.actual_home,actual.actual_away)*(isMyDouble?2:1):null;
                   const ptCol=pts===null?C.gold:pts>=10?C.green:pts>=6?C.blue:pts>0?C.gold:"#888";
@@ -2154,11 +2184,11 @@ export default function App(){
                             <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
                               <input type="number" min="0" max="9" value={match.homeScore} onChange={e=>{const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"homeScore",v);}}
                                 onClick={e=>e.target.select()}
-                                style={{width:38,textAlign:"center",padding:"7px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:7,fontSize:18,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                                style={{width:38,textAlign:"center",padding:"7px 0",border:`1.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:7,fontSize:18,fontWeight:600,background:isMyDouble?C.goldLt:"#f0f0f0",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace",boxShadow:"inset 0 1px 3px rgba(0,0,0,0.08)"}}/>
                               <span style={{fontSize:13,color:"var(--color-text-tertiary)"}}>–</span>
                               <input type="number" min="0" max="9" value={match.awayScore} onChange={e=>{const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"awayScore",v);}}
                                 onClick={e=>e.target.select()}
-                                style={{width:38,textAlign:"center",padding:"7px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:7,fontSize:18,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                                style={{width:38,textAlign:"center",padding:"7px 0",border:`1.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:7,fontSize:18,fontWeight:600,background:isMyDouble?C.goldLt:"#f0f0f0",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace",boxShadow:"inset 0 1px 3px rgba(0,0,0,0.08)"}}/>
                             </div>
                           )}
                           {/* Away team column */}
@@ -2182,11 +2212,11 @@ export default function App(){
                             <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
                               <input type="number" min="0" max="9" value={match.homeScore} onChange={e=>{const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"homeScore",v);}}
                                 onClick={e=>e.target.select()}
-                                style={{width:48,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                                style={{width:48,textAlign:"center",padding:"10px 0",border:`1.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:isMyDouble?C.goldLt:"#f0f0f0",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace",boxShadow:"inset 0 1px 3px rgba(0,0,0,0.08)"}}/>
                               <span style={{fontSize:14,color:"var(--color-text-tertiary)"}}>–</span>
                               <input type="number" min="0" max="9" value={match.awayScore} onChange={e=>{const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"awayScore",v);}}
                                 onClick={e=>e.target.select()}
-                                style={{width:48,textAlign:"center",padding:"10px 0",border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:"var(--color-background-secondary)",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace"}}/>
+                                style={{width:48,textAlign:"center",padding:"10px 0",border:`1.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:8,fontSize:20,fontWeight:600,background:isMyDouble?C.goldLt:"#f0f0f0",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace",boxShadow:"inset 0 1px 3px rgba(0,0,0,0.08)"}}/>
                             </div>
                           )}
                           <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500,flex:1,textAlign:"right"}}>{!SEEDED.has(match.away)&&awayQualifies?"★ ":""}{match.away}</span>
@@ -2216,7 +2246,7 @@ export default function App(){
                       {/* Mobile double-down + venue */}
                       {mobile&&(
                         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:4}}>
-                          {GROUP_VENUES[activeGroup]?.[idx]?<span style={{fontSize:8,color:"var(--color-text-tertiary)"}}>📍 {GROUP_VENUES[activeGroup][idx].venue}</span>:<span/>}
+                          {GROUP_VENUES[activeGroup]?.[idx]?<span style={{fontSize:8,color:"var(--color-text-tertiary)"}}>📍 {GROUP_VENUES[activeGroup][idx].city}{GROUP_DATES[activeGroup]?.[idx]?" · "+GROUP_DATES[activeGroup][idx]:""}</span>:<span/>}
                           {!isSeeded&&<button onClick={()=>!actual&&setDouble(roundKey,activeGroup,idx)}
                             style={{padding:"3px 8px",borderRadius:6,fontSize:10,fontWeight:isMyDouble?600:400,
                               cursor:actual?"not-allowed":"pointer",
@@ -2228,7 +2258,7 @@ export default function App(){
                           </button>}
                         </div>
                       )}
-                      {!mobile&&GROUP_VENUES[activeGroup]?.[idx]&&<div style={{fontSize:9,color:"var(--color-text-tertiary)",marginTop:4}}>📍 {GROUP_VENUES[activeGroup][idx].city}</div>}
+                      {!mobile&&GROUP_VENUES[activeGroup]?.[idx]&&<div style={{fontSize:9,color:"var(--color-text-tertiary)",marginTop:4}}>📍 {GROUP_VENUES[activeGroup][idx].city}{GROUP_DATES[activeGroup]?.[idx]?" · "+GROUP_DATES[activeGroup][idx]:""}</div>}
                     </div>
                   );
                 })}
@@ -2330,7 +2360,7 @@ export default function App(){
               {r32Open&&(
                 <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
                   {r32Bracket.map((match,i)=>(
-                    <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`M${match.matchId}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32" venue={KO_VENUES.r32[i]?.venue} city={KO_VENUES.r32[i]?.city}/>
+                    <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={KO_VENUES.r32[i]?.city||""} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
                   ))}
                 </div>
               )}
@@ -2358,7 +2388,7 @@ export default function App(){
                   <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Round of 32 · {Object.keys(koPicks.r32).length}/16</div>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:6}}>
                     {r32Bracket.map((match,i)=>(
-                      <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`M${match.matchId}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
+                      <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={KO_VENUES.r32[i]?.city||""} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
                     ))}
                   </div>
                 </div>
@@ -2698,6 +2728,7 @@ export default function App(){
           {!viewingUser&&activeLeague&&(
             <div>
               <button onClick={()=>{setActiveLeague(null);setMatchdayView(false);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← My leagues</button>
+              {!tournamentStarted()&&<div style={{display:"flex",gap:10,padding:"10px 14px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:10,marginBottom:"1rem",fontSize:12,color:"#7a5c10",alignItems:"center"}}><span>🔒</span><span>Picks are hidden until June 11 kickoff — come back then to see everyone's predictions!</span></div>}
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem",flexWrap:"wrap"}}>
                 <div style={{flex:1}}><div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)"}}>{activeLeague.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{activeLeague.members?.toLocaleString()} members</div></div>
                 {activeLeague.code&&<span style={{fontFamily:"monospace",fontSize:11,color:"var(--color-text-tertiary)",background:"var(--color-background-secondary)",padding:"5px 10px",borderRadius:99,border:"0.5px solid var(--color-border-tertiary)"}}>{activeLeague.code}</span>}
@@ -2917,9 +2948,9 @@ export default function App(){
             ]},
             {title:"Bonus picks",accent:C.gold,items:[
               {label:"Double-down",note:"×2 on one match per matchday · 3 total · no seeded teams",val:"×2",c:C.gold},
-              {label:"Golden Boot — correct top scorer",note:"Editable until June 11",val:"15 pts",c:C.green},
-              {label:"Top Assist — correct top assist provider",note:"Editable until June 11",val:"15 pts",c:C.blue},
-              {label:"Golden Glove — correct best goalkeeper",note:"Editable until June 11",val:"15 pts",c:C.gold},
+              {label:"Golden Boot — correct top scorer",val:"15 pts",c:C.green},
+              {label:"Top Assist — correct top assist provider",val:"15 pts",c:C.blue},
+              {label:"Golden Glove — correct best goalkeeper",val:"15 pts",c:C.gold},
             ]},
           ].map(({title,accent,note,items})=>(
             <div key={title} style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${accent}`,borderRadius:"0 12px 12px 0"}}>
