@@ -2622,7 +2622,7 @@ export default function App(){
               <button onClick={()=>setViewingUser(null)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← Back to league</button>
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem"}}>
                 <div style={{width:38,height:38,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:700,color:"#fff"}}>{viewingUser.avatar}</div>
-                <div><div style={{fontSize:16,fontWeight:500,color:"var(--color-text-primary)"}}>{viewingUser.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{viewingUser.handle} · {viewingUser.picks.group picks</div></div>
+                <div><div style={{fontSize:16,fontWeight:500,color:"var(--color-text-primary)"}}>{viewingUser.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{viewingUser.handle} · {viewingUser.picks.groupDone} group picks</div></div>
               </div>
               {!tournamentStarted()&&(
                 <div style={{padding:"1rem",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:10,textAlign:"center",marginBottom:"0.75rem"}}>
