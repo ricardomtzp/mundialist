@@ -2297,7 +2297,6 @@ export default function App(){
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 6px"}}>Pick the winner of every match. Your picks cascade automatically to the next round.</p>
               <div style={{display:"flex",gap:12,fontSize:11,alignItems:"center",flexWrap:"wrap"}}>
                 <span style={{color:C.blue}}>🔵 Tap to pick winner</span>
-                <span style={{color:C.gold,fontWeight:600}}>★ dark horse bonus — QF +5, SF +10, Final +15</span>
                 <span style={{fontFamily:"monospace",color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>{koPicked}/32 picks</span>
               </div>
             </div>
@@ -2392,19 +2391,19 @@ export default function App(){
               {koRound==="r16"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Round of 16 · {Object.keys(koPicks.r16).length}/8</div>
-                  {r16Matchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={mobile?KO_VENUES.r16[i]?.city||"":(`R16 ${i+1} · ${KO_VENUES.r16[i]?.city||""}`)} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>)}
+                  {r16Matchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={mobile?(KO_VENUES.r16[i]?.city||""):(`R16 ${i+1} · ${["Jul 7","Jul 7","Jul 8","Jul 8","Jul 9","Jul 9","Jul 10","Jul 10"][i]||""} · ${KO_VENUES.r16[i]?.city||""}`)} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>)}
                 </div>
               )}
               {koRound==="qf"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Quarter-finals · {Object.keys(koPicks.qf).length}/4</div>
-                  {qfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={mobile?KO_VENUES.qf[i]?.city||"":(`QF ${i+1} · ${KO_VENUES.qf[i]?.city||""}`)} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>)}
+                  {qfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={mobile?(KO_VENUES.qf[i]?.city||""):(`QF ${i+1} · ${["Jul 12","Jul 13","Jul 12","Jul 13"][i]||""} · ${KO_VENUES.qf[i]?.city||""}`)} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>)}
                 </div>
               )}
               {koRound==="sf"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Semi-finals · {Object.keys(koPicks.sf).length}/2</div>
-                  {sfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.sf[i]} onPick={t=>pickKO("sf",i,t)} label={mobile?KO_VENUES.sf[i]?.city||"":(`SF ${i+1} · ${KO_VENUES.sf[i]?.city||""}`)} actualWinner={getKOWinner(m.home,m.away)} roundKey="sf"/>)}
+                  {sfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.sf[i]} onPick={t=>pickKO("sf",i,t)} label={mobile?(KO_VENUES.sf[i]?.city||""):(`SF ${i+1} · ${["Jul 15","Jul 16"][i]||""} · ${KO_VENUES.sf[i]?.city||""}`)} actualWinner={getKOWinner(m.home,m.away)} roundKey="sf"/>)}
                 </div>
               )}
               {koRound==="final"&&(
@@ -2419,7 +2418,7 @@ export default function App(){
                   )}
                   <div style={{marginTop:8}}>
                     <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>3rd place match</div>
-                    <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label={`3rd place · ${KO_VENUES.third?.city||""}`} actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
+                    <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label="3rd place · Jul 19" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
                   </div>
                 </div>
               )}
@@ -2458,7 +2457,7 @@ export default function App(){
               {/* LEFT SF */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:160,flexShrink:0,padding:"80px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
-                <KOCard home={sfMatchups[0]?.home||"TBD"} away={sfMatchups[0]?.away||"TBD"} picked={koPicks.sf[0]} onPick={t=>pickKO("sf",0,t)} label="SF 1" actualWinner={getKOWinner(sfMatchups[0]?.home,sfMatchups[0]?.away)} roundKey="sf" venue={KO_VENUES.sf[0]?.venue} city={KO_VENUES.sf[0]?.city}/>
+                <KOCard home={sfMatchups[0]?.home||"TBD"} away={sfMatchups[0]?.away||"TBD"} picked={koPicks.sf[0]} onPick={t=>pickKO("sf",0,t)} label="SF 1 · Jul 15" actualWinner={getKOWinner(sfMatchups[0]?.home,sfMatchups[0]?.away)} roundKey="sf" venue={KO_VENUES.sf[0]?.venue} city={KO_VENUES.sf[0]?.city}/>
               </div>
 
               <div style={{width:14,flexShrink:0,display:"flex",alignItems:"center"}}>
@@ -2468,7 +2467,7 @@ export default function App(){
               {/* FINAL */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",width:172,flexShrink:0,gap:8}}>
                 <div style={{fontSize:10,fontWeight:500,color:C.gold,textTransform:"uppercase",letterSpacing:"0.06em"}}>Final</div>
-                <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final" label="Final" venue={KO_VENUES.final?.venue} city={KO_VENUES.final?.city}/>
+                <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final" label="Final · Jul 19" venue={KO_VENUES.final?.venue} city={KO_VENUES.final?.city}/>
                 {champion!=="TBD"&&(
                   <div style={{padding:"10px 12px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:8,textAlign:"center",width:"100%"}}>
                     <div style={{fontSize:18,marginBottom:2}}>🏆</div>
@@ -2477,7 +2476,7 @@ export default function App(){
                 )}
                 <div style={{marginTop:16,width:"100%"}}>
                   <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>3rd place match</div>
-                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label="3rd place" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third" venue={KO_VENUES.third?.venue} city={KO_VENUES.third?.city}/>
+                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label="3rd place · Jul 19" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third" venue={KO_VENUES.third?.venue} city={KO_VENUES.third?.city}/>
                   {koPicks.third&&koPicks.third!=="TBD"&&(
                     <div style={{marginTop:4,padding:"6px 10px",background:"var(--color-background-secondary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,textAlign:"center"}}>
                       <div style={{fontSize:10,color:"var(--color-text-secondary)"}}>🥉 {koPicks.third}</div>
@@ -2493,7 +2492,7 @@ export default function App(){
               {/* RIGHT SF */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:160,flexShrink:0,padding:"80px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
-                <KOCard home={sfMatchups[1]?.home||"TBD"} away={sfMatchups[1]?.away||"TBD"} picked={koPicks.sf[1]} onPick={t=>pickKO("sf",1,t)} label="SF 2" actualWinner={getKOWinner(sfMatchups[1]?.home,sfMatchups[1]?.away)} roundKey="sf" venue={KO_VENUES.sf[1]?.venue} city={KO_VENUES.sf[1]?.city}/>
+                <KOCard home={sfMatchups[1]?.home||"TBD"} away={sfMatchups[1]?.away||"TBD"} picked={koPicks.sf[1]} onPick={t=>pickKO("sf",1,t)} label="SF 2 · Jul 16" actualWinner={getKOWinner(sfMatchups[1]?.home,sfMatchups[1]?.away)} roundKey="sf" venue={KO_VENUES.sf[1]?.venue} city={KO_VENUES.sf[1]?.city}/>
               </div>
 
               <div style={{width:14,flexShrink:0,display:"flex",flexDirection:"column",justifyContent:"space-around",padding:"60px 0"}}>
