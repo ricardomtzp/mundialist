@@ -24,6 +24,9 @@ const GROUPS = {
   L:["England","Croatia","Ghana","Panama"],
 };
 
+const TOURNAMENT_START=new Date('2026-06-11T19:00:00Z');
+const tournamentStarted=()=>Date.now()>=TOURNAMENT_START.getTime();
+
 const SEEDED=new Set(["Mexico","Canada","USA","Brazil","Germany","Spain","France","England","Portugal","Belgium","Netherlands","Argentina"]);
 
 // FIFA World Rankings April 2026 (higher = better)
@@ -74,6 +77,7 @@ const GOLDEN_BOOT_PLAYERS=[
   {name:"Lamine Yamal",         nation:"Spain",        flag:"🇪🇸"},
   {name:"Santiago Giménez",    nation:"Mexico",       flag:"🇲🇽"},
   {name:"Raúl Jiménez",        nation:"Mexico",       flag:"🇲🇽"},
+  {name:"Hirving Lozano",      nation:"Mexico",       flag:"🇲🇽"},
   {name:"Alexis Vega",         nation:"Mexico",       flag:"🇲🇽"},
   {name:"Vinicius Jr",          nation:"Brazil",       flag:"🇧🇷"},
   {name:"Mikel Oyarzabal",      nation:"Spain",        flag:"🇪🇸"},
@@ -1174,6 +1178,7 @@ export default function App(){
   const [authError,setAuthError]=useState("");
   const [formPassword,setFormPassword]=useState("");
   const [waitlistDone,setWaitlistDone]=useState(false);
+  const [memberCount,setMemberCount]=useState(0);
   const [simulateStyle,setSimulateStyle]=useState("balanced");
   const [groupMatches,setGroupMatches]=useState(()=>{
     const all={};Object.entries(GROUPS).forEach(([g,teams])=>{all[g]=generateGroupMatches(teams);});return all;
@@ -1313,7 +1318,7 @@ export default function App(){
         });
       }
       setUser({name:formName,handle:"@"+formHandle.replace("@",""),email:formEmail,avatar:formName[0].toUpperCase(),id:data.user?.id});
-      setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
+      setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
       setPage("predict");window.scrollTo(0,0);
     } catch(err){
       setAuthError(err.message||"Sign up failed. Please try again.");
@@ -1335,7 +1340,7 @@ export default function App(){
       const {data:profile}=await supabase.from("users").select("*").eq("id",data.user.id).single();
       if(profile){
         setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:data.user.id});
-        setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
+        setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
         loadUserData(data.user.id);
         loadActualResults();
         setPage("predict");
@@ -1492,20 +1497,14 @@ export default function App(){
         supabase.from("users").select("*").eq("id",session.user.id).single().then(({data:profile})=>{
           if(profile){
             setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:session.user.id});
-            setJoinedLeagues([{id:"global",name:"Global League",members:10420,rank:4821,code:null}]);
+            setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
             loadUserData(session.user.id);
             loadActualResults();
-            setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),200);
           }
         });
       }
     });
   },[]);
-
-  // Scroll to top on every page change
-  useEffect(()=>{
-    window.scrollTo({top:0,behavior:"instant"});
-  },[page]);
 
   // Reload actual results whenever user logs in
   useEffect(()=>{
@@ -1590,9 +1589,9 @@ export default function App(){
     }
   },[activeLeague?.id, JSON.stringify(Object.keys(actualResults))]);
 
-  const filteredBoot=bootSearch.length>0?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(bootSearch.toLowerCase())||p.nation.toLowerCase().includes(bootSearch.toLowerCase())):[];
-  const filteredAssist=assistSearch.length>0?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(assistSearch.toLowerCase())||p.nation.toLowerCase().includes(assistSearch.toLowerCase())):[];
-  const filteredGlove=gloveSearch.length>0?GOLDEN_GLOVE_PLAYERS.filter(p=>p.name.toLowerCase().includes(gloveSearch.toLowerCase())||p.nation.toLowerCase().includes(gloveSearch.toLowerCase())):[];
+  const filteredBoot=bootSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(bootSearch.toLowerCase())||p.nation.toLowerCase().includes(bootSearch.toLowerCase())):[];
+  const filteredAssist=assistSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(assistSearch.toLowerCase())||p.nation.toLowerCase().includes(assistSearch.toLowerCase())):[];
+  const filteredGlove=gloveSearch.length>1?GOLDEN_GLOVE_PLAYERS.filter(p=>p.name.toLowerCase().includes(gloveSearch.toLowerCase())||p.nation.toLowerCase().includes(gloveSearch.toLowerCase())):[];
 
   const [leagueMembers,setLeagueMembers]=useState([]);
   const [leagueMembersLoading,setLeagueMembersLoading]=useState(false);
@@ -1829,7 +1828,7 @@ export default function App(){
 
           {/* Mobile top bar */}
           {mobile&&(
-            <nav style={{background:"#ffffff",borderBottom:"0.5px solid #e5e7eb",position:"fixed",top:0,left:0,right:0,zIndex:9999,height:48}}>
+            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:48}}>
               <div style={{padding:"0 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",height:"100%"}}>
                 <span style={{fontSize:16,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer"}} onClick={()=>setPage("home")}>Mundialist</span>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -1842,7 +1841,7 @@ export default function App(){
 
           {/* Mobile bottom tab bar */}
           {mobile&&(
-            <nav style={{background:"#ffffff",borderTop:"0.5px solid #e5e7eb",position:"fixed",bottom:0,left:0,right:0,zIndex:9999,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)",minHeight:56}}>
+            <nav style={{background:"var(--color-background-primary)",borderTop:"0.5px solid var(--color-border-tertiary)",position:"fixed",bottom:0,left:0,right:0,zIndex:200,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)",minHeight:56}}>
               {[
                 {p:"predict",icon:"⚽",label:"Groups"},
                 {p:"bracket",icon:"🏆",label:"Knockout"},
@@ -2027,7 +2026,7 @@ export default function App(){
                   <div key={i} style={{width:32,height:32,borderRadius:"50%",background:bg,border:"2px solid var(--color-background-secondary)",marginLeft:i>0?-10:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"#fff"}}>{"ABCDE"[i]}</div>
                 ))}
               </div>
-              <span style={{fontSize:14,color:"var(--color-text-secondary)"}}><strong style={{color:"var(--color-text-primary)"}}>1,204 players</strong> have already joined · be part of it</span>
+              <span style={{fontSize:14,color:"var(--color-text-secondary)"}}><strong style={{color:"var(--color-text-primary)"}}>{joinedLeagues.length>0?"Join them":""}</strong> Be part of it from day one</span>
             </div>
           </div>
         </div>
@@ -2623,16 +2622,22 @@ export default function App(){
               <button onClick={()=>setViewingUser(null)} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1rem",padding:0}}>← Back to league</button>
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem"}}>
                 <div style={{width:38,height:38,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:700,color:"#fff"}}>{viewingUser.avatar}</div>
-                <div><div style={{fontSize:16,fontWeight:500,color:"var(--color-text-primary)"}}>{viewingUser.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{viewingUser.handle} · {viewingUser.picks.groupDone} group picks</div></div>
+                <div><div style={{fontSize:16,fontWeight:500,color:"var(--color-text-primary)"}}>{viewingUser.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{viewingUser.handle} · {viewingUser.picks.group picks</div></div>
               </div>
+              {!tournamentStarted()&&(
+                <div style={{padding:"1rem",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:10,textAlign:"center",marginBottom:"0.75rem"}}>
+                  <div style={{fontSize:14,fontWeight:500,color:"#7a5c10",marginBottom:4}}>🔒 Picks hidden until kickoff</div>
+                  <div style={{fontSize:12,color:"#7a5c10"}}>All predictions revealed June 11 at tournament start</div>
+                </div>
+              )}
               <div style={card}>
                 {[
-                  {label:"Champion",val:viewingUser.picks.champion,emoji:"🏆",pts:"25 pts"},
-                  {label:"Runner-up",val:viewingUser.picks.runnerUp,emoji:"🥈",pts:"20 pts"},
-                  {label:"3rd place",val:viewingUser.picks.thirdPlace,emoji:"🥉",pts:"12 pts"},
-                  {label:"Golden Boot",val:viewingUser.picks.goldenBoot,emoji:"⚽",pts:"15 pts"},
-                  {label:"Top Assist",val:viewingUser.picks.topAssist,emoji:"🎯",pts:"15 pts"},
-                  {label:"Golden Glove",val:viewingUser.picks.goldenGlove,emoji:"🧤",pts:"15 pts"},
+                  {label:"Champion",val:tournamentStarted()?viewingUser.picks.champion:null,emoji:"🏆",pts:"25 pts"},
+                  {label:"Runner-up",val:tournamentStarted()?viewingUser.picks.runnerUp:null,emoji:"🥈",pts:"20 pts"},
+                  {label:"3rd place",val:tournamentStarted()?viewingUser.picks.thirdPlace:null,emoji:"🥉",pts:"12 pts"},
+                  {label:"Golden Boot",val:tournamentStarted()?viewingUser.picks.goldenBoot:null,emoji:"⚽",pts:"15 pts"},
+                  {label:"Top Assist",val:tournamentStarted()?viewingUser.picks.topAssist:null,emoji:"🎯",pts:"15 pts"},
+                  {label:"Golden Glove",val:tournamentStarted()?viewingUser.picks.goldenGlove:null,emoji:"🧤",pts:"15 pts"},
                 ].map(({label,val,emoji,pts},i,arr)=>(
                   <div key={label} style={{padding:"10px 16px",borderBottom:i<arr.length-1?"0.5px solid var(--color-border-tertiary)":"none",display:"flex",alignItems:"center",gap:12}}>
                     <span style={{fontSize:18}}>{val?FLAGS[val]||emoji:emoji}</span>
@@ -2703,7 +2708,7 @@ export default function App(){
                     fontWeight:!matchdayView?600:400,
                     boxShadow:!matchdayView?"0 1px 3px rgba(0,0,0,0.12)":"none",
                     transition:"all 0.15s"}}>Standings</button>
-                  <button onClick={()=>{setMatchdayView(true);loadMatchdayPicks(activeLeague.id);}} style={{flex:1,padding:"6px 14px",borderRadius:7,border:"none",fontSize:12,cursor:"pointer",
+                  <button onClick={()=>{if(tournamentStarted()){setMatchdayView(true);loadMatchdayPicks(activeLeague.id);}}} style={{flex:1,padding:"6px 14px",borderRadius:7,border:"none",fontSize:12,cursor:tournamentStarted()?"pointer":"not-allowed",opacity:tournamentStarted()?1:0.5,
                     background:matchdayView?"#fff":"transparent",
                     color:matchdayView?C.blue:"var(--color-text-secondary)",
                     fontWeight:matchdayView?600:400,
@@ -2730,8 +2735,14 @@ export default function App(){
                     </div>
                     <span style={{fontFamily:"monospace",fontWeight:600,fontSize:14,color:m.isMe?C.blue:"var(--color-text-primary)",width:45,textAlign:"center",flexShrink:0}}>{m.pts}</span>
                     <div style={{width:80,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:3,flexShrink:0}}>
-                      <span style={{fontSize:14}}>{FLAGS[m.picks.champion]||"—"}</span>
-                      <span style={{fontSize:10,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:mobile?35:50}}>{m.picks.champion||""}</span>
+                      {tournamentStarted()?(
+                        <>
+                          <span style={{fontSize:14}}>{FLAGS[m.picks.champion]||"—"}</span>
+                          <span style={{fontSize:10,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:mobile?35:50}}>{m.picks.champion||""}</span>
+                        </>
+                      ):(
+                        <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>🔒</span>
+                      )}
                     </div>
                     {!mobile&&<div style={{width:80,textAlign:"center",flexShrink:0}}>
                       <span style={{fontSize:11,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"block"}}>{m.picks.goldenBoot||"—"}</span>
