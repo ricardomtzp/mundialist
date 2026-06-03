@@ -2297,6 +2297,7 @@ export default function App(){
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 6px"}}>Pick the winner of every match. Your picks cascade automatically to the next round.</p>
               <div style={{display:"flex",gap:12,fontSize:11,alignItems:"center",flexWrap:"wrap"}}>
                 <span style={{color:C.blue}}>🔵 Tap to pick winner</span>
+                <span style={{color:C.gold,fontWeight:600}}>★ dark horse bonus — QF +5, SF +10, Final +15</span>
                 <span style={{fontFamily:"monospace",color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>{koPicked}/32 picks</span>
               </div>
             </div>
@@ -2418,7 +2419,7 @@ export default function App(){
                   )}
                   <div style={{marginTop:8}}>
                     <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>3rd place match</div>
-                    <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label="3rd place · Jul 19" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
+                    <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label={`3rd place · ${KO_VENUES.third?.city||""}`} actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
                   </div>
                 </div>
               )}
