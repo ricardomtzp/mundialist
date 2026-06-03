@@ -1530,11 +1530,12 @@ export default function App(){
     });
   },[]);
 
-  // Reload actual results whenever user logs in
+  // Reload actual results whenever user logs in + scroll to top
   useEffect(()=>{
     if(user?.id){
       loadActualResults();
       loadTournamentAwards();
+      window.scrollTo({top:0,behavior:"instant"});
     }
   },[user?.id]);
 
@@ -2217,14 +2218,13 @@ export default function App(){
                           )}
                           <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500,flex:1,textAlign:"right"}}>{!SEEDED.has(match.away)&&awayQualifies?"★ ":""}{match.away}</span>
                           <span style={{fontSize:20,flexShrink:0}}>{FLAGS[match.away]||"❓"}</span>
-                          {!isSeeded&&(
+                          {(isMyDouble||canDouble)&&!isSeeded&&(
                             <button onClick={()=>canDouble&&setDouble(roundKey,activeGroup,idx)}
                               style={{padding:"6px 10px",borderRadius:7,fontSize:12,fontWeight:isMyDouble?600:400,
                                 cursor:canDouble?"pointer":"not-allowed",flexShrink:0,
                                 border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,
                                 background:isMyDouble?C.goldLt:"transparent",
-                                color:isMyDouble?C.gold:!canDouble?"var(--color-text-tertiary)":"var(--color-text-secondary)",
-                                opacity:!canDouble&&!isMyDouble?0.3:1}}>
+                                color:isMyDouble?C.gold:"var(--color-text-secondary)"}}>
                               {isMyDouble?"⚡ ×2":"×2"}
                             </button>
                           )}
@@ -2243,7 +2243,7 @@ export default function App(){
                       {mobile&&(
                         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:4}}>
                           {GROUP_VENUES[activeGroup]?.[idx]?<span style={{fontSize:8,color:"var(--color-text-tertiary)"}}>📍 {GROUP_VENUES[activeGroup][idx].city}</span>:<span/>}
-                          {!isSeeded&&<button onClick={()=>!actual&&setDouble(roundKey,activeGroup,idx)}
+                          {(isMyDouble||canDouble)&&!isSeeded&&<button onClick={()=>!actual&&setDouble(roundKey,activeGroup,idx)}
                             style={{padding:"3px 8px",borderRadius:6,fontSize:10,fontWeight:isMyDouble?600:400,
                               cursor:actual?"not-allowed":"pointer",
                               border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,
