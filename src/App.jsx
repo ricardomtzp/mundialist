@@ -1343,7 +1343,7 @@ export default function App(){
         setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
         loadUserData(data.user.id);
         loadActualResults();
-        setPage("predict");
+        setPage("predict");setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),100);
       }
     } catch(err){
       setAuthError(err.message||"Sign in failed. Please check your email and password.");
@@ -1589,9 +1589,9 @@ export default function App(){
     }
   },[activeLeague?.id, JSON.stringify(Object.keys(actualResults))]);
 
-  const filteredBoot=bootSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(bootSearch.toLowerCase())||p.nation.toLowerCase().includes(bootSearch.toLowerCase())):[];
-  const filteredAssist=assistSearch.length>1?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(assistSearch.toLowerCase())||p.nation.toLowerCase().includes(assistSearch.toLowerCase())):[];
-  const filteredGlove=gloveSearch.length>1?GOLDEN_GLOVE_PLAYERS.filter(p=>p.name.toLowerCase().includes(gloveSearch.toLowerCase())||p.nation.toLowerCase().includes(gloveSearch.toLowerCase())):[];
+  const filteredBoot=bootSearch.length>0?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(bootSearch.toLowerCase())||p.nation.toLowerCase().includes(bootSearch.toLowerCase())):[];
+  const filteredAssist=assistSearch.length>0?GOLDEN_BOOT_PLAYERS.filter(p=>p.name.toLowerCase().includes(assistSearch.toLowerCase())||p.nation.toLowerCase().includes(assistSearch.toLowerCase())):[];
+  const filteredGlove=gloveSearch.length>0?GOLDEN_GLOVE_PLAYERS.filter(p=>p.name.toLowerCase().includes(gloveSearch.toLowerCase())||p.nation.toLowerCase().includes(gloveSearch.toLowerCase())):[];
 
   const [leagueMembers,setLeagueMembers]=useState([]);
   const [leagueMembersLoading,setLeagueMembersLoading]=useState(false);
@@ -1664,7 +1664,7 @@ export default function App(){
         // Get champion, runner-up and 3rd place from KO predictions
         const finalPred2=userPreds.find(p=>p.match_id==='KO-final-0');
         const championPick2=finalPred2?.advancing_team||null;
-        const thirdPred=userPreds.find(p=>p.match_id==='KO-third');
+        const thirdPred=userPreds.find(p=>p.match_id==='KO-third'||p.match_id==='KO-third-0');
         // Runner-up: both SF winners go to final, the one who doesn't win is runner-up
         const sfWinners=userPreds.filter(p=>p.match_id?.startsWith('KO-sf-')&&p.advancing_team).map(p=>p.advancing_team);
         const runnerUpPick=championPick2&&sfWinners.length===2?sfWinners.find(t=>t!==championPick2)||null:null;
@@ -1800,7 +1800,7 @@ export default function App(){
         <>
           {/* Desktop nav */}
           {!mobile&&(
-            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:56}}>
+            <nav style={{background:"#ffffff",borderBottom:"0.5px solid #e5e7eb",position:"fixed",top:0,left:0,right:0,zIndex:9999,height:56}}>
               <div style={{maxWidth:1280,margin:"0 auto",padding:"0 1.5rem",display:"flex",alignItems:"center",gap:"1rem",height:"100%"}}>
                 <span style={{fontSize:18,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer",marginRight:"auto"}} onClick={()=>setPage("home")}>Mundialist</span>
                 {NAV.map(({label,page:p})=>(
@@ -1828,7 +1828,7 @@ export default function App(){
 
           {/* Mobile top bar */}
           {mobile&&(
-            <nav style={{background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",position:"fixed",top:0,left:0,right:0,zIndex:200,height:48}}>
+            <nav style={{background:"#ffffff",borderBottom:"0.5px solid #e5e7eb",position:"fixed",top:0,left:0,right:0,zIndex:9999,height:48}}>
               <div style={{padding:"0 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",height:"100%"}}>
                 <span style={{fontSize:16,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer"}} onClick={()=>setPage("home")}>Mundialist</span>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -1841,7 +1841,7 @@ export default function App(){
 
           {/* Mobile bottom tab bar */}
           {mobile&&(
-            <nav style={{background:"var(--color-background-primary)",borderTop:"0.5px solid var(--color-border-tertiary)",position:"fixed",bottom:0,left:0,right:0,zIndex:200,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)",minHeight:56}}>
+            <nav style={{background:"#ffffff",borderTop:"0.5px solid #e5e7eb",position:"fixed",bottom:0,left:0,right:0,zIndex:9999,display:"flex",alignItems:"stretch",paddingBottom:"env(safe-area-inset-bottom)",minHeight:56}}>
               {[
                 {p:"predict",icon:"⚽",label:"Groups"},
                 {p:"bracket",icon:"🏆",label:"Knockout"},
