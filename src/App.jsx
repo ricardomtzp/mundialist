@@ -1771,7 +1771,7 @@ export default function App(){
                 color:isWinner?C.green:picked===team?(gold?"#7a5c10":C.blue):"var(--color-text-primary)",
                 overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{team}</span>
               {isWinner&&<span style={{fontSize:9,color:C.green,fontWeight:700}}>✓</span>}
-              {picked===team&&!isFinished&&!SEEDED.has(team)&&team!=="TBD"&&<span style={{fontSize:8,color:C.gold}}>★</span>}
+              {picked===team&&!isFinished&&!SEEDED.has(team)&&team!=="TBD"&&roundKey!=="r32"&&<span style={{fontSize:8,color:C.gold}}>★</span>}
               {picked===team&&!isFinished&&<span style={{fontSize:9,color:gold?"#7a5c10":C.blue,fontWeight:700}}>✓</span>}
             </div>
           );
@@ -2132,11 +2132,7 @@ export default function App(){
             })}
           </div>
 
-          {/* Dark horse legend */}
-          <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:"0.75rem",padding:"6px 10px",background:C.goldLt,borderRadius:8}}>
-            <span style={{color:C.gold,fontWeight:600}}>★</span>
-            <span style={{color:"#7a5c10",fontSize:11}}>Dark horse — non-seeded team in top 2. Earns bonus pts in KO: QF +5, SF +10, Final +15</span>
-          </div>
+
           {/* Match card */}
           <div style={card}>
 
@@ -2146,7 +2142,7 @@ export default function App(){
               const roundHasDouble=currentDouble!==null;
               return(<div key={ri}>
                 <div style={{padding:"7px 18px",background:"var(--color-background-secondary)",borderTop:ri>0?"0.5px solid var(--color-border-tertiary)":undefined,borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                  <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.05em"}}>Matchday {ri+1}</span>
+                  <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.05em"}}>Matchday {ri+1}{GROUP_DATES[activeGroup]?.[ri*2]?" · "+GROUP_DATES[activeGroup][ri*2]:""}</span>
                   {currentDouble&&currentDouble.startsWith(activeGroup+"-")&&<span style={{fontSize:11,color:C.gold,fontWeight:500}}>⚡ Double active</span>}
                 </div>
                 {indices.map(idx=>{
@@ -2246,7 +2242,7 @@ export default function App(){
                       {/* Mobile double-down + venue */}
                       {mobile&&(
                         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:4}}>
-                          {GROUP_VENUES[activeGroup]?.[idx]?<span style={{fontSize:8,color:"var(--color-text-tertiary)"}}>📍 {GROUP_VENUES[activeGroup][idx].city}{GROUP_DATES[activeGroup]?.[idx]?" · "+GROUP_DATES[activeGroup][idx]:""}</span>:<span/>}
+                          {GROUP_VENUES[activeGroup]?.[idx]?<span style={{fontSize:8,color:"var(--color-text-tertiary)"}}>📍 {GROUP_VENUES[activeGroup][idx].city}</span>:<span/>}
                           {!isSeeded&&<button onClick={()=>!actual&&setDouble(roundKey,activeGroup,idx)}
                             style={{padding:"3px 8px",borderRadius:6,fontSize:10,fontWeight:isMyDouble?600:400,
                               cursor:actual?"not-allowed":"pointer",
@@ -2258,7 +2254,7 @@ export default function App(){
                           </button>}
                         </div>
                       )}
-                      {!mobile&&GROUP_VENUES[activeGroup]?.[idx]&&<div style={{fontSize:9,color:"var(--color-text-tertiary)",marginTop:4}}>📍 {GROUP_VENUES[activeGroup][idx].city}{GROUP_DATES[activeGroup]?.[idx]?" · "+GROUP_DATES[activeGroup][idx]:""}</div>}
+                      {!mobile&&GROUP_VENUES[activeGroup]?.[idx]&&<div style={{fontSize:9,color:"var(--color-text-tertiary)",marginTop:4}}>📍 {GROUP_VENUES[activeGroup][idx].city}</div>}
                     </div>
                   );
                 })}
@@ -2301,8 +2297,8 @@ export default function App(){
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 6px"}}>Pick the winner of every match. Your picks cascade automatically to the next round.</p>
               <div style={{display:"flex",gap:12,fontSize:11,alignItems:"center",flexWrap:"wrap"}}>
                 <span style={{color:C.blue}}>🔵 Tap to pick winner</span>
-                <span style={{color:C.gold}}>★ dark horse bonus</span>
-                <span style={{fontFamily:"monospace",color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>{koPicked}/31 picks</span>
+                <span style={{color:C.gold,fontWeight:600}}>★ dark horse bonus — QF +5, SF +10, Final +15</span>
+                <span style={{fontFamily:"monospace",color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>{koPicked}/32 picks</span>
               </div>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-end",flexShrink:0}}>
@@ -2333,7 +2329,7 @@ export default function App(){
                 }} style={{padding:"8px 14px",border:`0.5px solid ${C.blue}`,borderRadius:8,background:C.blueLt,fontSize:12,color:C.blue,cursor:"pointer"}}>
                   Simulate ↻
                 </button>
-                <button onClick={()=>setPage("predict")} style={{padding:"8px 14px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,color:"var(--color-text-secondary)",cursor:"pointer"}}>← Group stage</button>
+
               </div>
             </div>
           </div>
