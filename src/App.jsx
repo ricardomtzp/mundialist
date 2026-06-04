@@ -1527,17 +1527,30 @@ export default function App(){
 
   // Check for existing session on load
   useEffect(()=>{
-    supabase.auth.getSession().then(({data:{session}})=>{
+    supabase.auth.getSession().then(async({data:{session}})=>{
       if(session?.user){
-        supabase.from("users").select("*").eq("id",session.user.id).single().then(({data:profile})=>{
-          if(profile){
-            setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:session.user.id});
-            setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
-            loadUserData(session.user.id);
-            loadActualResults();
-            setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),200);
-          }
-        });
+        const uid=session.user.id;
+        const meta=session.user.user_metadata;
+        const {data:profile}=await supabase.from("users").select("*").eq("id",uid).single();
+        if(profile){
+          setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name?.[0]?.toUpperCase()||"?",id:uid});
+          setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
+          loadUserData(uid);
+          loadActualResults();
+          setTimeout(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;},200);
+        } else if(meta?.full_name){
+          // Google OAuth user - create profile
+          const handle=(meta.full_name||"user").toLowerCase().replace(/\s+/g,"")+Math.random().toString(36).slice(2,6);
+          const avatarLetter=(meta.full_name||"?")[0].toUpperCase();
+          await supabase.from("users").upsert({id:uid,name:meta.full_name,handle,email:session.user.email,avatar_letter:avatarLetter});
+          await supabase.from("league_members").upsert({league_id:"00000000-0000-0000-0000-000000000001",user_id:uid,total_points:0},{onConflict:"league_id,user_id"});
+          setUser({name:meta.full_name,handle:"@"+handle,email:session.user.email,avatar:avatarLetter,id:uid});
+          setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
+          loadUserData(uid);
+          loadActualResults();
+          setPage("predict");
+          setTimeout(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;},300);
+        }
       }
     });
   },[]);
@@ -1965,15 +1978,6 @@ export default function App(){
                       <div style={{borderTop:"0.5px solid rgba(255,255,255,0.1)",paddingTop:"1rem"}}>
                         <p style={{fontSize:12,color:"rgba(255,255,255,0.4)",margin:"0 0 0.75rem"}}>Create your account to start predicting</p>
                         <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                          <button onClick={handleGoogleSignIn} style={{width:"100%",padding:"11px",background:"#fff",color:"#3c4043",border:"1px solid #dadce0",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:8}}>
-                            <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
-                            Continue with Google
-                          </button>
-                          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-                            <div style={{flex:1,height:"0.5px",background:"rgba(255,255,255,0.15)"}}/>
-                            <span style={{fontSize:11,color:"rgba(255,255,255,0.4)"}}>or</span>
-                            <div style={{flex:1,height:"0.5px",background:"rgba(255,255,255,0.15)"}}/>
-                          </div>
                           <input value={formName} onChange={e=>setFormName(e.target.value)} placeholder="Full name"
                             style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
                           <div style={{position:"relative"}}>
@@ -1996,7 +2000,18 @@ export default function App(){
                           {agreeError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>Please agree to the terms to continue</p>}
                           {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
                           <button onClick={handleCreate} disabled={authLoading}
-                              style={{padding:"11px",background:authLoading?"rgba(42,57,141,0.5)":C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:authLoading?"not-allowed":"pointer",marginTop:4}}>
+                            style={{padding:"11px",background:authLoadin
+                        {/* Google Sign Up */}
+                        <button onClick={handleGoogleSignIn} style={{width:"100%",padding:"11px",background:"#fff",color:"#3c4043",border:"1px solid #dadce0",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:10}}>
+                          <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
+                          Continue with Google
+                        </button>
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                          <div style={{flex:1,height:"0.5px",background:"var(--color-border-tertiary)"}}/>
+                          <span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>or</span>
+                          <div style={{flex:1,height:"0.5px",background:"var(--color-border-tertiary)"}}/>
+                        </div>
+                        <button style={{width:"100%",padding:"11px",background:authLoading?"rgba(42,57,141,0.5)":C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:authLoading?"not-allowed":"pointer",marginTop:4}}>
                             {authLoading?"Creating account...":"Start predicting →"}
                           </button>
                           <button onClick={()=>setAuthMode("signin")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.4)",padding:"4px 0",textAlign:"center"}}>
