@@ -1999,6 +1999,7 @@ export default function App(){
                           </label>
                           {agreeError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>Please agree to the terms to continue</p>}
                           {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
+                          <button onClick={handleCreate} disabled={authLoading}
                             style={{padding:"11px",background:authLoading?"rgba(42,57,141,0.5)":C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:authLoading?"not-allowed":"pointer",marginTop:4}}>
                             {authLoading?"Creating account...":"Start predicting →"}
                           </button>
