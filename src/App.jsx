@@ -2051,6 +2051,36 @@ export default function App(){
                           </div>
                           <p style={{fontSize:12,color:"rgba(255,255,255,0.4)",margin:"0 0 0.75rem"}}>Create your account to start predicting</p>
                           <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                            <input value={formName} onChange={e=>setFormName(e.target.value)} placeholder="Full name"
+                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                            <div style={{position:"relative"}}>
+                              <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,0.4)",fontSize:13}}>@</span>
+                              <input value={formHandle} onChange={e=>setFormHandle(e.target.value)} placeholder="username"
+                                style={{width:"100%",boxSizing:"border-box",padding:"9px 12px 9px 24px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                            </div>
+                            <input value={formEmail} onChange={e=>{setFormEmail(e.target.value);setEmailError("");}} placeholder="Email address" type="email"
+                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:`0.5px solid ${emailError?"#ef4444":"rgba(255,255,255,0.15)"}`,borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                            {emailError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{emailError}</p>}
+                            <input value={formPassword} onChange={e=>setFormPassword(e.target.value)} placeholder="Password" type="password"
+                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                            <label style={{display:"flex",alignItems:"flex-start",gap:8,cursor:"pointer"}}>
+                              <input type="checkbox" checked={formAgree} onChange={e=>{setFormAgree(e.target.checked);setAgreeError(false);}}
+                                style={{marginTop:2,accentColor:C.gold,flexShrink:0}}/>
+                              <span style={{fontSize:11,color:agreeError?"#ef4444":"rgba(255,255,255,0.5)",lineHeight:1.5}}>
+                                I agree to the <button onClick={e=>{e.preventDefault();setPage("terms");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:11,color:agreeError?"#ef4444":C.gold,padding:0,textDecoration:"underline"}}>Terms & Conditions</button> and consent to receive prediction updates and league emails from Mundialist.
+                              </span>
+                            </label>
+                            {agreeError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>Please agree to the terms to continue</p>}
+                            {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
+                            <button onClick={handleCreate} disabled={authLoading}
+                              style={{padding:"11px",background:authLoading?"rgba(42,57,141,0.5)":C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:authLoading?"not-allowed":"pointer",marginTop:4}}>
+                              {authLoading?"Creating account...":"Start predicting →"}
+                            </button>
+                            <button onClick={()=>setAuthMode("signin")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.4)",padding:"4px 0",textAlign:"center"}}>
+                              Already have an account? Sign in →
+                            </button>
+                          </div>
+                          </>
                   {/* Sign in form */}
                   {authMode==="signin"&&(
                     <div style={{borderTop:"0.5px solid rgba(255,255,255,0.1)",paddingTop:"1rem",marginTop:"0.5rem"}}>
