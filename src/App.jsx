@@ -2080,7 +2080,7 @@ export default function App(){
                               Already have an account? Sign in →
                             </button>
                           </div>
-                          </>
+                        )}
                   {/* Sign in form */}
                   {authMode==="signin"&&(
                     <div style={{borderTop:"0.5px solid rgba(255,255,255,0.1)",paddingTop:"1rem",marginTop:"0.5rem"}}>
