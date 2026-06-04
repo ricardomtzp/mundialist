@@ -2018,48 +2018,39 @@ export default function App(){
                           </div>
                         ):(
                         <>
-                        <p style={{fontSize:12,color:"rgba(255,255,255,0.4)",margin:"0 0 0.75rem"}}>Create your account to start predicting</p>
-                        <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                          <input value={formName} onChange={e=>setFormName(e.target.value)} placeholder="Full name"
-                            style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                          <div style={{position:"relative"}}>
-                            <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,0.4)",fontSize:13}}>@</span>
-                            <input value={formHandle} onChange={e=>setFormHandle(e.target.value)} placeholder="username"
-                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px 9px 24px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                        {authMode==="google_onboard"?(
+                          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                            <div style={{textAlign:"center",marginBottom:4}}>
+                              <div style={{fontSize:28,marginBottom:6}}>👋</div>
+                              <h3 style={{fontSize:16,fontWeight:600,color:"#fff",margin:"0 0 4px"}}>Almost there!</h3>
+                              <p style={{fontSize:12,color:"rgba(255,255,255,0.5)",margin:0}}>Set up your Mundialist profile</p>
+                            </div>
+                            <input value={onboardName} onChange={e=>setOnboardName(e.target.value)} placeholder="Full name"
+                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                            <div style={{position:"relative"}}>
+                              <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,0.4)",fontSize:13}}>@</span>
+                              <input value={onboardHandle} onChange={e=>setOnboardHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,""))} placeholder="username"
+                                style={{width:"100%",boxSizing:"border-box",padding:"9px 12px 9px 24px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                            </div>
+                            {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
+                            <button onClick={handleGoogleOnboard} disabled={!onboardName.trim()||!onboardHandle.trim()}
+                              style={{padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer",opacity:!onboardName.trim()||!onboardHandle.trim()?0.5:1}}>
+                              Start predicting →
+                            </button>
                           </div>
-                          <input value={formEmail} onChange={e=>{setFormEmail(e.target.value);setEmailError("");}} placeholder="Email address" type="email"
-                            style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:`0.5px solid ${emailError?"#ef4444":"rgba(255,255,255,0.15)"}`,borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                          {emailError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{emailError}</p>}
-                          <input value={formPassword} onChange={e=>setFormPassword(e.target.value)} placeholder="Password" type="password"
-                            style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                          <label style={{display:"flex",alignItems:"flex-start",gap:8,cursor:"pointer"}}>
-                            <input type="checkbox" checked={formAgree} onChange={e=>{setFormAgree(e.target.checked);setAgreeError(false);}}
-                              style={{marginTop:2,accentColor:C.gold,flexShrink:0}}/>
-                            <span style={{fontSize:11,color:agreeError?"#ef4444":"rgba(255,255,255,0.5)",lineHeight:1.5}}>
-                              I agree to the <button onClick={e=>{e.preventDefault();setPage("terms");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:11,color:agreeError?"#ef4444":C.gold,padding:0,textDecoration:"underline"}}>Terms & Conditions</button> and consent to receive prediction updates and league emails from Mundialist.
-                            </span>
-                          </label>
-                          {agreeError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>Please agree to the terms to continue</p>}
-                          {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
-                          <button onClick={handleCreate} disabled={authLoading}
-                            style={{padding:"11px",background:authLoading?"rgba(42,57,141,0.5)":C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:authLoading?"not-allowed":"pointer",marginTop:4}}>
-                            {authLoading?"Creating account...":"Start predicting →"}
+                        ):(
+                          <>
+                          <button onClick={handleGoogleSignIn} style={{width:"100%",padding:"11px",background:"#fff",color:"#3c4043",border:"1px solid #dadce0",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:8}}>
+                            <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
+                            Continue with Google
                           </button>
-                          <button onClick={()=>setAuthMode("signin")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.4)",padding:"4px 0",textAlign:"center"}}>
-                            Already have an account? Sign in →
-                          </button>
-                        </div>
-                        </>
-                        )}
-                      </div>
-                    </>
-                  ):(
-                    <div style={{textAlign:"center",padding:"1rem 0"}}>
-                      <div style={{fontSize:40,marginBottom:12}}>🎉</div>
-                      <h2 style={{fontSize:18,fontWeight:600,color:"#fff",margin:"0 0 8px"}}>You're on the list!</h2>
-                      <p style={{fontSize:13,color:"rgba(255,255,255,0.6)",margin:0,lineHeight:1.6}}>We'll email <strong style={{color:"rgba(255,255,255,0.9)"}}>{waitlistEmail}</strong> when predictions open.</p>
-                    </div>
-                  )}
+                          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                            <div style={{flex:1,height:"0.5px",background:"rgba(255,255,255,0.15)"}}/>
+                            <span style={{fontSize:11,color:"rgba(255,255,255,0.4)"}}>or</span>
+                            <div style={{flex:1,height:"0.5px",background:"rgba(255,255,255,0.15)"}}/>
+                          </div>
+                          <p style={{fontSize:12,color:"rgba(255,255,255,0.4)",margin:"0 0 0.75rem"}}>Create your account to start predicting</p>
+                          <div style={{display:"flex",flexDirection:"column",gap:8}}>
                   {/* Sign in form */}
                   {authMode==="signin"&&(
                     <div style={{borderTop:"0.5px solid rgba(255,255,255,0.1)",paddingTop:"1rem",marginTop:"0.5rem"}}>
