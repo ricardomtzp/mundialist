@@ -2017,6 +2017,7 @@ export default function App(){
                             </button>
                           </div>
                         ):(
+                        <>
                         <p style={{fontSize:12,color:"rgba(255,255,255,0.4)",margin:"0 0 0.75rem"}}>Create your account to start predicting</p>
                         <div style={{display:"flex",flexDirection:"column",gap:8}}>
                           <input value={formName} onChange={e=>setFormName(e.target.value)} placeholder="Full name"
@@ -2057,6 +2058,7 @@ export default function App(){
                             Already have an account? Sign in →
                           </button>
                         </div>
+                        </>
                         )}
                       </div>
                     </>
