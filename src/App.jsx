@@ -1541,6 +1541,29 @@ export default function App(){
     }catch(e){console.error('Load failed',e);}
   };
 
+  // Listen for auth state changes (handles OAuth redirects)
+  useEffect(()=>{
+    const {data:{subscription}}=supabase.auth.onAuthStateChange(async(event,session)=>{
+      if(event==="SIGNED_IN"&&session?.user){
+        const uid=session.user.id;
+        const meta=session.user.user_metadata;
+        const {data:profile}=await supabase.from("users").select("*").eq("id",uid).single();
+        if(profile){
+          setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name?.[0]?.toUpperCase()||"?",id:uid});
+          setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
+          loadUserData(uid);loadActualResults();
+          setPage("predict");
+        } else if(meta?.full_name||session.user.email){
+          setGoogleSession(session);
+          setOnboardName(meta?.full_name||"");
+          setOnboardHandle((meta?.full_name||"user").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,12));
+          setAuthMode("google_onboard");
+        }
+      }
+    });
+    return()=>subscription.unsubscribe();
+  },[]);
+
   // Check for existing session on load
   useEffect(()=>{
     supabase.auth.getSession().then(({data:{session}})=>{
