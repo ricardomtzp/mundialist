@@ -1787,6 +1787,11 @@ export default function App(){
       }).sort((a,b)=>b.pts-a.pts||b.picks.groupDone-a.picks.groupDone);
 
       setLeagueMembers(withPoints);
+      // Update member count in joinedLeagues
+      setJoinedLeagues(prev=>prev.map(l=>{
+        const lid=l.id==="global"?"00000000-0000-0000-0000-000000000001":l.id;
+        return lid===leagueId?{...l,members:withPoints.length}:l;
+      }));
     }catch(e){
       console.error('loadLeagueMembers error:',e);
     }finally{
