@@ -2068,7 +2068,6 @@ export default function App(){
                             Already have an account? Sign in →
                           </button>
                         </div>
-                        </>
                       </div>
                     </>
                   ):(
