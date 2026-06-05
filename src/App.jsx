@@ -2563,7 +2563,7 @@ export default function App(){
                 )}
                 <div style={{marginTop:16,width:"100%"}}>
                   <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>3rd place match</div>
-                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label="3rd place · Jul 19" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third" venue={KO_VENUES.third?.venue} city={KO_VENUES.third?.city}/>
+                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label="3rd place · Jul 18" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third" venue={KO_VENUES.third?.venue} city={KO_VENUES.third?.city}/>
                   {koPicks.third&&koPicks.third!=="TBD"&&(
                     <div style={{marginTop:4,padding:"6px 10px",background:"var(--color-background-secondary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,textAlign:"center"}}>
                       <div style={{fontSize:10,color:"var(--color-text-secondary)"}}>🥉 {koPicks.third}</div>
@@ -2744,12 +2744,12 @@ export default function App(){
               )}
               <div style={card}>
                 {[
-                  {label:"Champion",val:tournamentStarted()?viewingUser.picks.champion:null,emoji:"🏆",pts:"25 pts"},
-                  {label:"Runner-up",val:tournamentStarted()?viewingUser.picks.runnerUp:null,emoji:"🥈",pts:"20 pts"},
-                  {label:"3rd place",val:tournamentStarted()?viewingUser.picks.thirdPlace:null,emoji:"🥉",pts:"12 pts"},
-                  {label:"Golden Boot",val:tournamentStarted()?viewingUser.picks.goldenBoot:null,emoji:"⚽",pts:"15 pts"},
-                  {label:"Top Assist",val:tournamentStarted()?viewingUser.picks.topAssist:null,emoji:"🎯",pts:"15 pts"},
-                  {label:"Golden Glove",val:tournamentStarted()?viewingUser.picks.goldenGlove:null,emoji:"🧤",pts:"15 pts"},
+                  {label:"Champion",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.champion:null,emoji:"🏆",pts:"25 pts"},
+                  {label:"Runner-up",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.runnerUp:null,emoji:"🥈",pts:"20 pts"},
+                  {label:"3rd place",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.thirdPlace:null,emoji:"🥉",pts:"12 pts"},
+                  {label:"Golden Boot",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.goldenBoot:null,emoji:"⚽",pts:"15 pts"},
+                  {label:"Top Assist",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.topAssist:null,emoji:"🎯",pts:"15 pts"},
+                  {label:"Golden Glove",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.goldenGlove:null,emoji:"🧤",pts:"15 pts"},
                 ].map(({label,val,emoji,pts},i,arr)=>(
                   <div key={label} style={{padding:"10px 16px",borderBottom:i<arr.length-1?"0.5px solid var(--color-border-tertiary)":"none",display:"flex",alignItems:"center",gap:12}}>
                     <span style={{fontSize:18}}>{val?FLAGS[val]||emoji:emoji}</span>
