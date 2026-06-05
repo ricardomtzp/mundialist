@@ -1800,7 +1800,7 @@ export default function App(){
                 color:isWinner?C.green:picked===team?(gold?"#7a5c10":C.blue):"var(--color-text-primary)",
                 overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{team}</span>
               {isWinner&&<span style={{fontSize:9,color:C.green,fontWeight:700}}>✓</span>}
-              {picked===team&&!isFinished&&!SEEDED.has(team)&&team!=="TBD"&&roundKey!=="r32"&&<span style={{fontSize:8,color:C.gold}}>★</span>}
+              {!isFinished&&!SEEDED.has(team)&&team!=="TBD"&&roundKey!=="r32"&&<span style={{fontSize:8,color:C.gold}}>★</span>}
               {picked===team&&!isFinished&&<span style={{fontSize:9,color:gold?"#7a5c10":C.blue,fontWeight:700}}>✓</span>}
             </div>
           );
