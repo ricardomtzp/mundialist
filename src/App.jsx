@@ -2835,11 +2835,11 @@ export default function App(){
                 </div>
               </div>
               <div style={card}>
-                <div style={{padding:"10px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",gap:12}}>
+                <div style={{padding:"10px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",gap:12,alignItems:"center"}}>
+                  <span style={{fontSize:11,color:"var(--color-text-tertiary)",width:24,flexShrink:0}}>#</span>
                   <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",flex:1}}>Player</span>
-                  <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:60,textAlign:"center"}}>Pts</span>
-                  <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:80,textAlign:"center"}}>Champion</span>
-                  
+                  <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:45,textAlign:"center",flexShrink:0}}>Pts</span>
+                  {tournamentStarted()&&<span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:80,textAlign:"center",flexShrink:0}}>Champion</span>}
                 </div>
                 {leagueMembers.map((m,i)=>(
                   <div key={i} onClick={()=>setViewingUser(m)}
@@ -2862,7 +2862,7 @@ export default function App(){
                         <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>🔒</span>
                       )}
                     </div>
-                    {!mobile&&<div style={{width:80,textAlign:"center",flexShrink:0}}>
+                    {!mobile&&tournamentStarted()&&<div style={{width:80,textAlign:"center",flexShrink:0}}>
                       <span style={{fontSize:11,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"block"}}>{m.picks.goldenBoot||"—"}</span>
                     </div>}
                   </div>
