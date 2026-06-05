@@ -27,7 +27,7 @@ const GROUPS = {
 const TOURNAMENT_START=new Date('2026-06-11T19:00:00Z');
 const tournamentStarted=()=>Date.now()>=TOURNAMENT_START.getTime();
 
-const SEEDED=new Set(["Mexico","Canada","USA","Brazil","Germany","Spain","France","England","Portugal","Belgium","Netherlands","Argentina"]);
+const SEEDED=new Set(["Mexico","USA","Brazil","Germany","Spain","France","England","Portugal","Belgium","Netherlands","Argentina"]);
 
 // FIFA World Rankings April 2026 (higher = better)
 const FIFA_RANK={
@@ -2355,7 +2355,7 @@ export default function App(){
               {r32Open&&(
                 <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
                   {r32Bracket.map((match,i)=>(
-                    <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={KO_VENUES.r32[i]?.city||""} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
+                    <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`${KO_VENUES.r32[i]?.city||""}${" · "+["Jul 1","Jul 1","Jul 2","Jul 2","Jul 2","Jul 3","Jul 3","Jul 3","Jul 4","Jul 4","Jul 4","Jul 5","Jul 5","Jul 5","Jul 5","Jul 5"][i]||""}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
                   ))}
                 </div>
               )}
@@ -2383,7 +2383,7 @@ export default function App(){
                   <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Round of 32 · {Object.keys(koPicks.r32).length}/16</div>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:6}}>
                     {r32Bracket.map((match,i)=>(
-                      <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={KO_VENUES.r32[i]?.city||""} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
+                      <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`${KO_VENUES.r32[i]?.city||""}${" · "+["Jul 1","Jul 1","Jul 2","Jul 2","Jul 2","Jul 3","Jul 3","Jul 3","Jul 4","Jul 4","Jul 4","Jul 5","Jul 5","Jul 5","Jul 5","Jul 5"][i]||""}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
                     ))}
                   </div>
                 </div>
