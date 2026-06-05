@@ -1196,10 +1196,7 @@ export default function App(){
   const [actualResults,setActualResults]=useState({}); // {matchId: {home, away, status}}
   const [totalPoints,setTotalPoints]=useState(0);
   const [saveStatus,setSaveStatus]=useState(null); // null | 'saving' | 'saved' | 'error'
-  const [authMode,setAuthMode]=useState("signup"); // 'signup' | 'signin' | 'google_onboard'
-  const [googleSession,setGoogleSession]=useState(null);
-  const [onboardName,setOnboardName]=useState("");
-  const [onboardHandle,setOnboardHandle]=useState("");
+  const [authMode,setAuthMode]=useState("signup"); // 'signup' | 'signin'
   const [authLoading,setAuthLoading]=useState(false);
   const [authError,setAuthError]=useState("");
   const [formPassword,setFormPassword]=useState("");
@@ -1350,40 +1347,6 @@ export default function App(){
       setAuthError(err.message||"Sign up failed. Please try again.");
     } finally {
       setAuthLoading(false);
-    }
-  };
-
-  const handleGoogleOnboard=async()=>{
-    if(!onboardName.trim()||!onboardHandle.trim()){return;}
-    if(!googleSession)return;
-    const uid=googleSession.user.id;
-    const avatarLetter=onboardName[0].toUpperCase();
-    const handle=onboardHandle.toLowerCase().replace(/[^a-z0-9_]/g,"");
-    try{
-      await supabase.from("users").upsert({id:uid,name:onboardName,handle,email:googleSession.user.email,avatar_letter:avatarLetter});
-      await supabase.from("league_members").upsert({league_id:"00000000-0000-0000-0000-000000000001",user_id:uid,total_points:0},{onConflict:"league_id,user_id"});
-      setUser({name:onboardName,handle:"@"+handle,email:googleSession.user.email,avatar:avatarLetter,id:uid});
-      setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
-      loadUserData(uid);
-      loadActualResults();
-      setAuthMode("signup");
-      setGoogleSession(null);
-      setPage("predict");
-      setTimeout(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;},300);
-    }catch(e){
-      setAuthError(e.message||"Failed to create profile");
-    }
-  };
-
-  const handleGoogleSignIn=async()=>{
-    try{
-      const {error}=await supabase.auth.signInWithOAuth({
-        provider:'google',
-        options:{redirectTo:window.location.origin}
-      });
-      if(error)throw error;
-    }catch(e){
-      setAuthError(e.message||"Google sign in failed");
     }
   };
 
@@ -1552,25 +1515,17 @@ export default function App(){
 
   // Check for existing session on load
   useEffect(()=>{
-    supabase.auth.getSession().then(async({data:{session}})=>{
+    supabase.auth.getSession().then(({data:{session}})=>{
       if(session?.user){
-        const uid=session.user.id;
-        const meta=session.user.user_metadata;
-        const {data:profile}=await supabase.from("users").select("*").eq("id",uid).single();
-        if(profile){
-          setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name?.[0]?.toUpperCase()||"?",id:uid});
-          setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
-          loadUserData(uid);
-          loadActualResults();
-          setTimeout(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;},200);
-        } else if(meta?.full_name||session.user.email){
-          // New Google OAuth user - show onboarding to pick name/handle
-          setGoogleSession(session);
-          setOnboardName(meta?.full_name||"");
-          setOnboardHandle((meta?.full_name||"user").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,12));
-          setAuthMode("google_onboard");
-          setPage("home");
-        }
+        supabase.from("users").select("*").eq("id",session.user.id).single().then(({data:profile})=>{
+          if(profile){
+            setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:session.user.id});
+            setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
+            loadUserData(session.user.id);
+            loadActualResults();
+            setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),200);
+          }
+        });
       }
     });
   },[]);
@@ -1996,91 +1951,46 @@ export default function App(){
                       </div>
 
                       <div style={{borderTop:"0.5px solid rgba(255,255,255,0.1)",paddingTop:"1rem"}}>
-                        {authMode==="google_onboard"?(
-                          <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                            <div style={{textAlign:"center",marginBottom:4}}>
-                              <div style={{fontSize:28,marginBottom:6}}>👋</div>
-                              <h3 style={{fontSize:16,fontWeight:600,color:"#fff",margin:"0 0 4px"}}>Almost there!</h3>
-                              <p style={{fontSize:12,color:"rgba(255,255,255,0.5)",margin:0}}>Set up your Mundialist profile</p>
-                            </div>
-                            <input value={onboardName} onChange={e=>setOnboardName(e.target.value)} placeholder="Full name"
-                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            <div style={{position:"relative"}}>
-                              <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,0.4)",fontSize:13}}>@</span>
-                              <input value={onboardHandle} onChange={e=>setOnboardHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,""))} placeholder="username"
-                                style={{width:"100%",boxSizing:"border-box",padding:"9px 12px 9px 24px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            </div>
-                            {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
-                            <button onClick={handleGoogleOnboard} disabled={!onboardName.trim()||!onboardHandle.trim()}
-                              style={{padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer",opacity:!onboardName.trim()||!onboardHandle.trim()?0.5:1}}>
-                              Start predicting →
-                            </button>
+                        <p style={{fontSize:12,color:"rgba(255,255,255,0.4)",margin:"0 0 0.75rem"}}>Create your account to start predicting</p>
+                        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                          <input value={formName} onChange={e=>setFormName(e.target.value)} placeholder="Full name"
+                            style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                          <div style={{position:"relative"}}>
+                            <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,0.4)",fontSize:13}}>@</span>
+                            <input value={formHandle} onChange={e=>setFormHandle(e.target.value)} placeholder="username"
+                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px 9px 24px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
                           </div>
-                        ):(
-                        <>
-                        {authMode==="google_onboard"?(
-                          <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                            <div style={{textAlign:"center",marginBottom:4}}>
-                              <div style={{fontSize:28,marginBottom:6}}>👋</div>
-                              <h3 style={{fontSize:16,fontWeight:600,color:"#fff",margin:"0 0 4px"}}>Almost there!</h3>
-                              <p style={{fontSize:12,color:"rgba(255,255,255,0.5)",margin:0}}>Set up your Mundialist profile</p>
-                            </div>
-                            <input value={onboardName} onChange={e=>setOnboardName(e.target.value)} placeholder="Full name"
-                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            <div style={{position:"relative"}}>
-                              <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,0.4)",fontSize:13}}>@</span>
-                              <input value={onboardHandle} onChange={e=>setOnboardHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,""))} placeholder="username"
-                                style={{width:"100%",boxSizing:"border-box",padding:"9px 12px 9px 24px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            </div>
-                            {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
-                            <button onClick={handleGoogleOnboard} disabled={!onboardName.trim()||!onboardHandle.trim()}
-                              style={{padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer",opacity:!onboardName.trim()||!onboardHandle.trim()?0.5:1}}>
-                              Start predicting →
-                            </button>
-                          </div>
-                        ):(
-                          <>
-                          <button onClick={handleGoogleSignIn} style={{width:"100%",padding:"11px",background:"#fff",color:"#3c4043",border:"1px solid #dadce0",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:8}}>
-                            <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
-                            Continue with Google
+                          <input value={formEmail} onChange={e=>{setFormEmail(e.target.value);setEmailError("");}} placeholder="Email address" type="email"
+                            style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:`0.5px solid ${emailError?"#ef4444":"rgba(255,255,255,0.15)"}`,borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                          {emailError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{emailError}</p>}
+                          <input value={formPassword} onChange={e=>setFormPassword(e.target.value)} placeholder="Password" type="password"
+                            style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+                          <label style={{display:"flex",alignItems:"flex-start",gap:8,cursor:"pointer"}}>
+                            <input type="checkbox" checked={formAgree} onChange={e=>{setFormAgree(e.target.checked);setAgreeError(false);}}
+                              style={{marginTop:2,accentColor:C.gold,flexShrink:0}}/>
+                            <span style={{fontSize:11,color:agreeError?"#ef4444":"rgba(255,255,255,0.5)",lineHeight:1.5}}>
+                              I agree to the <button onClick={e=>{e.preventDefault();setPage("terms");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:11,color:agreeError?"#ef4444":C.gold,padding:0,textDecoration:"underline"}}>Terms & Conditions</button> and consent to receive prediction updates and league emails from Mundialist.
+                            </span>
+                          </label>
+                          {agreeError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>Please agree to the terms to continue</p>}
+                          {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
+                          <button onClick={handleCreate} disabled={authLoading}
+                            style={{padding:"11px",background:authLoading?"rgba(42,57,141,0.5)":C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:authLoading?"not-allowed":"pointer",marginTop:4}}>
+                            {authLoading?"Creating account...":"Start predicting →"}
                           </button>
-                          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-                            <div style={{flex:1,height:"0.5px",background:"rgba(255,255,255,0.15)"}}/>
-                            <span style={{fontSize:11,color:"rgba(255,255,255,0.4)"}}>or</span>
-                            <div style={{flex:1,height:"0.5px",background:"rgba(255,255,255,0.15)"}}/>
-                          </div>
-                          <p style={{fontSize:12,color:"rgba(255,255,255,0.4)",margin:"0 0 0.75rem"}}>Create your account to start predicting</p>
-                          <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                            <input value={formName} onChange={e=>setFormName(e.target.value)} placeholder="Full name"
-                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            <div style={{position:"relative"}}>
-                              <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,0.4)",fontSize:13}}>@</span>
-                              <input value={formHandle} onChange={e=>setFormHandle(e.target.value)} placeholder="username"
-                                style={{width:"100%",boxSizing:"border-box",padding:"9px 12px 9px 24px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            </div>
-                            <input value={formEmail} onChange={e=>{setFormEmail(e.target.value);setEmailError("");}} placeholder="Email address" type="email"
-                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:`0.5px solid ${emailError?"#ef4444":"rgba(255,255,255,0.15)"}`,borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            {emailError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{emailError}</p>}
-                            <input value={formPassword} onChange={e=>setFormPassword(e.target.value)} placeholder="Password" type="password"
-                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            <label style={{display:"flex",alignItems:"flex-start",gap:8,cursor:"pointer"}}>
-                              <input type="checkbox" checked={formAgree} onChange={e=>{setFormAgree(e.target.checked);setAgreeError(false);}}
-                                style={{marginTop:2,accentColor:C.gold,flexShrink:0}}/>
-                              <span style={{fontSize:11,color:agreeError?"#ef4444":"rgba(255,255,255,0.5)",lineHeight:1.5}}>
-                                I agree to the <button onClick={e=>{e.preventDefault();setPage("terms");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:11,color:agreeError?"#ef4444":C.gold,padding:0,textDecoration:"underline"}}>Terms & Conditions</button> and consent to receive prediction updates and league emails from Mundialist.
-                              </span>
-                            </label>
-                            {agreeError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>Please agree to the terms to continue</p>}
-                            {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
-                            <button onClick={handleCreate} disabled={authLoading}
-                              style={{padding:"11px",background:authLoading?"rgba(42,57,141,0.5)":C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:authLoading?"not-allowed":"pointer",marginTop:4}}>
-                              {authLoading?"Creating account...":"Start predicting →"}
-                            </button>
-                            <button onClick={()=>setAuthMode("signin")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.4)",padding:"4px 0",textAlign:"center"}}>
-                              Already have an account? Sign in →
-                            </button>
-                          </div>
-                        )}
+                          <button onClick={()=>setAuthMode("signin")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.4)",padding:"4px 0",textAlign:"center"}}>
+                            Already have an account? Sign in →
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  ):(
+                    <div style={{textAlign:"center",padding:"1rem 0"}}>
+                      <div style={{fontSize:40,marginBottom:12}}>🎉</div>
+                      <h2 style={{fontSize:18,fontWeight:600,color:"#fff",margin:"0 0 8px"}}>You're on the list!</h2>
+                      <p style={{fontSize:13,color:"rgba(255,255,255,0.6)",margin:0,lineHeight:1.6}}>We'll email <strong style={{color:"rgba(255,255,255,0.9)"}}>{waitlistEmail}</strong> when predictions open.</p>
+                    </div>
+                  )}
                   {/* Sign in form */}
                   {authMode==="signin"&&(
                     <div style={{borderTop:"0.5px solid rgba(255,255,255,0.1)",paddingTop:"1rem",marginTop:"0.5rem"}}>
@@ -2499,7 +2409,7 @@ export default function App(){
               {koRound==="final"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <div style={{fontSize:11,fontWeight:500,color:C.gold,marginBottom:4}}>Final · New York New Jersey Stadium</div>
-                  <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final"/>
+                  <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final" venue={KO_VENUES.final?.venue} city={KO_VENUES.final?.city}/>
                   {champion!=="TBD"&&(
                     <div style={{padding:"10px 12px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:8,textAlign:"center"}}>
                       <div style={{fontSize:22,marginBottom:2}}>🏆</div>
@@ -2524,7 +2434,7 @@ export default function App(){
               <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:160,flexShrink:0}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Round of 16</div>
                 {r16Matchups.slice(0,4).map((m,i)=>(
-                  <KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={`R16 ${i+1} · ${["Jul 7","Jul 7","Jul 8","Jul 8","Jul 9","Jul 9","Jul 10","Jul 10"][i]||""} · ${KO_VENUES.r16[i]?.city||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>
+                  <KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={`R16 ${i+1}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16" venue={KO_VENUES.r16[i]?.venue} city={KO_VENUES.r16[i]?.city}/>
                 ))}
               </div>
 
@@ -2536,7 +2446,7 @@ export default function App(){
               <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:160,flexShrink:0,padding:"22px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Quarter-finals</div>
                 {qfMatchups.slice(0,2).map((m,i)=>(
-                  <KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={`QF ${i+1} · ${["Jul 12","Jul 13","Jul 12","Jul 13"][i]||""} · ${KO_VENUES.qf[i]?.city||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>
+                  <KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={`QF ${i+1}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf" venue={KO_VENUES.qf[i]?.venue} city={KO_VENUES.qf[i]?.city}/>
                 ))}
               </div>
 
@@ -2547,7 +2457,7 @@ export default function App(){
               {/* LEFT SF */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:160,flexShrink:0,padding:"80px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
-                <KOCard home={sfMatchups[0]?.home||"TBD"} away={sfMatchups[0]?.away||"TBD"} picked={koPicks.sf[0]} onPick={t=>pickKO("sf",0,t)} label="SF 1 · Jul 15" actualWinner={getKOWinner(sfMatchups[0]?.home,sfMatchups[0]?.away)} roundKey="sf"/>
+                <KOCard home={sfMatchups[0]?.home||"TBD"} away={sfMatchups[0]?.away||"TBD"} picked={koPicks.sf[0]} onPick={t=>pickKO("sf",0,t)} label="SF 1 · Jul 15" actualWinner={getKOWinner(sfMatchups[0]?.home,sfMatchups[0]?.away)} roundKey="sf" venue={KO_VENUES.sf[0]?.venue} city={KO_VENUES.sf[0]?.city}/>
               </div>
 
               <div style={{width:14,flexShrink:0,display:"flex",alignItems:"center"}}>
@@ -2557,7 +2467,7 @@ export default function App(){
               {/* FINAL */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",width:172,flexShrink:0,gap:8}}>
                 <div style={{fontSize:10,fontWeight:500,color:C.gold,textTransform:"uppercase",letterSpacing:"0.06em"}}>Final</div>
-                <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final" label="Final · Jul 19"/>
+                <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final" label="Final · Jul 19" venue={KO_VENUES.final?.venue} city={KO_VENUES.final?.city}/>
                 {champion!=="TBD"&&(
                   <div style={{padding:"10px 12px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:8,textAlign:"center",width:"100%"}}>
                     <div style={{fontSize:18,marginBottom:2}}>🏆</div>
@@ -2566,7 +2476,7 @@ export default function App(){
                 )}
                 <div style={{marginTop:16,width:"100%"}}>
                   <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>3rd place match</div>
-                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label="3rd place · Jul 19" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
+                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label="3rd place · Jul 19" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third" venue={KO_VENUES.third?.venue} city={KO_VENUES.third?.city}/>
                   {koPicks.third&&koPicks.third!=="TBD"&&(
                     <div style={{marginTop:4,padding:"6px 10px",background:"var(--color-background-secondary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,textAlign:"center"}}>
                       <div style={{fontSize:10,color:"var(--color-text-secondary)"}}>🥉 {koPicks.third}</div>
@@ -2582,7 +2492,7 @@ export default function App(){
               {/* RIGHT SF */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:160,flexShrink:0,padding:"80px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
-                <KOCard home={sfMatchups[1]?.home||"TBD"} away={sfMatchups[1]?.away||"TBD"} picked={koPicks.sf[1]} onPick={t=>pickKO("sf",1,t)} label="SF 2 · Jul 16" actualWinner={getKOWinner(sfMatchups[1]?.home,sfMatchups[1]?.away)} roundKey="sf"/>
+                <KOCard home={sfMatchups[1]?.home||"TBD"} away={sfMatchups[1]?.away||"TBD"} picked={koPicks.sf[1]} onPick={t=>pickKO("sf",1,t)} label="SF 2 · Jul 16" actualWinner={getKOWinner(sfMatchups[1]?.home,sfMatchups[1]?.away)} roundKey="sf" venue={KO_VENUES.sf[1]?.venue} city={KO_VENUES.sf[1]?.city}/>
               </div>
 
               <div style={{width:14,flexShrink:0,display:"flex",flexDirection:"column",justifyContent:"space-around",padding:"60px 0"}}>
@@ -2593,7 +2503,7 @@ export default function App(){
               <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:160,flexShrink:0,padding:"22px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Quarter-finals</div>
                 {qfMatchups.slice(2,4).map((m,i)=>(
-                  <KOCard key={i+2} home={m.home} away={m.away} picked={koPicks.qf[i+2]} onPick={t=>pickKO("qf",i+2,t)} label={`QF ${i+3} · ${["Jul 12","Jul 13"][i]||""} · ${KO_VENUES.qf[i+2]?.city||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>
+                  <KOCard key={i+2} home={m.home} away={m.away} picked={koPicks.qf[i+2]} onPick={t=>pickKO("qf",i+2,t)} label={`QF ${i+3}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf" venue={KO_VENUES.qf[i+2]?.venue} city={KO_VENUES.qf[i+2]?.city}/>
                 ))}
               </div>
 
@@ -2605,7 +2515,7 @@ export default function App(){
               <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:5,width:160,flexShrink:0}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Round of 16</div>
                 {r16Matchups.slice(4,8).map((m,i)=>(
-                  <KOCard key={i+4} home={m.home} away={m.away} picked={koPicks.r16[i+4]} onPick={t=>pickKO("r16",i+4,t)} label={`R16 ${i+5} · ${["Jul 7","Jul 7","Jul 8","Jul 8","Jul 9","Jul 9","Jul 10","Jul 10"][i+4]||""} · ${KO_VENUES.r16[i+4]?.city||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>
+                  <KOCard key={i+4} home={m.home} away={m.away} picked={koPicks.r16[i+4]} onPick={t=>pickKO("r16",i+4,t)} label={`R16 ${i+5}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16" venue={KO_VENUES.r16[i+4]?.venue} city={KO_VENUES.r16[i+4]?.city}/>
                 ))}
               </div>
 
