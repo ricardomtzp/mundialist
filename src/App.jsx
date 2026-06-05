@@ -1939,7 +1939,32 @@ export default function App(){
       <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?"calc(56px + env(safe-area-inset-bottom))":0}}>
 
       {/* ══ HOME ══ */}
-      {page==="home"&&(
+      {page==="home"&&authMode==="google_onboard"&&(
+        <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%)",padding:"2rem"}}>
+          <div style={{background:"rgba(255,255,255,0.08)",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:16,padding:"2rem",width:"100%",maxWidth:400}}>
+            <div style={{textAlign:"center",marginBottom:"1.5rem"}}>
+              <div style={{fontSize:40,marginBottom:8}}>👋</div>
+              <h2 style={{fontSize:22,fontWeight:700,color:"#fff",margin:"0 0 6px",letterSpacing:"-0.03em"}}>Almost there!</h2>
+              <p style={{fontSize:13,color:"rgba(255,255,255,0.5)",margin:0}}>Set up your Mundialist profile to start predicting</p>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              <input value={onboardName} onChange={e=>setOnboardName(e.target.value)} placeholder="Full name"
+                style={{width:"100%",boxSizing:"border-box",padding:"11px 14px",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:8,fontSize:14,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+              <div style={{position:"relative"}}>
+                <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,0.4)",fontSize:14}}>@</span>
+                <input value={onboardHandle} onChange={e=>setOnboardHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,""))} placeholder="username"
+                  style={{width:"100%",boxSizing:"border-box",padding:"11px 14px 11px 28px",border:"0.5px solid rgba(255,255,255,0.2)",borderRadius:8,fontSize:14,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
+              </div>
+              {authError&&<p style={{fontSize:12,color:"#ef4444",margin:0}}>{authError}</p>}
+              <button onClick={handleGoogleOnboard} disabled={!onboardName.trim()||!onboardHandle.trim()}
+                style={{padding:"13px",background:"#2a398d",color:"#fff",border:"none",borderRadius:8,fontSize:15,fontWeight:600,cursor:"pointer",marginTop:4,opacity:!onboardName.trim()||!onboardHandle.trim()?0.5:1}}>
+                Start predicting →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {page==="home"&&authMode!=="google_onboard"&&(
         <div>
           {/* Hero */}
           <div style={{background:`linear-gradient(135deg,${C.blue} 0%,#1a2566 50%,#0d1433 100%)`,minHeight:"100vh",display:"flex",flexDirection:"column",justifyContent:"center",padding:"4rem 2rem",position:"relative",overflow:"hidden"}}>
@@ -2002,28 +2027,7 @@ export default function App(){
                       </div>
 
                       <div style={{borderTop:"0.5px solid rgba(255,255,255,0.1)",paddingTop:"1rem"}}>
-                        {authMode==="google_onboard"?(
-                          <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                            <div style={{textAlign:"center",marginBottom:4}}>
-                              <div style={{fontSize:28,marginBottom:6}}>👋</div>
-                              <h3 style={{fontSize:16,fontWeight:600,color:"#fff",margin:"0 0 4px"}}>Almost there!</h3>
-                              <p style={{fontSize:12,color:"rgba(255,255,255,0.5)",margin:0}}>Set up your Mundialist profile</p>
-                            </div>
-                            <input value={onboardName} onChange={e=>setOnboardName(e.target.value)} placeholder="Full name"
-                              style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            <div style={{position:"relative"}}>
-                              <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"rgba(255,255,255,0.4)",fontSize:13}}>@</span>
-                              <input value={onboardHandle} onChange={e=>setOnboardHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,""))} placeholder="username"
-                                style={{width:"100%",boxSizing:"border-box",padding:"9px 12px 9px 24px",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:7,fontSize:13,background:"rgba(255,255,255,0.06)",color:"#fff",outline:"none"}}/>
-                            </div>
-                            {authError&&<p style={{fontSize:11,color:"#ef4444",margin:"-4px 0 0"}}>{authError}</p>}
-                            <button onClick={handleGoogleOnboard} disabled={!onboardName.trim()||!onboardHandle.trim()}
-                              style={{padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer",opacity:!onboardName.trim()||!onboardHandle.trim()?0.5:1}}>
-                              Start predicting →
-                            </button>
-                          </div>
-                        ):(
-                          <>
+                        {true&&(<>
                           <button onClick={handleGoogleSignIn} style={{width:"100%",padding:"11px",background:"#fff",color:"#3c4043",border:"1px solid #dadce0",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:8}}>
                             <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
                             Continue with Google
@@ -2065,7 +2069,6 @@ export default function App(){
                           </button>
                         </div>
                         </>
-                        )}
                       </div>
                     </>
                   ):(
