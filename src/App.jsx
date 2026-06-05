@@ -1344,7 +1344,7 @@ export default function App(){
         });
       }
       setUser({name:formName,handle:"@"+formHandle.replace("@",""),email:formEmail,avatar:formName[0].toUpperCase(),id:data.user?.id});
-      setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
+      setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||leagueMembers.length||0,rank:1,code:null}]);
       setPage("predict");window.scrollTo(0,0);
     } catch(err){
       setAuthError(err.message||"Sign up failed. Please try again.");
@@ -1372,7 +1372,7 @@ export default function App(){
       await supabase.from("users").upsert({id:uid,name:onboardName,handle,email:googleSession.user.email,avatar_letter:avatarLetter});
       await supabase.from("league_members").upsert({league_id:"00000000-0000-0000-0000-000000000001",user_id:uid,total_points:0},{onConflict:"league_id,user_id"});
       setUser({name:onboardName,handle:"@"+handle,email:googleSession.user.email,avatar:avatarLetter,id:uid});
-      setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
+      setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||leagueMembers.length||0,rank:1,code:null}]);
       loadUserData(uid);loadActualResults();
       setAuthMode("signup");setGoogleSession(null);setPage("predict");
     }catch(e){setAuthError(e.message||"Failed to create profile");}
@@ -1391,7 +1391,7 @@ export default function App(){
       const {data:profile}=await supabase.from("users").select("*").eq("id",data.user.id).single();
       if(profile){
         setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:data.user.id});
-        setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
+        setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||leagueMembers.length||0,rank:1,code:null}]);
         loadUserData(data.user.id);
         loadActualResults();
         setPage("predict");setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),100);
@@ -1550,7 +1550,7 @@ export default function App(){
         const {data:profile}=await supabase.from("users").select("*").eq("id",uid).single();
         if(profile){
           setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name?.[0]?.toUpperCase()||"?",id:uid});
-          setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
+          setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||leagueMembers.length||0,rank:1,code:null}]);
           loadUserData(uid);loadActualResults();
           setPage("predict");
         } else if(meta?.full_name||session.user.email){
@@ -1571,7 +1571,7 @@ export default function App(){
         supabase.from("users").select("*").eq("id",session.user.id).single().then(({data:profile})=>{
           if(profile){
             setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:session.user.id});
-            setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||0,rank:1,code:null}]);
+            setJoinedLeagues([{id:"global",name:"Global League",members:memberCount||leagueMembers.length||0,rank:1,code:null}]);
             loadUserData(session.user.id);
             loadActualResults();
             setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),200);
