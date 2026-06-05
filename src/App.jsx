@@ -2853,19 +2853,13 @@ export default function App(){
                     <span style={{fontSize:13,fontWeight:600,color:i<3?C.blue:"var(--color-text-tertiary)",fontFamily:"monospace",width:24,flexShrink:0}}>{i+1}</span>
                     <div style={{display:"flex",alignItems:"center",gap:8,flex:1}}>
                       <div style={{width:28,height:28,borderRadius:"50%",background:[C.blue,C.red,C.green,C.gold,C.purple][i%5],display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:600,color:"#fff"}}>{m.avatar}</div>
-                      <div><div style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>{m.name}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>{m.handle}</div></div>
+                      <div><div style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>{m.name}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:mobile?100:150}}>{m.handle}</div></div>
                     </div>
-                    <span style={{fontFamily:"monospace",fontWeight:600,fontSize:14,color:m.isMe?C.blue:"var(--color-text-primary)",width:45,textAlign:"center",flexShrink:0}}>{m.pts}</span>
-                    <div style={{width:80,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:3,flexShrink:0}}>
-                      {tournamentStarted()?(
-                        <>
-                          <span style={{fontSize:14}}>{FLAGS[m.picks.champion]||"—"}</span>
-                          <span style={{fontSize:10,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:mobile?35:50}}>{m.picks.champion||""}</span>
-                        </>
-                      ):(
-                        <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>🔒</span>
-                      )}
-                    </div>
+                    <span style={{fontFamily:"monospace",fontWeight:600,fontSize:14,color:m.isMe?C.blue:"var(--color-text-primary)",width:50,textAlign:"right",flexShrink:0}}>{m.pts}</span>
+                    {tournamentStarted()&&<div style={{width:70,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:3,flexShrink:0,marginLeft:8}}>
+                      <span style={{fontSize:14}}>{FLAGS[m.picks.champion]||"—"}</span>
+                      <span style={{fontSize:10,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:mobile?30:50}}>{m.picks.champion||""}</span>
+                    </div>}
                     {!mobile&&tournamentStarted()&&<div style={{width:80,textAlign:"center",flexShrink:0}}>
                       <span style={{fontSize:11,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"block"}}>{m.picks.goldenBoot||"—"}</span>
                     </div>}
