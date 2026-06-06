@@ -1552,7 +1552,7 @@ export default function App(){
   // Listen for auth state changes (handles OAuth redirects)
   useEffect(()=>{
     const {data:{subscription}}=supabase.auth.onAuthStateChange(async(event,session)=>{
-      if(event==="SIGNED_IN"&&session?.user){
+      if((event==="SIGNED_IN"||event==="INITIAL_SESSION")&&session?.user){
         const uid=session.user.id;
         const meta=session.user.user_metadata;
         const {data:profile}=await supabase.from("users").select("*").eq("id",uid).single();
