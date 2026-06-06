@@ -1990,6 +1990,20 @@ export default function App(){
       <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?"calc(56px + env(safe-area-inset-bottom))":0}}>
 
       {/* ══ HOME ══ */}
+      {/* Global clear confirmation modal */}
+      {showClearConfirm&&(
+        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",zIndex:99999,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+          <div style={{background:"#ffffff",borderRadius:14,padding:"1.5rem",maxWidth:340,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.3)"}}>
+            <div style={{fontSize:28,marginBottom:8,textAlign:"center"}}>⚠️</div>
+            <div style={{fontSize:16,fontWeight:600,color:"var(--color-text-primary)",marginBottom:6,textAlign:"center"}}>Reset all picks?</div>
+            <div style={{fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1.25rem",textAlign:"center",lineHeight:1.5}}>This will clear all your group picks, knockout bracket, and bonus picks. This cannot be undone.</div>
+            <div style={{display:"flex",gap:8}}>
+              <button onClick={()=>setShowClearConfirm(false)} style={{flex:1,padding:"11px",background:"#f1f5f9",border:"0.5px solid #e2e8f0",borderRadius:8,fontSize:14,cursor:"pointer",color:"#1e293b",fontWeight:500}}>Cancel</button>
+              <button onClick={clearAll} style={{flex:1,padding:"11px",background:"#ef4444",border:"none",borderRadius:8,fontSize:14,cursor:"pointer",color:"#fff",fontWeight:600}}>Yes, reset</button>
+            </div>
+          </div>
+        </div>
+      )}
       {page==="home"&&authMode==="google_onboard"&&(
         <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%)",padding:"2rem"}}>
           <div style={{background:"rgba(255,255,255,0.08)",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:16,padding:"2rem",width:"100%",maxWidth:400}}>
