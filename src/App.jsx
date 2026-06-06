@@ -2869,14 +2869,15 @@ export default function App(){
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem",flexWrap:"wrap"}}>
                 <div style={{flex:1}}><div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)"}}>{activeLeague.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{(leagueMembers.length||activeLeague.members||0).toLocaleString()} members</div></div>
                 {activeLeague.code&&(
-                  <div style={{display:"flex",alignItems:"center",gap:6}}>
-                    <span style={{fontFamily:"monospace",fontSize:11,color:"var(--color-text-tertiary)",background:"var(--color-background-secondary)",padding:"5px 10px",borderRadius:99,border:"0.5px solid var(--color-border-tertiary)"}}>{activeLeague.code}</span>
+                  <div style={{background:C.blueLt,border:`0.5px solid ${C.blue}`,borderRadius:10,padding:"10px 12px",marginBottom:"0.75rem"}}>
+                    <div style={{fontSize:11,fontWeight:500,color:C.blue,marginBottom:8}}>🔗 Invite your friends</div>
+                    <div style={{fontFamily:"monospace",fontSize:13,fontWeight:500,color:"var(--color-text-primary)",background:"var(--color-background-primary)",padding:"7px 10px",borderRadius:6,marginBottom:8,textAlign:"center",border:"0.5px solid var(--color-border-tertiary)"}}>{activeLeague.code}</div>
                     <button onClick={()=>{
                       const msg = `Join my Mundialist league "${activeLeague.name}" and predict the World Cup 2026! Picks lock June 11 at kickoff.`;
                       if(navigator.share){navigator.share({title:"Mundialist - "+activeLeague.name,text:msg,url:"https://mundialist.com/?join="+activeLeague.code});}
-                      else{navigator.clipboard?.writeText(msg);alert("Link copied to clipboard!");}
-                    }} style={{padding:"5px 10px",background:C.blue,color:"#fff",border:"none",borderRadius:99,fontSize:11,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap"}}>
-                      📤 Share
+                      else{navigator.clipboard?.writeText("https://mundialist.com/?join="+activeLeague.code);alert("Invite link copied!");}
+                    }} style={{width:"100%",padding:"8px",background:C.blue,color:"#fff",border:"none",borderRadius:7,fontSize:12,fontWeight:500,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+                      <span>📤</span> Share invite link
                     </button>
                   </div>
                 )}
