@@ -1197,6 +1197,8 @@ export default function App(){
   const [totalPoints,setTotalPoints]=useState(0);
   const [saveStatus,setSaveStatus]=useState(null); // null | 'saving' | 'saved' | 'error'
   const [authMode,setAuthMode]=useState("signup");
+  const [pendingJoinCode,setPendingJoinCode]=useState(()=>new URLSearchParams(window.location.search).get('join')||null);
+  const [pendingLeagueName,setPendingLeagueName]=useState(null);
   const [googleSession,setGoogleSession]=useState(null);
   const [onboardName,setOnboardName]=useState("");
   const [onboardHandle,setOnboardHandle]=useState(""); // 'signup' | 'signin'
@@ -1571,6 +1573,10 @@ export default function App(){
     });
     return()=>subscription.unsubscribe();
   },[]);
+
+  useEffect(()=>{
+    if(pendingJoinCode){supabase.from('leagues').select('name').eq('invite_code',pendingJoinCode).single().then(({data})=>{if(data?.name)setPendingLeagueName(data.name);});}
+  },[pendingJoinCode]);
 
   // Check for existing session on load
   useEffect(()=>{
@@ -2024,6 +2030,7 @@ export default function App(){
               </div>
 
               {/* CTA card */}
+              {pendingJoinCode&&pendingLeagueName&&!user&&(<div style={{background:"#EAF3DE",border:"0.5px solid #3B6D11",borderRadius:10,padding:"10px 14px",marginBottom:"1rem",display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:16}}>🏆</span><span style={{fontSize:13,color:"#3B6D11",fontWeight:500}}>You've been invited to join <strong>{pendingLeagueName}</strong>! Sign up to join automatically.</span></div>)}
               {!user?(
                 <div style={{background:"rgba(255,255,255,0.08)",border:"0.5px solid rgba(255,255,255,0.15)",borderRadius:16,padding:"1.75rem",maxWidth:460}}>
 
