@@ -687,7 +687,14 @@ const ANNEX_C = {
 // M85+M86 winners → R16 match 95
 // M87+M88 winners → R16 match 96
 const R32_TO_R16 = [
-  [0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15]
+  [1,4],   // M89: W74 vs W77 -> Philadelphia Jul 4
+  [0,2],   // M90: W73 vs W75 -> Houston Jul 4
+  [3,5],   // M91: W76 vs W78 -> New Jersey Jul 5
+  [6,7],   // M92: W79 vs W80 -> Mexico City Jul 5
+  [10,11], // M93: W83 vs W84 -> Dallas Jul 6
+  [8,9],   // M94: W81 vs W82 -> Seattle Jul 6
+  [12,14], // M95: W85 vs W87 -> Vancouver Jul 7
+  [13,15], // M96: W86 vs W88 -> Atlanta Jul 7
 ];
 
 const ANNEX_IDX={"1A":0,"1B":1,"1D":2,"1E":3,"1G":4,"1I":5,"1K":6,"1L":7};
@@ -798,45 +805,45 @@ const GROUP_VENUES={
 
 const KO_VENUES={
   r32:[
-    {venue:"Estadio Azteca",city:"Mexico City"},
-    {venue:"Dallas Stadium",city:"Dallas"},
-    {venue:"Los Angeles Stadium",city:"Los Angeles"},
-    {venue:"San Francisco Bay Area Stadium",city:"San Francisco"},
-    {venue:"Estadio Azteca",city:"Mexico City"},
-    {venue:"Miami Stadium",city:"Miami"},
-    {venue:"Atlanta Stadium",city:"Atlanta"},
-    {venue:"Seattle Stadium",city:"Seattle"},
-    {venue:"Houston Stadium",city:"Houston"},
-    {venue:"BC Place",city:"Vancouver"},
-    {venue:"Estadio BBVA",city:"Monterrey"},
-    {venue:"Kansas City Stadium",city:"Kansas City"},
-    {venue:"Dallas Stadium",city:"Dallas"},
-    {venue:"New York New Jersey Stadium",city:"New Jersey"},
-    {venue:"Los Angeles Stadium",city:"Los Angeles"},
-    {venue:"Estadio Azteca",city:"Mexico City"},
+    {date:"Jun 28",city:"Los Angeles"},   // M73: 2A vs 2B
+    {date:"Jun 29",city:"Boston"},         // M74: 1E vs 3rd
+    {date:"Jun 29",city:"Houston"},        // M75: 1F vs 2C
+    {date:"Jun 29",city:"Monterrey"},      // M76: 1C vs 2F
+    {date:"Jun 29",city:"Boston"},         // M77: 1I vs 3rd
+    {date:"Jun 30",city:"Dallas"},         // M78: 2E vs 2I
+    {date:"Jun 30",city:"Mexico City"},    // M79: 1A vs 3rd
+    {date:"Jul 1",city:"Atlanta"},         // M80: 1L vs 3rd
+    {date:"Jul 1",city:"San Francisco"},   // M81: 1D vs 3rd
+    {date:"Jul 1",city:"Seattle"},         // M82: 1G vs 3rd
+    {date:"Jul 2",city:"Toronto"},         // M83: 2K vs 2L
+    {date:"Jul 2",city:"Los Angeles"},     // M84: 1H vs 2J
+    {date:"Jul 3",city:"Vancouver"},       // M85: 1B vs 3rd
+    {date:"Jul 3",city:"Miami"},           // M86: 1J vs 2H
+    {date:"Jul 3",city:"Kansas City"},     // M87: 1K vs 3rd
+    {date:"Jul 3",city:"Dallas"},          // M88: 2D vs 2G
   ],
   r16:[
-    {venue:"New York New Jersey Stadium",city:"New Jersey"},
-    {venue:"Dallas Stadium",city:"Dallas"},
-    {venue:"Los Angeles Stadium",city:"Los Angeles"},
-    {venue:"Miami Stadium",city:"Miami"},
-    {venue:"Estadio Azteca",city:"Mexico City"},
-    {venue:"Seattle Stadium",city:"Seattle"},
-    {venue:"Atlanta Stadium",city:"Atlanta"},
-    {venue:"Houston Stadium",city:"Houston"},
+    {date:"Jul 4",city:"Philadelphia"},    // M89: W74 vs W77
+    {date:"Jul 4",city:"Houston"},         // M90: W73 vs W75
+    {date:"Jul 5",city:"New Jersey"},      // M91: W76 vs W78
+    {date:"Jul 5",city:"Mexico City"},     // M92: W79 vs W80
+    {date:"Jul 6",city:"Dallas"},          // M93: W83 vs W84
+    {date:"Jul 6",city:"Seattle"},         // M94: W81 vs W82
+    {date:"Jul 7",city:"Vancouver"},       // M95: W85 vs W87
+    {date:"Jul 7",city:"Atlanta"},         // M96: W86 vs W88
   ],
   qf:[
-    {venue:"New York New Jersey Stadium",city:"New Jersey"},
-    {venue:"Dallas Stadium",city:"Dallas"},
-    {venue:"Los Angeles Stadium",city:"Los Angeles"},
-    {venue:"Miami Stadium",city:"Miami"},
+    {date:"Jul 9",city:"Boston"},          // M97: W89 vs W90
+    {date:"Jul 10",city:"Los Angeles"},    // M98: W93 vs W94
+    {date:"Jul 11",city:"Miami"},          // M99: W91 vs W92
+    {date:"Jul 11",city:"Kansas City"},    // M100: W95 vs W96
   ],
   sf:[
-    {venue:"Atlanta Stadium",city:"Atlanta"},
-    {venue:"Dallas Stadium",city:"Dallas"},
+    {date:"Jul 14",city:"Dallas"},         // M101: W97 vs W98
+    {date:"Jul 15",city:"Atlanta"},        // M102: W99 vs W100
   ],
-  final:{venue:"New York New Jersey Stadium",city:"New Jersey"},
-  third:{venue:"Miami Stadium",city:"Miami"},
+  final:{date:"Jul 19",city:"New Jersey"},
+  third:{date:"Jul 18",city:"Miami"},
 };
 
 const GROUP_DATES={
@@ -2554,13 +2561,13 @@ export default function App(){
               {koRound==="r16"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Round of 16 · {Object.keys(koPicks.r16).length}/8</div>
-                  {r16Matchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={`${["Jul 4","Jul 4","Jul 5","Jul 5","Jul 6","Jul 6","Jul 7","Jul 7"][i]||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>)}
+                  {r16Matchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={`${KO_VENUES.r16[i]?.city||""} · ${KO_VENUES.r16[i]?.date||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>)}
                 </div>
               )}
               {koRound==="qf"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Quarter-finals · {Object.keys(koPicks.qf).length}/4</div>
-                  {qfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={`${["Jul 9","Jul 10","Jul 11","Jul 11"][i]||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>)}
+                  {qfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={`${KO_VENUES.qf[i]?.city||""} · ${KO_VENUES.qf[i]?.date||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>)}
                 </div>
               )}
               {koRound==="sf"&&(
@@ -2581,7 +2588,7 @@ export default function App(){
                   )}
                   <div style={{marginTop:8}}>
                     <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>3rd place match</div>
-                    <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label="3rd place · Jul 18" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
+                    <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label=`3rd place · ${KO_VENUES.third?.city||""} · ${KO_VENUES.third?.date||""}` actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
                   </div>
                 </div>
               )}
@@ -2620,7 +2627,7 @@ export default function App(){
               {/* LEFT SF */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:160,flexShrink:0,padding:"80px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
-                <KOCard home={sfMatchups[0]?.home||"TBD"} away={sfMatchups[0]?.away||"TBD"} picked={koPicks.sf[0]} onPick={t=>pickKO("sf",0,t)} label="SF 1 · Jul 14" actualWinner={getKOWinner(sfMatchups[0]?.home,sfMatchups[0]?.away)} roundKey="sf"/>
+                <KOCard home={sfMatchups[0]?.home||"TBD"} away={sfMatchups[0]?.away||"TBD"} picked={koPicks.sf[0]} onPick={t=>pickKO("sf",0,t)} label=`SF 1 · ${KO_VENUES.sf[0]?.city||""} · ${KO_VENUES.sf[0]?.date||""}` actualWinner={getKOWinner(sfMatchups[0]?.home,sfMatchups[0]?.away)} roundKey="sf"/>
               </div>
 
               <div style={{width:14,flexShrink:0,display:"flex",alignItems:"center"}}>
@@ -2630,7 +2637,7 @@ export default function App(){
               {/* FINAL */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",width:172,flexShrink:0,gap:8}}>
                 <div style={{fontSize:10,fontWeight:500,color:C.gold,textTransform:"uppercase",letterSpacing:"0.06em"}}>Final</div>
-                <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final" label="Final · Jul 19"/>
+                <KOCard home={finalMatchup.home} away={finalMatchup.away} picked={koPicks.final[0]} onPick={t=>pickKO("final",0,t)} gold={true} actualWinner={getKOWinner(finalMatchup.home,finalMatchup.away)} roundKey="final" label=`Final · ${KO_VENUES.final?.city||""} · ${KO_VENUES.final?.date||""}`/>
                 {champion!=="TBD"&&(
                   <div style={{padding:"10px 12px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:8,textAlign:"center",width:"100%"}}>
                     <div style={{fontSize:18,marginBottom:2}}>🏆</div>
@@ -2639,7 +2646,7 @@ export default function App(){
                 )}
                 <div style={{marginTop:16,width:"100%"}}>
                   <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>3rd place match</div>
-                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label="3rd place · Jul 18" actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
+                  <KOCard home={thirdPlaceMatchup.home} away={thirdPlaceMatchup.away} picked={koPicks.third} onPick={t=>{setKoPicks(prev=>({...prev,third:t}));saveKOPick('third',0,t);}} label=`3rd place · ${KO_VENUES.third?.city||""} · ${KO_VENUES.third?.date||""}` actualWinner={getKOWinner(thirdPlaceMatchup.home,thirdPlaceMatchup.away)} roundKey="third"/>
                   {koPicks.third&&koPicks.third!=="TBD"&&(
                     <div style={{marginTop:4,padding:"6px 10px",background:"var(--color-background-secondary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,textAlign:"center"}}>
                       <div style={{fontSize:10,color:"var(--color-text-secondary)"}}>🥉 {koPicks.third}</div>
@@ -2655,7 +2662,7 @@ export default function App(){
               {/* RIGHT SF */}
               <div style={{display:"flex",flexDirection:"column",justifyContent:"center",width:160,flexShrink:0,padding:"80px 0"}}>
                 <div style={{fontSize:9,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",marginBottom:4}}>Semi-final</div>
-                <KOCard home={sfMatchups[1]?.home||"TBD"} away={sfMatchups[1]?.away||"TBD"} picked={koPicks.sf[1]} onPick={t=>pickKO("sf",1,t)} label="SF 2 · Jul 15" actualWinner={getKOWinner(sfMatchups[1]?.home,sfMatchups[1]?.away)} roundKey="sf"/>
+                <KOCard home={sfMatchups[1]?.home||"TBD"} away={sfMatchups[1]?.away||"TBD"} picked={koPicks.sf[1]} onPick={t=>pickKO("sf",1,t)} label=`SF 2 · ${KO_VENUES.sf[1]?.city||""} · ${KO_VENUES.sf[1]?.date||""}` actualWinner={getKOWinner(sfMatchups[1]?.home,sfMatchups[1]?.away)} roundKey="sf"/>
               </div>
 
               <div style={{width:14,flexShrink:0,display:"flex",flexDirection:"column",justifyContent:"space-around",padding:"60px 0"}}>
