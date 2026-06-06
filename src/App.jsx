@@ -2133,7 +2133,7 @@ export default function App(){
         {(()=>{
           const groupDone = totalPredicted === 72;
           const koDone = koPicked >= 32;
-          const bonusDone = goldenBootLocked && topAssistLocked && goldenGloveLocked;
+          const bonusDone = goldenBootLocked && topAssistLocked && goldenGloveLocked && doublesSelected===3;
           const allDone = groupDone && koDone && bonusDone;
           const nextAction = !groupDone ? null : !koDone ? {label:"Fill in Knockout →", page:"bracket"} : !bonusDone ? {label:"Fill in Bonuses →", page:"bonuses"} : null;
           if(allDone) return(
@@ -2149,7 +2149,7 @@ export default function App(){
                 {[
                   {label:"⚽ Groups", done:groupDone, current:totalPredicted, total:72},
                   {label:"🏆 Knockout", done:koDone, current:koPicked, total:32},
-                  {label:"⭐ Bonuses", done:bonusDone, current:[goldenBootLocked,topAssistLocked,goldenGloveLocked].filter(Boolean).length, total:3},
+                  {label:"⭐ Bonuses", done:bonusDone&&doublesSelected===3, current:[goldenBootLocked,topAssistLocked,goldenGloveLocked].filter(Boolean).length+doublesSelected, total:6},
                 ].map(({label,done,current,total})=>(
                   <div key={label}>
                     <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
