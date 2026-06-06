@@ -946,8 +946,8 @@ function simulateKnockout(r32Bracket, style){
     newKO.r32[i]=winner;
   });
 
-  // Build R16 matchups from R32 results
-  const r16pairs=[[0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15]];
+  // Build R16 matchups from R32 results - official FIFA bracket path
+  const r16pairs=[[1,4],[0,2],[3,5],[6,7],[10,11],[8,9],[12,14],[13,15]];
   r16pairs.forEach(([a,b],i)=>{
     const home=newKO.r32[a]||"TBD";
     const away=newKO.r32[b]||"TBD";
