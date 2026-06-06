@@ -2564,7 +2564,10 @@ export default function App(){
               </div>
               {koRound==="r32"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                  <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Round of 32 · {Object.keys(koPicks.r32).length}/16</div>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+                    <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)"}}>Round of 32 · {Object.keys(koPicks.r32).length}/16</span>
+                    <button onClick={()=>setShowClearConfirm(true)} style={{padding:"4px 8px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,background:"var(--color-background-primary)",fontSize:11,cursor:"pointer",color:"var(--color-text-tertiary)",display:"flex",alignItems:"center",gap:4}}><span>🗑️</span><span>Reset</span></button>
+                  </div>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:6}}>
                     {r32Bracket.map((match,i)=>(
                       <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`${KO_VENUES.r32[i]?.city||""}${" · "+["Jul 1","Jul 1","Jul 2","Jul 2","Jul 2","Jul 3","Jul 3","Jul 3","Jul 4","Jul 4","Jul 4","Jul 5","Jul 5","Jul 5","Jul 5","Jul 5"][i]||""}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
