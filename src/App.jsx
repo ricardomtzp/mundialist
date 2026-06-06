@@ -1575,8 +1575,8 @@ export default function App(){
             loadUserData(session.user.id);
             loadActualResults();
             // Pre-load global league member count
-            supabase.from('league_members').select('user_id',{count:'exact',head:true}).eq('league_id','00000000-0000-0000-0000-000000000001').then(({count})=>{
-              if(count)setJoinedLeagues(prev=>prev.map(l=>l.id==="global"?{...l,members:count}:l));
+            supabase.from('league_members').select('user_id').eq('league_id','00000000-0000-0000-0000-000000000001').then(({data})=>{
+              if(data?.length)setJoinedLeagues(prev=>prev.map(l=>l.id==="global"?{...l,members:data.length}:l));
             });
             setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),200);
           }
