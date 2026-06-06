@@ -2861,7 +2861,18 @@ export default function App(){
               {!tournamentStarted()&&<div style={{display:"flex",gap:10,padding:"10px 14px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:10,marginBottom:"1rem",fontSize:12,color:"#7a5c10",alignItems:"center"}}><span>🔒</span><span>Picks are hidden until June 11 kickoff — come back then to see everyone's predictions!</span></div>}
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:"1.25rem",flexWrap:"wrap"}}>
                 <div style={{flex:1}}><div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)"}}>{activeLeague.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{(leagueMembers.length||activeLeague.members||0).toLocaleString()} members</div></div>
-                {activeLeague.code&&<span style={{fontFamily:"monospace",fontSize:11,color:"var(--color-text-tertiary)",background:"var(--color-background-secondary)",padding:"5px 10px",borderRadius:99,border:"0.5px solid var(--color-border-tertiary)"}}>{activeLeague.code}</span>}
+                {activeLeague.code&&(
+                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                    <span style={{fontFamily:"monospace",fontSize:11,color:"var(--color-text-tertiary)",background:"var(--color-background-secondary)",padding:"5px 10px",borderRadius:99,border:"0.5px solid var(--color-border-tertiary)"}}>{activeLeague.code}</span>
+                    <button onClick={()=>{
+                      const msg = `Join my Mundialist league "${activeLeague.name}" and predict the World Cup 2026!\n\nmundialist.com/?join=${activeLeague.code}`;
+                      if(navigator.share){navigator.share({title:"Mundialist - "+activeLeague.name,text:msg,url:"https://mundialist.com/?join="+activeLeague.code});}
+                      else{navigator.clipboard?.writeText(msg);alert("Link copied to clipboard!");}
+                    }} style={{padding:"5px 10px",background:C.blue,color:"#fff",border:"none",borderRadius:99,fontSize:11,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap"}}>
+                      📤 Share
+                    </button>
+                  </div>
+                )}
                 <div style={{display:"flex",background:"#f1f5f9",borderRadius:10,padding:3,gap:2,boxShadow:"inset 0 1px 3px rgba(0,0,0,0.06)"}}>
                   <button onClick={()=>setMatchdayView(false)} style={{flex:1,padding:"6px 14px",borderRadius:7,border:"none",fontSize:12,cursor:"pointer",
                     background:!matchdayView?"#fff":"transparent",
