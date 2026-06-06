@@ -1609,6 +1609,27 @@ export default function App(){
   },[user?.id]);
 
   // ── Load matchday picks ──────────────────────────────────────────────────
+  const loadJoinedLeagues=async(userId)=>{
+    try{
+      const {data}=await supabase
+        .from('league_members')
+        .select('league_id, leagues(id,name,invite_code)')
+        .eq('user_id',userId);
+      if(!data?.length)return;
+      const leagues=data.map(d=>({
+        id:d.leagues.id,
+        name:d.leagues.name,
+        code:d.leagues.invite_code==='MND26-GLOBAL'?null:d.leagues.invite_code,
+        members:0,
+        rank:1,
+      }));
+      // Always put global first
+      const global=leagues.find(l=>l.id==='00000000-0000-0000-0000-000000000001');
+      const others=leagues.filter(l=>l.id!=='00000000-0000-0000-0000-000000000001');
+      setJoinedLeagues(global?[global,...others]:others);
+    }catch(e){console.error('loadJoinedLeagues error:',e);}
+  };
+
   const loadMatchdayPicks=async(leagueId)=>{
     setMatchdayLoading(true);
     try{
