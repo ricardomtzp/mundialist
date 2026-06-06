@@ -2865,7 +2865,7 @@ export default function App(){
                   <div style={{display:"flex",alignItems:"center",gap:6}}>
                     <span style={{fontFamily:"monospace",fontSize:11,color:"var(--color-text-tertiary)",background:"var(--color-background-secondary)",padding:"5px 10px",borderRadius:99,border:"0.5px solid var(--color-border-tertiary)"}}>{activeLeague.code}</span>
                     <button onClick={()=>{
-                      const msg = `Join my Mundialist league "${activeLeague.name}" and predict the World Cup 2026!\n\nmundialist.com/?join=${activeLeague.code}`;
+                      const msg = `Join my Mundialist league "${activeLeague.name}" and predict the World Cup 2026! Picks lock June 11 at kickoff.`;
                       if(navigator.share){navigator.share({title:"Mundialist - "+activeLeague.name,text:msg,url:"https://mundialist.com/?join="+activeLeague.code});}
                       else{navigator.clipboard?.writeText(msg);alert("Link copied to clipboard!");}
                     }} style={{padding:"5px 10px",background:C.blue,color:"#fff",border:"none",borderRadius:99,fontSize:11,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap"}}>
