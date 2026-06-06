@@ -3030,6 +3030,7 @@ export default function App(){
               </div>
               <button onClick={async()=>{
                 if(!leagueName.trim())return;
+                if(!user?.id){alert("Not logged in - please sign in again");return;}
                 showSaving();
                 const {data,error}=await supabase.from("leagues").insert({
                   name:leagueName,
