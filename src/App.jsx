@@ -1318,6 +1318,14 @@ export default function App(){
     }
   };
   const [showClearConfirm,setShowClearConfirm]=useState(false);
+  const [showClearKOConfirm,setShowClearKOConfirm]=useState(false);
+  const clearKO=async()=>{
+    setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
+    setShowClearKOConfirm(false);
+    showSaving();
+    await supabase.from('predictions').delete().eq('user_id',user.id).like('match_id','KO-%');
+    showSaved();
+  };
   const clearAll=async()=>{
     const all={};Object.entries(GROUPS).forEach(([g,teams])=>{all[g]=generateGroupMatches(teams);});
     setGroupMatches(all);
@@ -1991,6 +1999,19 @@ export default function App(){
 
       {/* ══ HOME ══ */}
       {/* Global clear confirmation modal */}
+      {showClearKOConfirm&&(
+        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",zIndex:99999,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+          <div style={{background:"#ffffff",borderRadius:14,padding:"1.5rem",maxWidth:340,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.3)"}}>
+            <div style={{fontSize:28,marginBottom:8,textAlign:"center"}}>⚠️</div>
+            <div style={{fontSize:16,fontWeight:600,color:"var(--color-text-primary)",marginBottom:6,textAlign:"center"}}>Reset knockout picks?</div>
+            <div style={{fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1.25rem",textAlign:"center",lineHeight:1.5}}>This will clear your R32, R16, QF, SF and Final picks. Group picks and bonuses will be kept.</div>
+            <div style={{display:"flex",gap:8}}>
+              <button onClick={()=>setShowClearKOConfirm(false)} style={{flex:1,padding:"11px",background:"#f1f5f9",border:"0.5px solid #e2e8f0",borderRadius:8,fontSize:14,cursor:"pointer",color:"#1e293b",fontWeight:500}}>Cancel</button>
+              <button onClick={clearKO} style={{flex:1,padding:"11px",background:"#ef4444",border:"none",borderRadius:8,fontSize:14,cursor:"pointer",color:"#fff",fontWeight:600}}>Yes, reset</button>
+            </div>
+          </div>
+        </div>
+      )}
       {showClearConfirm&&(
         <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",zIndex:99999,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
           <div style={{background:"#ffffff",borderRadius:14,padding:"1.5rem",maxWidth:340,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.3)"}}>
@@ -2567,7 +2588,7 @@ export default function App(){
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
                     <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)"}}>Round of 32 · {Object.keys(koPicks.r32).length}/16</span>
-                    <button onClick={()=>setShowClearConfirm(true)} style={{padding:"4px 8px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,background:"var(--color-background-primary)",fontSize:11,cursor:"pointer",color:"var(--color-text-tertiary)",display:"flex",alignItems:"center",gap:4}}><span>🗑️</span><span>Reset</span></button>
+                    <button onClick={()=>setShowClearKOConfirm(true)} style={{padding:"4px 8px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,background:"var(--color-background-primary)",fontSize:11,cursor:"pointer",color:"var(--color-text-tertiary)",display:"flex",alignItems:"center",gap:4}}><span>🗑️</span><span>Reset</span></button>
                   </div>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:6}}>
                     {r32Bracket.map((match,i)=>(
