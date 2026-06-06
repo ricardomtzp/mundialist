@@ -2196,10 +2196,10 @@ export default function App(){
                 <div style={{fontSize:20,fontWeight:600,color:doublesSelected===3?C.green:"var(--color-text-primary)",fontFamily:"monospace",lineHeight:1}}>{doublesSelected}<span style={{fontSize:11,color:"var(--color-text-tertiary)",fontWeight:400}}>/3</span></div>
                 <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:2}}>doubles</div>
               </div>
-              <button onClick={()=>setShowClearConfirm(true)} style={{padding:"8px 10px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:14,cursor:"pointer",color:"var(--color-text-tertiary)"}}>🗑️</button>
+              <button onClick={()=>setShowClearConfirm(true)} style={{padding:"6px 10px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,cursor:"pointer",color:"var(--color-text-tertiary)",display:"flex",flexDirection:"column",alignItems:"center",gap:1}}><span style={{fontSize:14}}>🗑️</span><span style={{fontSize:9}}>Reset</span></button>
               {showClearConfirm&&(
-                <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.5)",zIndex:10000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
-                  <div style={{background:"var(--color-background-primary)",borderRadius:14,padding:"1.5rem",maxWidth:340,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.3)"}}>
+                <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",zIndex:10000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
+                  <div style={{background:"#ffffff",borderRadius:14,padding:"1.5rem",maxWidth:340,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.3)"}}>
                     <div style={{fontSize:28,marginBottom:8,textAlign:"center"}}>⚠️</div>
                     <div style={{fontSize:16,fontWeight:600,color:"var(--color-text-primary)",marginBottom:6,textAlign:"center"}}>Reset all picks?</div>
                     <div style={{fontSize:13,color:"var(--color-text-secondary)",marginBottom:"1.25rem",textAlign:"center",lineHeight:1.5}}>This will clear all your group picks, knockout bracket, and bonus picks. This cannot be undone.</div>
