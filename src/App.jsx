@@ -3036,7 +3036,7 @@ export default function App(){
                   invite_code:createdCode,
                   admin_id:user.id,
                 }).select().single();
-                if(error){showError();alert('Error: '+error.message);return;}
+                if(error){showError();console.error(error.message);return;}
                 await supabase.from("league_members").insert({league_id:data.id,user_id:user.id,total_points:0});
                 const nl={id:data.id,name:data.name,members:1,rank:1,code:createdCode};
                 setJoinedLeagues(p=>[...p.filter(l=>l.id!==data.id),nl]);
