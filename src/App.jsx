@@ -1320,7 +1320,7 @@ export default function App(){
   const [showClearConfirm,setShowClearConfirm]=useState(false);
   const [showClearKOConfirm,setShowClearKOConfirm]=useState(false);
   const [showBracketChanged,setShowBracketChanged]=useState(false);
-  const prevR32Ref=React.useRef(null);
+  const prevR32Ref=useRef(null);
   const clearKO=async()=>{
     setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
     setShowClearKOConfirm(false);
