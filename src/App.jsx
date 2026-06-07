@@ -2536,13 +2536,9 @@ export default function App(){
           {/* R32 Grid - desktop collapsible */}
                     {!mobile&&(
             <div style={{marginBottom:"1.5rem"}}>
-              <button onClick={()=>setR32Open(o=>!o)} style={{display:"flex",alignItems:"center",gap:10,marginBottom:"0.75rem",background:"none",border:"none",cursor:"pointer",padding:0,width:"100%"}}>
-                <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em"}}>Round of 32</span>
-
-                <span style={{fontSize:11,fontFamily:"monospace",color:C.blue,background:C.blueLt,padding:"2px 8px",borderRadius:99}}>{Object.keys(koPicks.r32).length}/16</span>
-                <span style={{fontSize:11,color:"var(--color-text-tertiary)",marginLeft:"auto"}}>{r32Open?"▲ Hide":"▼ Show"}</span>
+              <div style={{marginBottom:"0.75rem"}}><span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em"}}>Round of 32</span></div>
               </button>
-              {r32Open&&(
+              {(
                 <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
                   {r32Bracket.map((match,i)=>(
                     <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`${KO_VENUES.r32[i]?.city||""}${" · "+["Jun 28","Jun 29","Jun 29","Jun 29","Jun 29","Jun 30","Jun 30","Jul 1","Jul 1","Jul 1","Jul 2","Jul 2","Jul 3","Jul 3","Jul 3","Jul 3"][i]||""}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
