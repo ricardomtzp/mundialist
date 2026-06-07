@@ -2276,6 +2276,7 @@ export default function App(){
                 <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:2}}>doubles</div>
               </div>
               <button onClick={()=>setShowClearConfirm(true)} style={{padding:"6px 10px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,background:"var(--color-background-primary)",fontSize:12,cursor:"pointer",color:"var(--color-text-tertiary)",display:"flex",flexDirection:"column",alignItems:"center",gap:1}}><span style={{fontSize:14}}>🗑️</span><span style={{fontSize:9}}>Reset</span></button>
+              <button onClick={simulateAll} style={{padding:"6px 10px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:12,fontWeight:500,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:1}}><span style={{fontSize:14}}>↻</span><span style={{fontSize:9}}>Simulate</span></button>
               {showClearConfirm&&(
                 <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",zIndex:10000,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
                   <div style={{background:"#ffffff",borderRadius:14,padding:"1.5rem",maxWidth:340,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.3)"}}>
@@ -2294,22 +2295,16 @@ export default function App(){
 
           {/* Prediction style selector + simulate */}
           <div style={{background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:10,padding:"12px 14px",marginBottom:"1.25rem"}}>
-            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
-              <div style={{display:"flex",gap:4,flex:1}}>
-                {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
-                  <button key={k} onClick={()=>setSimulateStyle(k)}
-                    style={{padding:"5px 10px",borderRadius:8,fontSize:12,cursor:"pointer",fontWeight:simulateStyle===k?500:400,
-                      border:`${simulateStyle===k?"1.5px":"0.5px"} solid ${simulateStyle===k?adventInfo.color:"var(--color-border-tertiary)"}`,
-                      background:simulateStyle===k?adventInfo.color+"18":"var(--color-background-secondary)",
-                      color:simulateStyle===k?adventInfo.color:"var(--color-text-secondary)"}}>
-                    {e} {l}
-                  </button>
-                ))}
-              </div>
-              <button onClick={simulateAll}
-                style={{padding:"7px 14px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:12,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
-                Simulate ↻
-              </button>
+            <div style={{display:"flex",gap:4,marginBottom:10}}>
+              {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
+                <button key={k} onClick={()=>setSimulateStyle(k)}
+                  style={{padding:"5px 10px",borderRadius:8,fontSize:12,cursor:"pointer",fontWeight:simulateStyle===k?500:400,
+                    border:`${simulateStyle===k?"1.5px":"0.5px"} solid ${simulateStyle===k?adventInfo.color:"var(--color-border-tertiary)"}`,
+                    background:simulateStyle===k?adventInfo.color+"18":"var(--color-background-secondary)",
+                    color:simulateStyle===k?adventInfo.color:"var(--color-text-secondary)"}}>
+                  {e} {l}
+                </button>
+              ))}
             </div>
             {adventScore!==null&&(
               <div>
