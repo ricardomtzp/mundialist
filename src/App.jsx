@@ -2294,23 +2294,21 @@ export default function App(){
 
           {/* Prediction style selector + simulate */}
           <div style={{background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:10,padding:"12px 14px",marginBottom:"1.25rem"}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
-              <div>
-                <div style={{fontSize:12,fontWeight:500,color:"var(--color-text-primary)",marginBottom:8}}>Simulation style</div>
-                <div style={{display:"flex",gap:6}}>
-                  {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
-                    <button key={k} onClick={()=>setSimulateStyle(k)}
-                      style={{padding:"6px 12px",borderRadius:8,fontSize:12,cursor:"pointer",fontWeight:simulateStyle===k?600:400,
-                        border:`0.5px solid ${simulateStyle===k?adventInfo.color:"var(--color-border-tertiary)"}`,
-                        background:simulateStyle===k?adventInfo.color+"18":"var(--color-background-secondary)",
-                        color:simulateStyle===k?adventInfo.color:"var(--color-text-secondary)"}}>
-                      {e} {l}
-                    </button>
-                  ))}
-                </div>
+            <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+              <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",flexShrink:0}}>Style:</span>
+              <div style={{display:"flex",gap:4,flex:1,flexWrap:"wrap"}}>
+                {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
+                  <button key={k} onClick={()=>setSimulateStyle(k)}
+                    style={{padding:"5px 10px",borderRadius:8,fontSize:11,cursor:"pointer",fontWeight:simulateStyle===k?600:400,
+                      border:`0.5px solid ${simulateStyle===k?adventInfo.color:"var(--color-border-tertiary)"}`,
+                      background:simulateStyle===k?adventInfo.color+"18":"var(--color-background-secondary)",
+                      color:simulateStyle===k?adventInfo.color:"var(--color-text-secondary)"}}>
+                    {e} {l}
+                  </button>
+                ))}
               </div>
               <button onClick={simulateAll}
-                style={{padding:"9px 18px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap"}}>
+                style={{padding:"7px 14px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:12,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
                 Simulate ↻
               </button>
             </div>
@@ -2509,7 +2507,7 @@ export default function App(){
                   </button>
                 ))}
               </div>
-              <div style={{display:"flex",gap:8}}>
+              <div style={{display:"flex",gap:6,alignItems:"center"}}>
                 <button onClick={async()=>{
                   const simKO=simulateKnockout(r32Bracket,simulateStyle);
                   setKoPicks(simKO);
@@ -2522,7 +2520,7 @@ export default function App(){
                   if(simKO.final?.[0])saves.push(saveKOPick('final',0,simKO.final[0]));
                   if(simKO.third)saves.push(saveKOPick('third',0,simKO.third));
                   await Promise.all(saves);
-                }} style={{padding:"8px 14px",border:`0.5px solid ${C.blue}`,borderRadius:8,background:C.blueLt,fontSize:12,color:C.blue,cursor:"pointer"}}>
+                }} style={{padding:"7px 14px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:12,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap"}}>
                   Simulate ↻
                 </button>
 
