@@ -2357,7 +2357,8 @@ export default function App(){
                   const isSeeded=SEEDED.has(match.home)||SEEDED.has(match.away);
                   const doubleId=`${activeGroup}-${idx}`;
                   const isMyDouble=currentDouble===doubleId;
-                  const canDouble=!isSeeded&&(!roundHasDouble||isMyDouble);
+                  const matchdayHasPicks=groupMatches[activeGroup]?.slice(ri*2,ri*2+2).some(m=>m.homeScore!=="");
+                  const canDouble=!isSeeded&&(!roundHasDouble||isMyDouble)&&matchdayHasPicks;
                   // Only show dark horse label if group has picks AND team qualifies to R16
                   const groupHasPicks=groupMatches[activeGroup]?.some(m=>m.homeScore!==""&&m.awayScore!=="");
                   const homeQualifies=groupHasPicks&&allStandings[activeGroup]?.slice(0,2).some(r=>r.team===match.home);
