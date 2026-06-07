@@ -1922,7 +1922,7 @@ export default function App(){
 
       {/* ── Save toast ── */}
       {saveStatus&&(
-        <div style={{position:"fixed",bottom:24,right:24,zIndex:999,padding:"10px 16px",borderRadius:10,fontSize:13,fontWeight:500,
+        <div style={{position:"fixed",bottom:mobile?"calc(72px + env(safe-area-inset-bottom))":24,right:24,zIndex:999,padding:"10px 16px",borderRadius:10,fontSize:13,fontWeight:500,
           background:saveStatus==="saved"?C.green:saveStatus==="error"?"#ef4444":"var(--color-background-secondary)",
           color:saveStatus==="saving"?"var(--color-text-primary)":"#fff",
           border:`0.5px solid ${saveStatus==="saved"?C.green:saveStatus==="error"?"#ef4444":"var(--color-border-tertiary)"}`,
