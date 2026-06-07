@@ -1902,6 +1902,7 @@ export default function App(){
   const mobile=windowWidth<768;
   const [koRound,setKoRound]=useState("r32");
   const [r32Open,setR32Open]=useState(false);
+  const [showUserMenu,setShowUserMenu]=useState(false);
 
   // Get actual winner for a KO match from Supabase matches table
   const getKOWinner=(home,away)=>{
@@ -1952,7 +1953,7 @@ export default function App(){
                     <span style={{fontSize:12,color:"var(--color-text-primary)",fontWeight:500}}>{user.handle}</span>
                     <span style={{fontSize:10,color:"var(--color-text-tertiary)",fontFamily:"monospace"}}>{totalPredicted}/72 · {koPicked}/32{totalPoints>0?" · "+totalPoints+"pts":""}</span>
                   </div>
-                  <button onClick={async()=>{await supabase.auth.signOut();setUser(null);setPage("home");}}
+                  <button onClick={async()=>{await supabase.auth.signOut();setUser(null);setJoinedLeagues([]);setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});setGroupMatches(()=>{const all={};Object.entries(GROUPS).forEach(([g,teams])=>{all[g]=generateGroupMatches(teams);});return all;});setPage("home");}}
                     style={{padding:"4px 8px",background:"none",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:11,color:"var(--color-text-tertiary)",cursor:"pointer",marginLeft:4}}>
                     Sign out
                   </button>
@@ -1968,7 +1969,15 @@ export default function App(){
                 <span style={{fontSize:16,fontWeight:700,letterSpacing:"-0.04em",color:C.blue,cursor:"pointer"}} onClick={()=>setPage("home")}>Mundialist</span>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   {totalPoints>0&&<span style={{fontSize:11,fontWeight:500,color:C.green,background:C.greenLt,padding:"2px 8px",borderRadius:99,fontFamily:"monospace"}}>{totalPoints}pts</span>}
-                  <div style={{width:28,height:28,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"#fff"}}>{user.avatar}</div>
+                  <div style={{position:"relative"}}>
+                    <div onClick={()=>setShowUserMenu(m=>!m)} style={{width:28,height:28,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"#fff",cursor:"pointer"}}>{user.avatar}</div>
+                    {showUserMenu&&(
+                      <div style={{position:"absolute",right:0,top:36,background:"#fff",border:"0.5px solid #e5e7eb",borderRadius:8,boxShadow:"0 4px 16px rgba(0,0,0,0.12)",zIndex:99999,minWidth:120,overflow:"hidden"}}>
+                        <div style={{padding:"8px 12px",fontSize:12,color:"var(--color-text-secondary)",borderBottom:"0.5px solid #e5e7eb"}}>{user.handle}</div>
+                        <button onClick={async()=>{await supabase.auth.signOut();setUser(null);setPage("home");setShowUserMenu(false);}} style={{width:"100%",padding:"10px 12px",background:"none",border:"none",cursor:"pointer",fontSize:13,color:"#ef4444",textAlign:"left"}}>Sign out</button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </nav>
