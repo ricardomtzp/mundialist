@@ -2563,10 +2563,11 @@ export default function App(){
               <div style={{display:"flex",background:"var(--color-background-secondary)",borderRadius:10,padding:3,gap:2,marginBottom:"1rem",overflowX:"auto"}}>
                 {["r32","r16","qf","sf","final"].map(r=>(
                   <button key={r} onClick={()=>setKoRound(r)}
-                    style={{flex:1,padding:"7px 4px",borderRadius:7,border:"none",fontSize:11,cursor:"pointer",
+                    style={{flex:1,padding:"7px 4px",borderRadius:7,fontSize:11,cursor:"pointer",
                       fontWeight:koRound===r?500:400,whiteSpace:"nowrap",minWidth:40,
                       background:koRound===r?"var(--color-background-primary)":"transparent",
-                      color:koRound===r?"var(--color-text-primary)":"var(--color-text-tertiary)"}}>
+                      color:koRound===r?"#185FA5":"var(--color-text-tertiary)",
+                      border:koRound===r?"1.5px solid #185FA5":"1.5px solid transparent"}}>
                     {r==="r32"?"R32":r==="r16"?"R16":r==="qf"?"QF":r==="sf"?"SF":"Final"}
                   </button>
                 ))}
