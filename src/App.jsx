@@ -2494,7 +2494,7 @@ export default function App(){
                 <span style={{fontFamily:"monospace",color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>{koPicked}/32 picks</span>
               </div>
             </div>
-            <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-end",flexShrink:0}}>
+            <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-start",flexShrink:0}}>
               <div style={{display:"flex",gap:6}}>
                 {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
                   <button key={k} onClick={()=>setSimulateStyle(k)}
