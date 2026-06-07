@@ -2537,7 +2537,6 @@ export default function App(){
                     {!mobile&&(
             <div style={{marginBottom:"1.5rem"}}>
               <div style={{marginBottom:"0.75rem"}}><span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",textTransform:"uppercase",letterSpacing:"0.06em"}}>Round of 32</span></div>
-              </button>
               {(
                 <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
                   {r32Bracket.map((match,i)=>(
