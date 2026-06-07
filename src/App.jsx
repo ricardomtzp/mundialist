@@ -1319,6 +1319,8 @@ export default function App(){
   };
   const [showClearConfirm,setShowClearConfirm]=useState(false);
   const [showClearKOConfirm,setShowClearKOConfirm]=useState(false);
+  const [showBracketChanged,setShowBracketChanged]=useState(false);
+  const prevR32Ref=React.useRef(null);
   const clearKO=async()=>{
     setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
     setShowClearKOConfirm(false);
@@ -1592,6 +1594,17 @@ export default function App(){
   useEffect(()=>{
     if(pendingJoinCode){supabase.from('leagues').select('name').eq('invite_code',pendingJoinCode).single().then(({data})=>{if(data?.name)setPendingLeagueName(data.name);});}
   },[pendingJoinCode]);
+
+  // Detect when R32 bracket changes due to group score edits
+  useEffect(()=>{
+    const prev=prevR32Ref.current;
+    if(prev){
+      const changed=r32Bracket.some((m,i)=>m.home!==prev[i]?.home||m.away!==prev[i]?.away);
+      const hasKOPicks=Object.keys(koPicks.r32).length>0||Object.keys(koPicks.r16).length>0;
+      if(changed&&hasKOPicks)setShowBracketChanged(true);
+    }
+    prevR32Ref.current=r32Bracket.map(m=>({home:m.home,away:m.away}));
+  },[r32Bracket]);
 
   // Check for existing session on load
   useEffect(()=>{
@@ -2324,6 +2337,21 @@ export default function App(){
             )}
           </div>
 
+          {showBracketChanged&&(
+            <div style={{background:"#FEF9EC",border:"1px solid #F59E0B",borderRadius:8,padding:"10px 12px",marginBottom:"1rem"}}>
+              <div style={{fontSize:12,fontWeight:500,color:"#92400E",marginBottom:8}}>⚠️ Group standings changed — your knockout bracket may be affected.</div>
+              <div style={{display:"flex",gap:6}}>
+                <button onClick={async()=>{
+                  setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
+                  setShowBracketChanged(false);
+                  showSaving();
+                  await supabase.from('predictions').delete().eq('user_id',user.id).like('match_id','KO-%');
+                  showSaved();
+                }} style={{flex:1,padding:"7px",background:"#F59E0B",color:"#fff",border:"none",borderRadius:6,fontSize:12,fontWeight:500,cursor:"pointer"}}>Reset bracket</button>
+                <button onClick={()=>setShowBracketChanged(false)} style={{flex:1,padding:"7px",background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:12,cursor:"pointer",color:"var(--color-text-secondary)"}}>Keep my picks</button>
+              </div>
+            </div>
+          )}
           {/* Group tabs */}
           {/* Group tabs - 2 row grid on mobile, 6-col grid on desktop */}
           <div style={{display:"grid",gridTemplateColumns:mobile?"repeat(6,1fr)":"repeat(6,1fr)",gap:mobile?4:6,marginBottom:"1.25rem"}}>
