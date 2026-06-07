@@ -2347,7 +2347,7 @@ export default function App(){
                   showSaving();
                   await supabase.from('predictions').delete().eq('user_id',user.id).like('match_id','KO-%');
                   showSaved();
-                }} style={{flex:1,padding:"7px",background:"#F59E0B",color:"#fff",border:"none",borderRadius:6,fontSize:12,fontWeight:500,cursor:"pointer"}}>Reset bracket</button>
+                }} style={{flex:1,padding:"7px",background:"#F59E0B",color:"#fff",border:"none",borderRadius:6,fontSize:12,fontWeight:500,cursor:"pointer"}}>Reset knockout</button>
                 <button onClick={()=>setShowBracketChanged(false)} style={{flex:1,padding:"7px",background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:12,cursor:"pointer",color:"var(--color-text-secondary)"}}>Keep my picks</button>
               </div>
             </div>
