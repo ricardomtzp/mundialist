@@ -2315,7 +2315,7 @@ export default function App(){
               </button>
             </div>
             {adventScore!==null&&(
-              <div>
+              <div style={{marginTop:10}}>
                 <div style={{height:3,background:"var(--color-background-secondary)",borderRadius:99,overflow:"hidden",marginBottom:4}}>
                   <div style={{height:"100%",width:`${adventInfo.width||0}%`,background:adventInfo.color,borderRadius:99,transition:"width 0.3s"}}/>
                 </div>
