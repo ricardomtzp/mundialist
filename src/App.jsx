@@ -2294,13 +2294,12 @@ export default function App(){
 
           {/* Prediction style selector + simulate */}
           <div style={{background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:10,padding:"12px 14px",marginBottom:"1.25rem"}}>
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",flexShrink:0}}>Style:</span>
-              <div style={{display:"flex",gap:4,flex:1,overflowX:"auto",minWidth:0}}>
+            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
+              <div style={{display:"flex",gap:4,flex:1}}>
                 {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
                   <button key={k} onClick={()=>setSimulateStyle(k)}
-                    style={{padding:"5px 10px",borderRadius:8,fontSize:11,cursor:"pointer",fontWeight:simulateStyle===k?600:400,
-                      border:`0.5px solid ${simulateStyle===k?adventInfo.color:"var(--color-border-tertiary)"}`,
+                    style={{padding:"5px 10px",borderRadius:8,fontSize:12,cursor:"pointer",fontWeight:simulateStyle===k?500:400,
+                      border:`${simulateStyle===k?"1.5px":"0.5px"} solid ${simulateStyle===k?adventInfo.color:"var(--color-border-tertiary)"}`,
                       background:simulateStyle===k?adventInfo.color+"18":"var(--color-background-secondary)",
                       color:simulateStyle===k?adventInfo.color:"var(--color-text-secondary)"}}>
                     {e} {l}
@@ -2313,14 +2312,11 @@ export default function App(){
               </button>
             </div>
             {adventScore!==null&&(
-              <div style={{marginTop:10}}>
-                <div style={{height:4,background:"var(--color-background-secondary)",borderRadius:99,overflow:"hidden"}}>
+              <div>
+                <div style={{height:3,background:"var(--color-background-secondary)",borderRadius:99,overflow:"hidden",marginBottom:4}}>
                   <div style={{height:"100%",width:`${adventInfo.width||0}%`,background:adventInfo.color,borderRadius:99,transition:"width 0.3s"}}/>
                 </div>
-                <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
-                  <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>Your pick style: <strong style={{color:adventInfo.color}}>{adventInfo.emoji} {adventInfo.label}</strong></span>
-                  
-                </div>
+                <span style={{fontSize:10,color:"var(--color-text-tertiary)"}}>Pick style: <strong style={{color:adventInfo.color}}>{adventInfo.emoji} {adventInfo.label}</strong></span>
               </div>
             )}
           </div>
