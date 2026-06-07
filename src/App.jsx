@@ -969,7 +969,7 @@ function simulateKnockout(r32Bracket, style){
 
   // SF — track losers for 3rd place
   const sfLosers=[];
-  [[0,1],[2,3]].forEach(([a,b],i)=>{
+  [[0,2],[1,3]].forEach(([a,b],i)=>{
     const home=newKO.qf[a]||"TBD";
     const away=newKO.qf[b]||"TBD";
     if(home==="TBD"||away==="TBD")return;
@@ -1246,7 +1246,7 @@ export default function App(){
   const r32Bracket=useMemo(()=>buildR32Bracket(allStandings),[allStandings]);
   const r16Matchups=useMemo(()=>R32_TO_R16.map(([i,j],idx)=>({id:idx,home:koPicks.r32[i]||"TBD",away:koPicks.r32[j]||"TBD"})),[koPicks.r32]);
   const qfMatchups=useMemo(()=>[0,1,2,3].map(i=>({id:i,home:koPicks.r16[i*2]||"TBD",away:koPicks.r16[i*2+1]||"TBD"})),[koPicks.r16]);
-  const sfMatchups=useMemo(()=>[0,1].map(i=>({id:i,home:koPicks.qf[i*2]||"TBD",away:koPicks.qf[i*2+1]||"TBD"})),[koPicks.qf]);
+  const sfMatchups=useMemo(()=>[{id:0,home:koPicks.qf[0]||"TBD",away:koPicks.qf[2]||"TBD"},{id:1,home:koPicks.qf[1]||"TBD",away:koPicks.qf[3]||"TBD"}],[koPicks.qf]);
   const finalMatchup=useMemo(()=>({home:koPicks.sf[0]||"TBD",away:koPicks.sf[1]||"TBD"}),[koPicks.sf]);
   const thirdPlaceMatchup=useMemo(()=>({
     home:sfMatchups[0]&&koPicks.sf[0]?([sfMatchups[0].home,sfMatchups[0].away].find(t=>t!==koPicks.sf[0])||"TBD"):"TBD",
