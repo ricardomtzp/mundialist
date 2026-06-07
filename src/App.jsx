@@ -2561,7 +2561,7 @@ export default function App(){
               {r32Open&&(
                 <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
                   {r32Bracket.map((match,i)=>(
-                    <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`${KO_VENUES.r32[i]?.city||""}${" · "+["Jul 1","Jul 1","Jul 2","Jul 2","Jul 2","Jul 3","Jul 3","Jul 3","Jul 4","Jul 4","Jul 4","Jul 5","Jul 5","Jul 5","Jul 5","Jul 5"][i]||""}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
+                    <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`${KO_VENUES.r32[i]?.city||""}${" · "+["Jun 28","Jun 29","Jun 29","Jun 29","Jun 29","Jun 30","Jun 30","Jul 1","Jul 1","Jul 1","Jul 2","Jul 2","Jul 3","Jul 3","Jul 3","Jul 3"][i]||""}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
                   ))}
                 </div>
               )}
@@ -2592,27 +2592,36 @@ export default function App(){
                   </div>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:6}}>
                     {r32Bracket.map((match,i)=>(
-                      <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`${KO_VENUES.r32[i]?.city||""}${" · "+["Jul 1","Jul 1","Jul 2","Jul 2","Jul 2","Jul 3","Jul 3","Jul 3","Jul 4","Jul 4","Jul 4","Jul 5","Jul 5","Jul 5","Jul 5","Jul 5"][i]||""}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
+                      <KOCard key={i} home={match.home} away={match.away} picked={koPicks.r32[i]} onPick={t=>pickKO("r32",i,t)} label={`${KO_VENUES.r32[i]?.city||""}${" · "+["Jun 28","Jun 29","Jun 29","Jun 29","Jun 29","Jun 30","Jun 30","Jul 1","Jul 1","Jul 1","Jul 2","Jul 2","Jul 3","Jul 3","Jul 3","Jul 3"][i]||""}`} actualWinner={getKOWinner(match.home,match.away)} roundKey="r32"/>
                     ))}
                   </div>
                 </div>
               )}
               {koRound==="r16"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                  <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Round of 16 · {Object.keys(koPicks.r16).length}/8</div>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+                    <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)"}}>Round of 16 · {Object.keys(koPicks.r16).length}/8</span>
+                    <button onClick={()=>setShowClearKOConfirm(true)} style={{padding:"4px 8px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,background:"var(--color-background-primary)",fontSize:11,cursor:"pointer",color:"var(--color-text-tertiary)",display:"flex",alignItems:"center",gap:4}}><span>🗑️</span><span>Reset</span></button>
+                  </div>
                   {r16Matchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.r16[i]} onPick={t=>pickKO("r16",i,t)} label={`${KO_VENUES.r16[i]?.city||""} · ${KO_VENUES.r16[i]?.date||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="r16"/>)}
                 </div>
               )}
               {koRound==="qf"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                  <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Quarter-finals · {Object.keys(koPicks.qf).length}/4</div>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+                    <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)"}}>Quarter-finals · {Object.keys(koPicks.qf).length}/4</span>
+                    <button onClick={()=>setShowClearKOConfirm(true)} style={{padding:"4px 8px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,background:"var(--color-background-primary)",fontSize:11,cursor:"pointer",color:"var(--color-text-tertiary)",display:"flex",alignItems:"center",gap:4}}><span>🗑️</span><span>Reset</span></button>
+                  </div>
                   {qfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.qf[i]} onPick={t=>pickKO("qf",i,t)} label={`${KO_VENUES.qf[i]?.city||""} · ${KO_VENUES.qf[i]?.date||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="qf"/>)}
                 </div>
               )}
               {koRound==="sf"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                  <div style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)",marginBottom:4}}>Semi-finals · {Object.keys(koPicks.sf).length}/2</div>
-                  {sfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.sf[i]} onPick={t=>pickKO("sf",i,t)} label={`${["Jul 14","Jul 15"][i]||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="sf"/>)}
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+                    <span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)"}}>Semi-finals · {Object.keys(koPicks.sf).length}/2</span>
+                    <button onClick={()=>setShowClearKOConfirm(true)} style={{padding:"4px 8px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,background:"var(--color-background-primary)",fontSize:11,cursor:"pointer",color:"var(--color-text-tertiary)",display:"flex",alignItems:"center",gap:4}}><span>🗑️</span><span>Reset</span></button>
+                  </div>
+                  {sfMatchups.map((m,i)=><KOCard key={i} home={m.home} away={m.away} picked={koPicks.sf[i]} onPick={t=>pickKO("sf",i,t)} label={`${KO_VENUES.sf[i]?.city||""} · ${KO_VENUES.sf[i]?.date||""}`} actualWinner={getKOWinner(m.home,m.away)} roundKey="sf"/>)}
                 </div>
               )}
               {koRound==="final"&&(
