@@ -2020,6 +2020,22 @@ export default function App(){
       <div style={{paddingTop:user?(mobile?48:56):0,paddingBottom:user&&mobile?"calc(56px + env(safe-area-inset-bottom))":0}}>
 
       {/* ══ HOME ══ */}
+      {/* Bracket changed popup */}
+      {showBracketChanged&&(
+        <div style={{position:"fixed",top:mobile?"calc(56px + 8px)":"calc(64px + 8px)",left:"50%",transform:"translateX(-50%)",zIndex:99998,width:"calc(100% - 2rem)",maxWidth:420,background:"#FEF9EC",border:"1px solid #F59E0B",borderRadius:10,padding:"12px 14px",boxShadow:"0 4px 20px rgba(0,0,0,0.15)"}}>
+          <div style={{fontSize:12,fontWeight:500,color:"#92400E",marginBottom:8}}>⚠️ Group standings changed — your knockout bracket may be affected.</div>
+          <div style={{display:"flex",gap:6}}>
+            <button onClick={async()=>{
+              setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
+              setShowBracketChanged(false);
+              showSaving();
+              await supabase.from('predictions').delete().eq('user_id',user.id).like('match_id','KO-%');
+              showSaved();
+            }} style={{flex:1,padding:"7px",background:"#F59E0B",color:"#fff",border:"none",borderRadius:6,fontSize:12,fontWeight:500,cursor:"pointer"}}>Reset knockout</button>
+            <button onClick={()=>setShowBracketChanged(false)} style={{flex:1,padding:"7px",background:"#fff",border:"0.5px solid #F59E0B",borderRadius:6,fontSize:12,cursor:"pointer",color:"#92400E"}}>Keep my picks</button>
+          </div>
+        </div>
+      )}
       {/* Global clear confirmation modal */}
       {showClearKOConfirm&&(
         <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",zIndex:99999,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
@@ -2337,21 +2353,7 @@ export default function App(){
             )}
           </div>
 
-          {showBracketChanged&&(
-            <div style={{background:"#FEF9EC",border:"1px solid #F59E0B",borderRadius:8,padding:"10px 12px",marginBottom:"1rem"}}>
-              <div style={{fontSize:12,fontWeight:500,color:"#92400E",marginBottom:8}}>⚠️ Group standings changed — your knockout bracket may be affected.</div>
-              <div style={{display:"flex",gap:6}}>
-                <button onClick={async()=>{
-                  setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
-                  setShowBracketChanged(false);
-                  showSaving();
-                  await supabase.from('predictions').delete().eq('user_id',user.id).like('match_id','KO-%');
-                  showSaved();
-                }} style={{flex:1,padding:"7px",background:"#F59E0B",color:"#fff",border:"none",borderRadius:6,fontSize:12,fontWeight:500,cursor:"pointer"}}>Reset knockout</button>
-                <button onClick={()=>setShowBracketChanged(false)} style={{flex:1,padding:"7px",background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:6,fontSize:12,cursor:"pointer",color:"var(--color-text-secondary)"}}>Keep my picks</button>
-              </div>
-            </div>
-          )}
+
           {/* Group tabs */}
           {/* Group tabs - 2 row grid on mobile, 6-col grid on desktop */}
           <div style={{display:"grid",gridTemplateColumns:mobile?"repeat(6,1fr)":"repeat(6,1fr)",gap:mobile?4:6,marginBottom:"1.25rem"}}>
