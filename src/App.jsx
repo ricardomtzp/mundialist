@@ -2424,16 +2424,7 @@ export default function App(){
                           )}
                           <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500,flex:1,textAlign:"right"}}>{match.away}</span>
                           <span style={{fontSize:20,flexShrink:0}}>{FLAGS[match.away]||"❓"}</span>
-                          {(isMyDouble||canDouble)&&!isSeeded&&(
-                            <button onClick={()=>canDouble&&setDouble(roundKey,activeGroup,idx)}
-                              style={{padding:"6px 10px",borderRadius:7,fontSize:12,fontWeight:isMyDouble?600:400,
-                                cursor:canDouble?"pointer":"not-allowed",flexShrink:0,
-                                border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,
-                                background:isMyDouble?C.goldLt:"transparent",
-                                color:isMyDouble?C.gold:"var(--color-text-secondary)"}}>
-                              {isMyDouble?"⚡ ×2":"×2"}
-                            </button>
-                          )}
+                          
                         </div>
                       )}
                       {/* Actual result row - Option A */}
@@ -2449,15 +2440,7 @@ export default function App(){
                       {mobile&&(
                         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:4}}>
                           {GROUP_VENUES[activeGroup]?.[idx]?<span style={{fontSize:8,color:"var(--color-text-tertiary)"}}>📍 {GROUP_VENUES[activeGroup][idx].city}</span>:<span/>}
-                          {(isMyDouble||canDouble)&&!isSeeded&&<button onClick={()=>!actual&&setDouble(roundKey,activeGroup,idx)}
-                            style={{padding:"3px 8px",borderRadius:6,fontSize:10,fontWeight:isMyDouble?600:400,
-                              cursor:actual?"not-allowed":"pointer",
-                              border:`0.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,
-                              background:isMyDouble?C.goldLt:"transparent",
-                              color:isMyDouble?C.gold:"var(--color-text-secondary)",
-                              opacity:actual&&!isMyDouble?0.3:1}}>
-                            {isMyDouble?"⚡ ×2":"×2"}
-                          </button>}
+                          }
                         </div>
                       )}
                       {!mobile&&GROUP_VENUES[activeGroup]?.[idx]&&<div style={{fontSize:9,color:"var(--color-text-tertiary)",marginTop:4}}>📍 {GROUP_VENUES[activeGroup][idx].city}</div>}
