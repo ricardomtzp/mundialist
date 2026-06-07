@@ -2294,9 +2294,9 @@ export default function App(){
 
           {/* Prediction style selector + simulate */}
           <div style={{background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:10,padding:"12px 14px",marginBottom:"1.25rem"}}>
-            <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
               <span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",flexShrink:0}}>Style:</span>
-              <div style={{display:"flex",gap:4,flex:1,flexWrap:"wrap"}}>
+              <div style={{display:"flex",gap:4,flex:1,overflowX:"auto",minWidth:0}}>
                 {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
                   <button key={k} onClick={()=>setSimulateStyle(k)}
                     style={{padding:"5px 10px",borderRadius:8,fontSize:11,cursor:"pointer",fontWeight:simulateStyle===k?600:400,
