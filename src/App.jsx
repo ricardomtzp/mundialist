@@ -2506,7 +2506,7 @@ export default function App(){
                   </button>
                 ))}
               </div>
-              <div style={{display:"flex",gap:6,alignItems:"center"}}>
+              <div style={{display:"flex",gap:6,alignItems:"center",justifyContent:"flex-start"}}>
                 <button onClick={async()=>{
                   const simKO=simulateKnockout(r32Bracket,simulateStyle);
                   setKoPicks(simKO);
