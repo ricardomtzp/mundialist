@@ -1644,11 +1644,19 @@ export default function App(){
         .select('league_id, leagues(id,name,invite_code)')
         .eq('user_id',userId);
       if(!data?.length)return;
+      const leagueIds=data.map(d=>d.leagues.id);
+      // Get member counts for all leagues in one query
+      const {data:counts}=await supabase
+        .from('league_members')
+        .select('league_id')
+        .in('league_id',leagueIds);
+      const countMap={};
+      (counts||[]).forEach(r=>{countMap[r.league_id]=(countMap[r.league_id]||0)+1;});
       const leagues=data.map(d=>({
         id:d.leagues.id,
         name:d.leagues.name,
         code:d.leagues.invite_code==='MND26-GLOBAL'?null:d.leagues.invite_code,
-        members:0,
+        members:countMap[d.leagues.id]||0,
         rank:1,
       }));
       // Always put global first
