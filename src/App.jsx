@@ -1321,6 +1321,7 @@ export default function App(){
   const [showClearKOConfirm,setShowClearKOConfirm]=useState(false);
   const [showBracketChanged,setShowBracketChanged]=useState(false);
   const prevR32Ref=useRef(null);
+  const bracketInitializedRef=useRef(false);
   const clearKO=async()=>{
     setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
     setShowClearKOConfirm(false);
@@ -1598,12 +1599,16 @@ export default function App(){
   // Detect when R32 bracket changes due to group score edits
   useEffect(()=>{
     const prev=prevR32Ref.current;
-    if(prev){
+    if(prev&&bracketInitializedRef.current){
       const changed=r32Bracket.some((m,i)=>m.home!==prev[i]?.home||m.away!==prev[i]?.away);
       const hasKOPicks=Object.keys(koPicks.r32).length>0||Object.keys(koPicks.r16).length>0;
       if(changed&&hasKOPicks)setShowBracketChanged(true);
     }
     prevR32Ref.current=r32Bracket.map(m=>({home:m.home,away:m.away}));
+    // Mark as initialized after first render with real data
+    if(r32Bracket.some(m=>m.home!=="TBD")){
+      bracketInitializedRef.current=true;
+    }
   },[r32Bracket]);
 
   // Check for existing session on load
