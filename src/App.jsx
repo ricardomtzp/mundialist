@@ -2568,7 +2568,22 @@ export default function App(){
             </div>
           </div>
 
-          {r32AllTBD&&(
+          {(()=>{
+          const groupDone=totalPredicted===72;
+          const koDone=koPicked>=32;
+          const bonusDone=goldenBootLocked&&topAssistLocked&&goldenGloveLocked&&doublesSelected===3;
+          const nextAction=page==="bracket"&&koDone&&!bonusDone?{label:"Knockout complete! Fill in Bonuses →",page:"bonuses"}:
+                           page==="bonuses"&&bonusDone?{label:"All picks complete — you're ready for June 11! ✅",page:null}:
+                           page==="bracket"&&!groupDone?{label:"← Fill in Group Stage first",page:"predict"}:null;
+          if(!nextAction)return null;
+          return(
+            <div style={{background:nextAction.page?C.blueLt:"#EAF3DE",border:`0.5px solid ${nextAction.page?C.blue:"#3B6D11"}`,borderRadius:10,padding:"10px 14px",marginBottom:"1rem",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
+              <span style={{fontSize:13,fontWeight:500,color:nextAction.page?C.blue:"#3B6D11"}}>{nextAction.label}</span>
+              {nextAction.page&&<button onClick={()=>setPage(nextAction.page)} style={{padding:"6px 14px",background:C.blue,color:"#fff",border:"none",borderRadius:7,fontSize:12,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>Go →</button>}
+            </div>
+          );
+        })()}
+        {r32AllTBD&&(
             <div style={{display:"flex",gap:12,padding:"14px 18px",background:C.blueLt,border:`0.5px solid ${C.blue}`,borderRadius:10,marginBottom:"1.5rem",alignItems:"center"}}>
               <span style={{fontSize:22}}>⚽</span>
               <div>
@@ -2834,6 +2849,21 @@ export default function App(){
             </div>
           </div>
 
+        {(()=>{
+          const groupDone=totalPredicted===72;
+          const koDone=koPicked>=32;
+          const bonusDone=goldenBootLocked&&topAssistLocked&&goldenGloveLocked&&doublesSelected===3;
+          const nextAction=page==="bracket"&&koDone&&!bonusDone?{label:"Knockout complete! Fill in Bonuses →",page:"bonuses"}:
+                           page==="bonuses"&&bonusDone?{label:"All picks complete — you're ready for June 11! ✅",page:null}:
+                           page==="bracket"&&!groupDone?{label:"← Fill in Group Stage first",page:"predict"}:null;
+          if(!nextAction)return null;
+          return(
+            <div style={{background:nextAction.page?C.blueLt:"#EAF3DE",border:`0.5px solid ${nextAction.page?C.blue:"#3B6D11"}`,borderRadius:10,padding:"10px 14px",marginBottom:"1rem",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
+              <span style={{fontSize:13,fontWeight:500,color:nextAction.page?C.blue:"#3B6D11"}}>{nextAction.label}</span>
+              {nextAction.page&&<button onClick={()=>setPage(nextAction.page)} style={{padding:"6px 14px",background:C.blue,color:"#fff",border:"none",borderRadius:7,fontSize:12,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>Go →</button>}
+            </div>
+          );
+        })()}
           {/* Golden Boot */}
           <div style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${C.green}`,borderRadius:"0 12px 12px 0"}}>
             <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
