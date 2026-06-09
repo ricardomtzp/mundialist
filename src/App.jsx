@@ -2532,12 +2532,9 @@ export default function App(){
             <div>
               <h1 style={{fontSize:22,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 4px",color:"var(--color-text-primary)"}}>Knockout Stage</h1>
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 6px"}}>Pick the winner of every match. Your picks cascade automatically to the next round.</p>
-              <div style={{display:"flex",gap:12,fontSize:11,alignItems:"center",flexWrap:"wrap"}}>
-                <span style={{color:C.blue}}>🔵 Tap to pick winner</span>
-                <span style={{fontFamily:"monospace",color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>{koPicked}/32 picks</span>
-              </div>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-start",flexShrink:0}}>
+              <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginBottom:4}}>Auto-fills bracket based on FIFA rankings</div>
               <div style={{display:"flex",gap:6}}>
                 {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
                   <button key={k} onClick={()=>setSimulateStyle(k)}
@@ -2611,6 +2608,10 @@ export default function App(){
                     {r==="r32"?"R32":r==="r16"?"R16":r==="qf"?"QF":r==="sf"?"SF":"Final"}
                   </button>
                 ))}
+              </div>
+              <div style={{display:"flex",gap:10,fontSize:11,alignItems:"center",marginBottom:"0.75rem"}}>
+                <span style={{color:C.blue}}>🔵 Tap a team to pick the winner</span>
+                <span style={{fontFamily:"monospace",color:C.gold,background:C.goldLt,padding:"2px 8px",borderRadius:99}}>{koPicked}/32 picks</span>
               </div>
               {koRound==="r32"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
