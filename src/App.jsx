@@ -2535,7 +2535,6 @@ export default function App(){
               <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 6px"}}>Pick the winner of every match. Your picks cascade automatically to the next round.</p>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-start",flexShrink:0}}>
-              <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginBottom:4}}>Auto-fills bracket based on FIFA rankings</div>
               <div style={{display:"flex",gap:6}}>
                 {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
                   <button key={k} onClick={()=>setSimulateStyle(k)}
@@ -2547,6 +2546,7 @@ export default function App(){
                   </button>
                 ))}
               </div>
+              <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:2,marginBottom:2}}>Auto-fills bracket based on FIFA rankings. Pick a style to control how bold the predictions are.</div>
               <div style={{display:"flex",gap:6,alignItems:"center",justifyContent:"flex-start"}}>
                 <button onClick={async()=>{
                   const simKO=simulateKnockout(r32Bracket,simulateStyle);
