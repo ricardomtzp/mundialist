@@ -2546,7 +2546,7 @@ export default function App(){
                   </button>
                 ))}
               </div>
-              <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:2,marginBottom:2}}>Auto-fills bracket based on FIFA rankings. Pick a style to control how bold the predictions are.</div>
+              <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginTop:2}}>Auto-fills bracket based on FIFA rankings.</div><div style={{fontSize:11,color:"var(--color-text-tertiary)",marginBottom:2}}>Pick a style to control how bold the predictions are.</div>
               <div style={{display:"flex",gap:6,alignItems:"center",justifyContent:"flex-start"}}>
                 <button onClick={async()=>{
                   const simKO=simulateKnockout(r32Bracket,simulateStyle);
