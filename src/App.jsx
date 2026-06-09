@@ -2338,7 +2338,7 @@ export default function App(){
           <div style={{background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:10,padding:"12px 14px",marginBottom:"1.25rem"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
               <div>
-                <div style={{fontSize:12,fontWeight:500,color:"var(--color-text-primary)",marginBottom:8}}>Simulation style</div>
+                <div style={{fontSize:12,fontWeight:500,color:"var(--color-text-primary)",marginBottom:2}}>Simulation style</div><div style={{fontSize:11,color:"var(--color-text-tertiary)",marginBottom:8}}>Auto-fills all 72 matches based on FIFA rankings. Pick a style to control how bold the predictions are.</div>
                 <div style={{display:"flex",gap:6}}>
                   {[{k:"cautious",e:"🛡️",l:"Cautious"},{k:"balanced",e:"⚖️",l:"Balanced"},{k:"bold",e:"🔥",l:"Bold"},{k:"maverick",e:"🚀",l:"Maverick"}].map(({k,e,l})=>(
                     <button key={k} onClick={()=>setSimulateStyle(k)}
