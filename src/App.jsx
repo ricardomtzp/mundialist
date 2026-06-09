@@ -1322,6 +1322,7 @@ export default function App(){
   const [showBracketChanged,setShowBracketChanged]=useState(false);
   const prevR32Ref=useRef(null);
   const bracketInitializedRef=useRef(false);
+  const sessionLoadedRef=useRef(false);
   const clearKO=async()=>{
     setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
     setShowClearKOConfirm(false);
@@ -1579,6 +1580,7 @@ export default function App(){
         if(profile){
           setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name?.[0]?.toUpperCase()||"?",id:uid});
           setJoinedLeagues([{id:"global",name:"Global League",members:leagueMembers.length||memberCount||0,rank:1,code:null}]);
+          sessionLoadedRef.current=true;
           loadUserData(uid);loadActualResults();loadJoinedLeagues(uid);
           setPage("predict");
         } else if(meta?.full_name||session.user.email){
@@ -1619,6 +1621,7 @@ export default function App(){
           if(profile){
             setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:session.user.id});
             setJoinedLeagues([{id:"global",name:"Global League",members:leagueMembers.length||memberCount||0,rank:1,code:null}]);
+            if(sessionLoadedRef.current)return;
             loadUserData(session.user.id);
             loadActualResults();
             // Pre-load global league member count
