@@ -2573,8 +2573,9 @@ export default function App(){
           const koDone=koPicked>=32;
           const bonusDone=goldenBootLocked&&topAssistLocked&&goldenGloveLocked&&doublesSelected===3;
           const nextAction=!groupDone?{label:"Fill in Group Stage first →",page:"predict"}:
-                           koDone&&!bonusDone?{label:"Knockout complete! Fill in Bonuses →",page:"bonuses"}:
-                           koDone&&bonusDone?{label:"All picks complete — you're ready for June 11! ✅",page:null}:null;
+                           koDone&&bonusDone?{label:"All picks complete — you're ready for June 11! ✅",page:null}:
+                           koDone?{label:"Knockout complete! Fill in Bonuses →",page:"bonuses"}:
+                           {label:"Pick the winner of each match — your bracket updates automatically.",page:null};
           if(!nextAction)return null;
           return(
             <div style={{background:(koDone&&bonusDone)?"#EAF3DE":C.blueLt,border:`0.5px solid ${(koDone&&bonusDone)?"#3B6D11":C.blue}`,borderRadius:10,padding:"10px 14px",marginBottom:"1rem",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
