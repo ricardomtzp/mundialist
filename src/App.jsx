@@ -1433,7 +1433,7 @@ export default function App(){
 
   // ── Save helpers ──────────────────────────────────────────────────────────
   const showSaved=()=>{setSaveStatus('saved');setTimeout(()=>setSaveStatus(null),2000);};
-  const showSaving=()=>setSaveStatus('saving');
+  const showSaving=()=>{setSaveStatus('saving');setTimeout(()=>setSaveStatus(s=>s==='saving'?null:s),5000);};
   const showError=()=>{setSaveStatus('error');setTimeout(()=>setSaveStatus(null),3000);};
 
   const saveGroupPick=async(group,idx,homeScore,awayScore)=>{
