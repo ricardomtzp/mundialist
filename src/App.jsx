@@ -2355,6 +2355,7 @@ export default function App(){
                 style={{padding:"9px 18px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap"}}>
                 Simulate ↻
               </button>
+              <span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Auto-fills bracket based on FIFA rankings. Pick a style to control how bold the predictions are.</span>
             </div>
             {adventScore!==null&&(
               <div style={{marginTop:10}}>
