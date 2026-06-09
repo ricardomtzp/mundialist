@@ -2824,6 +2824,47 @@ export default function App(){
         <div style={{maxWidth:660,margin:"0 auto",padding:"2rem 1.5rem"}}>
           <h1 style={{fontSize:22,fontWeight:600,letterSpacing:"-0.03em",margin:"0 0 4px",color:"var(--color-text-primary)"}}>Bonus Picks</h1>
           <p style={{fontSize:13,color:"var(--color-text-secondary)",margin:"0 0 1.25rem"}}>Strategic extras on top of your match predictions. All editable until June 11.</p>
+          {(()=>{
+          const groupDone=totalPredicted===72;
+          const koDone=koPicked>=32;
+          const bonusDone=goldenBootLocked&&topAssistLocked&&goldenGloveLocked&&doublesSelected===3;
+          const allDone=groupDone&&koDone&&bonusDone;
+          const nextAction=!groupDone?{label:"Fill in Knockout →",page:"bracket"}:!koDone?{label:"Fill in Knockout →",page:"bracket"}:!bonusDone?{label:"Fill in Bonuses →",page:"bonuses"}:null;
+          if(allDone)return(
+            <div style={{background:"#EAF3DE",border:"0.5px solid #3B6D11",borderRadius:10,padding:"10px 14px",marginBottom:"1rem",display:"flex",alignItems:"center",gap:10}}>
+              <span style={{fontSize:18}}>✅</span>
+              <span style={{fontSize:13,fontWeight:500,color:"#3B6D11"}}>All picks complete — you're ready for June 11!</span>
+            </div>
+          );
+          return(
+            <div style={{background:"var(--color-background-primary)",border:"0.5px solid #185FA5",borderRadius:10,padding:"12px 14px",marginBottom:"1rem"}}>
+              <div style={{fontSize:11,fontWeight:500,color:"#185FA5",marginBottom:10}}>📋 Pick completion</div>
+              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                {[
+                  {label:"⚽ Groups",done:groupDone,current:totalPredicted,total:72},
+                  {label:"🏆 Knockout",done:koDone,current:koPicked,total:32},
+                  {label:"⭐ Bonuses",done:bonusDone&&doublesSelected===3,current:[goldenBootLocked,topAssistLocked,goldenGloveLocked].filter(Boolean).length+doublesSelected,total:6},
+                ].map(({label,done,current,total})=>(
+                  <div key={label}>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+                      <span style={{fontSize:11,color:"var(--color-text-primary)"}}>{label}</span>
+                      <span style={{fontSize:11,fontWeight:600,color:done?"#3B6D11":"#ef4444"}}>{current}/{total}{done?" ✓":""}</span>
+                    </div>
+                    <div style={{height:4,background:"#e5e7eb",borderRadius:2,overflow:"hidden"}}>
+                      <div style={{height:"100%",width:`${Math.round(current/total*100)}%`,background:done?"#3B6D11":"#185FA5",borderRadius:2,transition:"width 0.3s"}}/>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {nextAction&&(
+                <button onClick={()=>setPage(nextAction.page)}
+                  style={{width:"100%",marginTop:10,padding:"8px",background:"#185FA5",color:"#fff",border:"none",borderRadius:7,fontSize:12,fontWeight:600,cursor:"pointer"}}>
+                  {nextAction.label}
+                </button>
+              )}
+            </div>
+          );
+        })()}
           <LockBanner/>
 
           {/* Double-down */}
@@ -2879,47 +2920,7 @@ export default function App(){
             </div>
           </div>
 
-        {(()=>{
-          const groupDone=totalPredicted===72;
-          const koDone=koPicked>=32;
-          const bonusDone=goldenBootLocked&&topAssistLocked&&goldenGloveLocked&&doublesSelected===3;
-          const allDone=groupDone&&koDone&&bonusDone;
-          const nextAction=!groupDone?{label:"Fill in Knockout →",page:"bracket"}:!koDone?{label:"Fill in Knockout →",page:"bracket"}:!bonusDone?{label:"Fill in Bonuses →",page:"bonuses"}:null;
-          if(allDone)return(
-            <div style={{background:"#EAF3DE",border:"0.5px solid #3B6D11",borderRadius:10,padding:"10px 14px",marginBottom:"1rem",display:"flex",alignItems:"center",gap:10}}>
-              <span style={{fontSize:18}}>✅</span>
-              <span style={{fontSize:13,fontWeight:500,color:"#3B6D11"}}>All picks complete — you're ready for June 11!</span>
-            </div>
-          );
-          return(
-            <div style={{background:"var(--color-background-primary)",border:"0.5px solid #185FA5",borderRadius:10,padding:"12px 14px",marginBottom:"1rem"}}>
-              <div style={{fontSize:11,fontWeight:500,color:"#185FA5",marginBottom:10}}>📋 Pick completion</div>
-              <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                {[
-                  {label:"⚽ Groups",done:groupDone,current:totalPredicted,total:72},
-                  {label:"🏆 Knockout",done:koDone,current:koPicked,total:32},
-                  {label:"⭐ Bonuses",done:bonusDone&&doublesSelected===3,current:[goldenBootLocked,topAssistLocked,goldenGloveLocked].filter(Boolean).length+doublesSelected,total:6},
-                ].map(({label,done,current,total})=>(
-                  <div key={label}>
-                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
-                      <span style={{fontSize:11,color:"var(--color-text-primary)"}}>{label}</span>
-                      <span style={{fontSize:11,fontWeight:600,color:done?"#3B6D11":"#ef4444"}}>{current}/{total}{done?" ✓":""}</span>
-                    </div>
-                    <div style={{height:4,background:"#e5e7eb",borderRadius:2,overflow:"hidden"}}>
-                      <div style={{height:"100%",width:`${Math.round(current/total*100)}%`,background:done?"#3B6D11":"#185FA5",borderRadius:2,transition:"width 0.3s"}}/>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {nextAction&&(
-                <button onClick={()=>setPage(nextAction.page)}
-                  style={{width:"100%",marginTop:10,padding:"8px",background:"#185FA5",color:"#fff",border:"none",borderRadius:7,fontSize:12,fontWeight:600,cursor:"pointer"}}>
-                  {nextAction.label}
-                </button>
-              )}
-            </div>
-          );
-        })()}
+        
           {/* Golden Boot */}
           <div style={{...card,marginBottom:"1rem",borderLeft:`3px solid ${C.green}`,borderRadius:"0 12px 12px 0"}}>
             <div style={{padding:"12px 16px",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
