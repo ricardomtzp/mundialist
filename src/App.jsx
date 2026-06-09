@@ -2881,7 +2881,6 @@ export default function App(){
 
         {(()=>{
           const groupDone=totalPredicted===72;
-          const groupDone=totalPredicted===72;
           const koDone=koPicked>=32;
           const bonusDone=goldenBootLocked&&topAssistLocked&&goldenGloveLocked&&doublesSelected===3;
           const allDone=groupDone&&koDone&&bonusDone;
