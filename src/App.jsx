@@ -1444,13 +1444,17 @@ export default function App(){
       // Load user profile
       const {data:profile}=await supabase.from("users").select("*").eq("id",data.user.id).single();
       if(profile){
+        sessionLoadedRef.current=true;
         setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:data.user.id});
         setJoinedLeagues([{id:"global",name:"Global League",members:leagueMembers.length||memberCount||0,rank:1,code:null}]);
-        sessionLoadedRef.current=true;
+        setAuthLoading(false);
         loadUserData(data.user.id);
         loadActualResults();
         loadJoinedLeagues(data.user.id);
-        setPage("predict");setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),100);
+        setPage("predict");
+        setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),100);
+      } else {
+        setAuthError("Account not found. Please sign up first.");
       }
     } catch(err){
       setAuthError(err.message||"Sign in failed. Please check your email and password.");
