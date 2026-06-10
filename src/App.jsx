@@ -1495,32 +1495,95 @@ export default function App(){
   };
 
   // ── Calculate total points ────────────────────────────────────────────────
-  const calcTotalPoints=useCallback((groupMatchesData, koPicked, doubleDownData, actualResultsData)=>{
+  const calcTotalPoints=useCallback((groupMatchesData, koPicked, doubleDownData, actualResultsData, goldenBootPickData, topAssistPickData, goldenGlovePickData, tournamentAwardsData)=>{
     let total=0;
-    // Group stage points
-    Object.entries(GROUPS).forEach(([g,teams])=>{
+    const actualArr=Object.values(actualResultsData);
+
+    // 1. Group stage match points
+    Object.entries(GROUPS).forEach(([g])=>{
       const matches=groupMatchesData[g]||[];
       matches.forEach((m,idx)=>{
-        const matchId=`OF-2026-06-${String(idx+1).padStart(2,'0')}-${m.home?.replace(/\s/g,'-')}-${m.away?.replace(/\s/g,'-')}`;
-        // Find actual result by home/away team names
-        const actual=Object.values(actualResultsData).find(r=>
-          r.home_team===m.home&&r.away_team===m.away&&r.status==='finished'
-        );
+        const actual=actualArr.find(r=>r.home_team===m.home&&r.away_team===m.away&&r.status==='finished');
         if(!actual)return;
         let pts=calcMatchPoints(m.homeScore,m.awayScore,actual.actual_home,actual.actual_away);
-        // Check double-down
         const doubleId=`${g}-${idx}`;
         if(Object.values(doubleDownData).includes(doubleId))pts*=2;
         total+=pts;
       });
     });
-    // Knockout points
-    Object.entries(koPicked.r32||{}).forEach(([id,team])=>{
-      const match=Object.values(actualResultsData).find(r=>r.stage==='r32'&&r.status==='finished');
-      if(!match)return;
-      const winner=match.actual_home>match.actual_away?match.home_team:match.away_team;
-      if(team===winner)total+=calcKOPoints('r32',team,winner,!SEEDED.has(team));
+
+    // 2. Group standings points (5/3 for top 2, 2 for correct 3rd place qualifier)
+    Object.entries(GROUPS).forEach(([g,teams])=>{
+      const groupActual=actualArr.filter(r=>r.status==='finished'&&r.group_name===g);
+      if(groupActual.length<6)return;
+      // Build actual standings
+      const ap={};teams.forEach(t=>{ap[t]={pts:0,gd:0,gf:0};});
+      groupActual.forEach(r=>{
+        const h=r.actual_home,a=r.actual_away;
+        if(h>a){ap[r.home_team].pts+=3;}else if(h<a){ap[r.away_team].pts+=3;}else{ap[r.home_team].pts+=1;ap[r.away_team].pts+=1;}
+        ap[r.home_team].gd+=h-a;ap[r.away_team].gd+=a-h;
+        ap[r.home_team].gf+=h;ap[r.away_team].gf+=a;
+      });
+      const actualStandings=teams.slice().sort((a,b)=>ap[b].pts-ap[a].pts||ap[b].gd-ap[a].gd||ap[b].gf-ap[a].gf);
+      // Build user predicted standings
+      const up={};teams.forEach(t=>{up[t]={pts:0,gd:0,gf:0};});
+      (groupMatchesData[g]||[]).forEach(m=>{
+        if(m.homeScore===''||m.awayScore==='')return;
+        const h=parseInt(m.homeScore),a=parseInt(m.awayScore);
+        if(h>a){up[m.home].pts+=3;}else if(h<a){up[m.away].pts+=3;}else{up[m.home].pts+=1;up[m.away].pts+=1;}
+        up[m.home].gd+=h-a;up[m.away].gd+=a-h;
+        up[m.home].gf+=h;up[m.away].gf+=a;
+      });
+      const userStandings=teams.slice().sort((a,b)=>up[b].pts-up[a].pts||up[b].gd-up[a].gd||up[b].gf-up[a].gf);
+      // 5/3 pts for top 2
+      const a1=actualStandings[0],a2=actualStandings[1],u1=userStandings[0],u2=userStandings[1];
+      if(u1===a1&&u2===a2)total+=5;
+      else if(u1===a2&&u2===a1)total+=3;
+      // 2 pts for correct 3rd place if they qualify (handled by tournament data)
+      // We award 2 pts if user predicted 3rd matches actual 3rd AND they qualified
+      if(userStandings[2]&&actualStandings[2]&&userStandings[2]===actualStandings[2]){
+        // Check if this 3rd place team actually qualified (in actualResults as a KO team)
+        const qualified=actualArr.some(r=>r.stage==='r32'&&r.status==='finished'&&(r.home_team===actualStandings[2]||r.away_team===actualStandings[2]));
+        if(qualified)total+=2;
+      }
     });
+
+    // 3. KO round points - match by home/away team names
+    ['r32','r16','qf','sf'].forEach(round=>{
+      Object.entries(koPicked[round]||{}).forEach(([,team])=>{
+        const actual=actualArr.find(r=>r.stage===round&&r.status==='finished'&&(r.home_team===team||r.away_team===team));
+        if(!actual)return;
+        const winner=actual.actual_home>actual.actual_away?actual.home_team:actual.away_team;
+        if(team===winner)total+=calcKOPoints(round,team,winner,!SEEDED.has(team));
+      });
+    });
+
+    // Final - champion (25pts) and runner-up (20pts)
+    const finalActual=actualArr.find(r=>r.stage==='final'&&r.status==='finished');
+    if(finalActual){
+      const champion=finalActual.actual_home>finalActual.actual_away?finalActual.home_team:finalActual.away_team;
+      const runnerUp=champion===finalActual.home_team?finalActual.away_team:finalActual.home_team;
+      if(koPicked.final?.[0]===champion)total+=calcKOPoints('final',champion,champion,!SEEDED.has(champion));
+      if(koPicked.sf){
+        // Runner-up is SF winner who lost the final
+        const sfWinners=Object.values(koPicked.sf||{});
+        const pickedRunnerUp=sfWinners.find(t=>t!==koPicked.final?.[0])||null;
+        if(pickedRunnerUp===runnerUp)total+=20;
+      }
+    }
+
+    // Third place match
+    const thirdActual=actualArr.find(r=>r.stage==='third'&&r.status==='finished');
+    if(thirdActual&&koPicked.third){
+      const thirdWinner=thirdActual.actual_home>thirdActual.actual_away?thirdActual.home_team:thirdActual.away_team;
+      if(koPicked.third===thirdWinner)total+=calcKOPoints('third',koPicked.third,thirdWinner,!SEEDED.has(koPicked.third));
+    }
+
+    // 4. Bonus picks (15pts each)
+    if(tournamentAwardsData?.golden_boot&&goldenBootPickData?.name===tournamentAwardsData.golden_boot)total+=15;
+    if(tournamentAwardsData?.top_assist&&topAssistPickData?.name===tournamentAwardsData.top_assist)total+=15;
+    if(tournamentAwardsData?.golden_glove&&goldenGlovePickData?.name===tournamentAwardsData.golden_glove)total+=15;
+
     setTotalPoints(total);
     return total;
   },[]);
@@ -3267,6 +3330,7 @@ export default function App(){
             {title:"Group tables",accent:C.purple,note:"Auto-calculated from your match scores — no separate pick needed.",items:[
               {label:"Winner & runner-up correct, right order",val:"5",c:C.purple},
               {label:"Both correct, positions swapped",val:"3",c:C.purple},
+              {label:"Correct 3rd place team qualifies from group",val:"2",c:C.purple},
               {label:"Any other outcome",val:"0",c:"#888"},
             ]},
             {title:"Knockout stage",accent:C.green,note:"Points accumulate — a correct champion pick earns 12+14+16+18+25 = 85 pts total.",items:[
