@@ -1426,6 +1426,7 @@ export default function App(){
       await supabase.from("league_members").upsert({league_id:"00000000-0000-0000-0000-000000000001",user_id:uid,total_points:0},{onConflict:"league_id,user_id"});
       setUser({name:onboardName,handle:"@"+handle,email:googleSession.user.email,avatar:avatarLetter,id:uid});
       setJoinedLeagues([{id:"global",name:"Global League",members:leagueMembers.length||memberCount||0,rank:1,code:null}]);
+      sessionLoadedRef.current=true;
       loadUserData(uid);loadActualResults();loadJoinedLeagues(uid);
       setAuthMode("signup");setGoogleSession(null);setPage("predict");
     }catch(e){setAuthError(e.message||"Failed to create profile");}
@@ -1673,8 +1674,8 @@ export default function App(){
           if(!sessionLoadedRef.current){
             sessionLoadedRef.current=true;
             loadUserData(uid);loadActualResults();loadJoinedLeagues(uid);
+            setPage("predict");
           }
-          setPage("predict");
         } else if(meta?.full_name||session.user.email){
           setGoogleSession(session);
           setOnboardName(meta?.full_name||"");
