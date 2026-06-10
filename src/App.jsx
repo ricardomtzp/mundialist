@@ -1248,7 +1248,6 @@ export default function App(){
   const [leagueStep,setLeagueStep]=useState("overview");
   const [leagueCode,setLeagueCode]=useState("");
   const [leagueJoinError,setLeagueJoinError]=useState(null);
-  const [leagueJoinError,setLeagueJoinError]=useState(null);
   const [leagueName,setLeagueName]=useState("");
   const [joinedLeagues,setJoinedLeagues]=useState([]);
   const [activeLeague,setActiveLeague]=useState(null);
