@@ -1116,6 +1116,21 @@ function calcKOPoints(round, pickedTeam, actualWinner, isDarkHorse){
   return base+darkBonus;
 }
 
+function getKORoundFromId(matchId){
+  if(!matchId)return null;
+  const parts=matchId.split('-');
+  // Format: OF-2026-MM-DD-...
+  const month=parseInt(parts[2]);
+  const day=parseInt(parts[3]);
+  if(month===6||(month===7&&day<=3))return 'r32';
+  if(month===7&&day<=7)return 'r16';
+  if(month===7&&day<=11)return 'qf';
+  if(month===7&&day<=15)return 'sf';
+  if(month===7&&day===18)return 'third';
+  if(month===7&&day===19)return 'final';
+  return null;
+}
+
 function useCountdown(){
   const target=new Date("2026-06-11T18:00:00Z").getTime();
   const calc=()=>{
@@ -1555,10 +1570,14 @@ export default function App(){
       }
     });
 
-    // 3. KO round points - match by home/away team names
+    // 3. KO round points - derive round from match ID date
     ['r32','r16','qf','sf'].forEach(round=>{
       Object.entries(koPicked[round]||{}).forEach(([,team])=>{
-        const actual=actualArr.find(r=>r.stage===round&&r.status==='finished'&&(r.home_team===team||r.away_team===team));
+        const actual=actualArr.find(r=>{
+          if(r.status!=='finished'||r.stage!=='knockout')return false;
+          const roundFromId=getKORoundFromId(r.id);
+          return roundFromId===round&&(r.home_team===team||r.away_team===team);
+        });
         if(!actual)return;
         const winner=actual.actual_home>actual.actual_away?actual.home_team:actual.away_team;
         if(team===winner)total+=calcKOPoints(round,team,winner,!SEEDED.has(team));
@@ -1566,21 +1585,18 @@ export default function App(){
     });
 
     // Final - champion (25pts) and runner-up (20pts)
-    const finalActual=actualArr.find(r=>r.stage==='final'&&r.status==='finished');
+    const finalActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='final');
     if(finalActual){
       const champion=finalActual.actual_home>finalActual.actual_away?finalActual.home_team:finalActual.away_team;
       const runnerUp=champion===finalActual.home_team?finalActual.away_team:finalActual.home_team;
       if(koPicked.final?.[0]===champion)total+=calcKOPoints('final',champion,champion,!SEEDED.has(champion));
-      if(koPicked.sf){
-        // Runner-up is SF winner who lost the final
-        const sfWinners=Object.values(koPicked.sf||{});
-        const pickedRunnerUp=sfWinners.find(t=>t!==koPicked.final?.[0])||null;
-        if(pickedRunnerUp===runnerUp)total+=20;
-      }
+      const sfWinners=Object.values(koPicked.sf||{});
+      const pickedRunnerUp=sfWinners.find(t=>t!==koPicked.final?.[0])||null;
+      if(pickedRunnerUp===runnerUp)total+=20;
     }
 
     // Third place match
-    const thirdActual=actualArr.find(r=>r.stage==='third'&&r.status==='finished');
+    const thirdActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='third');
     if(thirdActual&&koPicked.third){
       const thirdWinner=thirdActual.actual_home>thirdActual.actual_away?thirdActual.home_team:thirdActual.away_team;
       if(koPicked.third===thirdWinner)total+=calcKOPoints('third',koPicked.third,thirdWinner,!SEEDED.has(koPicked.third));
