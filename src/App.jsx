@@ -1112,8 +1112,8 @@ function calcKOPoints(round, pickedTeam, actualWinner, isDarkHorse){
   if(!actualWinner||!pickedTeam)return 0;
   if(pickedTeam!==actualWinner)return 0;
   const base={r32:12,r16:14,qf:16,sf:18,final:25,third:12}[round]||0;
-  const darkBonus=isDarkHorse?{qf:5,sf:10,final:15}[round]||0:0;
-  return base+darkBonus;
+  if(isDarkHorse)return Math.round(base*1.5);
+  return base;
 }
 
 function getKORoundFromId(matchId){
@@ -3440,10 +3440,12 @@ export default function App(){
               {label:"Tournament champion",val:"25",c:C.gold},
               {label:"Third place match",val:"12",c:C.green},
             ]},
-            {title:"Dark horse bonus",accent:C.red,note:"On top of normal knockout pts. Non-seeded team = not one of the 12 group leaders.",items:[
-              {label:"Non-seeded team reaches QF",val:"+5",c:C.red},
-              {label:"Non-seeded team reaches SF",val:"+10",c:C.red},
-              {label:"Non-seeded team reaches Final",val:"+15",c:C.red},
+            {title:"Dark horse bonus",accent:C.red,note:"If your advancing team is non-seeded, their knockout points are multiplied by 1.5×. Non-seeded = not one of the 12 group seeded teams.",items:[
+              {label:"R32 dark horse advancing",val:"18 pts",c:C.red},
+              {label:"R16 dark horse advancing",val:"21 pts",c:C.red},
+              {label:"QF dark horse advancing",val:"24 pts",c:C.red},
+              {label:"SF dark horse advancing",val:"27 pts",c:C.red},
+              {label:"Final dark horse advancing",val:"38 pts",c:C.red},
             ]},
             {title:"Bonus picks",accent:C.gold,items:[
               {label:"Double-down",note:"×2 on one match per matchday · 3 total · no seeded teams",val:"×2",c:C.gold},
