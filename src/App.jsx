@@ -3145,7 +3145,7 @@ export default function App(){
                 )}
               </div>
               <div style={{marginTop:"0.75rem",background:"var(--color-background-secondary)",borderRadius:8,display:"flex"}}>
-                {viewingUserBreakdown&&(
+                {viewingUserBreakdown?(
                   <>
                     <div style={{flex:1,textAlign:"center",padding:"10px 8px",borderRight:"0.5px solid var(--color-border-tertiary)"}}>
                       <div style={{fontSize:16,fontWeight:600,color:"var(--color-text-primary)",fontFamily:"monospace"}}>{viewingUserBreakdown.match}</div>
