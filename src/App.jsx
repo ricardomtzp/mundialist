@@ -1700,26 +1700,26 @@ export default function App(){
     }
   },[r32Bracket]);
 
-  // Check for existing session on load
+  // Check for existing session on load - only fires if onAuthStateChange INITIAL_SESSION hasn't already handled it
   useEffect(()=>{
-    supabase.auth.getSession().then(({data:{session}})=>{
-      if(session?.user){
-        supabase.from("users").select("*").eq("id",session.user.id).single().then(({data:profile})=>{
-          if(profile){
-            setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:session.user.id});
-            setJoinedLeagues([{id:"global",name:"Global League",members:leagueMembers.length||memberCount||0,rank:1,code:null}]);
-            if(sessionLoadedRef.current)return;
-            loadUserData(session.user.id);
-            loadActualResults();
-            // Pre-load global league member count
-            supabase.from('league_members').select('user_id').eq('league_id','00000000-0000-0000-0000-000000000001').then(({data})=>{
-              if(data?.length)setJoinedLeagues(prev=>prev.map(l=>l.id==="global"?{...l,members:data.length}:l));
-            });
-            setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),200);
-          }
-        });
-      }
-    });
+    setTimeout(()=>{
+      if(sessionLoadedRef.current)return;
+      supabase.auth.getSession().then(({data:{session}})=>{
+        if(session?.user&&!sessionLoadedRef.current){
+          supabase.from("users").select("*").eq("id",session.user.id).single().then(({data:profile})=>{
+            if(profile&&!sessionLoadedRef.current){
+              sessionLoadedRef.current=true;
+              setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:session.user.id});
+              setJoinedLeagues([{id:"global",name:"Global League",members:leagueMembers.length||memberCount||0,rank:1,code:null}]);
+              loadUserData(session.user.id);
+              loadActualResults();
+              loadJoinedLeagues(session.user.id);
+              setPage("predict");
+            }
+          });
+        }
+      });
+    },500);
   },[]);
 
   // Reload actual results whenever user logs in + scroll to top
