@@ -3143,9 +3143,38 @@ export default function App(){
                   </div>
                 )}
               </div>
-              <div style={{marginTop:"0.75rem",padding:"10px 14px",background:"var(--color-background-secondary)",borderRadius:8,display:"flex",gap:16}}>
-                <div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:600,color:C.blue,fontFamily:"monospace"}}>{viewingUser.pts}</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>points</div></div>
-                <div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)",fontFamily:"monospace"}}>{viewingUser.picks.groupDone} picks</div><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>group picks</div></div>
+              <div style={{marginTop:"0.75rem",background:"var(--color-background-secondary)",borderRadius:8,display:"flex"}}>
+                {tournamentStarted()&&viewingUserBreakdown?(
+                  <>
+                    <div style={{flex:1,textAlign:"center",padding:"10px 8px",borderRight:"0.5px solid var(--color-border-tertiary)"}}>
+                      <div style={{fontSize:16,fontWeight:600,color:"var(--color-text-primary)",fontFamily:"monospace"}}>{viewingUserBreakdown.match}</div>
+                      <div style={{fontSize:10,color:"var(--color-text-tertiary)",marginTop:2}}>⚽ Matches</div>
+                    </div>
+                    <div style={{flex:1,textAlign:"center",padding:"10px 8px",borderRight:"0.5px solid var(--color-border-tertiary)"}}>
+                      <div style={{fontSize:16,fontWeight:600,color:"var(--color-text-primary)",fontFamily:"monospace"}}>{viewingUserBreakdown.ko}</div>
+                      <div style={{fontSize:10,color:"var(--color-text-tertiary)",marginTop:2}}>🏆 Knockout</div>
+                    </div>
+                    <div style={{flex:1,textAlign:"center",padding:"10px 8px",borderRight:"0.5px solid var(--color-border-tertiary)"}}>
+                      <div style={{fontSize:16,fontWeight:600,color:"var(--color-text-primary)",fontFamily:"monospace"}}>{viewingUserBreakdown.bonus}</div>
+                      <div style={{fontSize:10,color:"var(--color-text-tertiary)",marginTop:2}}>⭐ Bonuses</div>
+                    </div>
+                    <div style={{flex:1,textAlign:"center",padding:"10px 8px"}}>
+                      <div style={{fontSize:16,fontWeight:600,color:C.blue,fontFamily:"monospace"}}>{viewingUserBreakdown.total}</div>
+                      <div style={{fontSize:10,color:C.blue,marginTop:2}}>Total</div>
+                    </div>
+                  </>
+                ):(
+                  <>
+                    <div style={{flex:1,textAlign:"center",padding:"10px 14px",borderRight:"0.5px solid var(--color-border-tertiary)"}}>
+                      <div style={{fontSize:18,fontWeight:600,color:C.blue,fontFamily:"monospace"}}>{viewingUser.pts}</div>
+                      <div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>points</div>
+                    </div>
+                    <div style={{flex:1,textAlign:"center",padding:"10px 14px"}}>
+                      <div style={{fontSize:18,fontWeight:600,color:"var(--color-text-primary)",fontFamily:"monospace"}}>{viewingUser.picks.groupDone}</div>
+                      <div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>group picks</div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           )}
