@@ -1272,6 +1272,13 @@ export default function App(){
   const doublesSelected=Object.values(doubleDown).filter(Boolean).length;
   const koPicked=Object.values(koPicks).reduce((s,r)=>s+(r===null?0:typeof r==='string'?1:Object.keys(r).length),0);
   const adventScore=useMemo(()=>calcAdventurousness(groupMatches,allStandings),[groupMatches,allStandings]);
+
+  // Recalculate total points whenever relevant state changes
+  useEffect(()=>{
+    if(user&&Object.keys(actualResults).length>0){
+      calcTotalPoints(groupMatches,koPicks,doubleDown,actualResults,goldenBootPick,topAssistPick,goldenGlovePick,tournamentAwards);
+    }
+  },[groupMatches,koPicks,doubleDown,actualResults,goldenBootPick,topAssistPick,goldenGlovePick,tournamentAwards,user]);
   const adventInfo=adventLabel(adventScore);
 
   const updateScore=(group,idx,side,val)=>{
