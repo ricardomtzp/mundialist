@@ -11,14 +11,14 @@ const C = {
 
 const GROUPS = {
   A:["Mexico","South Africa","South Korea","Czechia"],
-  B:["Canada","Switzerland","Qatar","Bosnia and Herzegovina"],
+  B:["Canada","Bosnia and Herzegovina","Qatar","Switzerland"],
   C:["Brazil","Morocco","Haiti","Scotland"],
   D:["USA","Paraguay","Australia","Türkiye"],
   E:["Germany","Curaçao","Ivory Coast","Ecuador"],
   F:["Netherlands","Japan","Sweden","Tunisia"],
   G:["Belgium","Egypt","Iran","New Zealand"],
   H:["Spain","Cape Verde","Saudi Arabia","Uruguay"],
-  I:["France","Senegal","Norway","Iraq"],
+  I:["France","Senegal","Iraq","Norway"],
   J:["Argentina","Algeria","Austria","Jordan"],
   K:["Portugal","DR Congo","Uzbekistan","Colombia"],
   L:["England","Croatia","Ghana","Panama"],
@@ -848,15 +848,15 @@ const KO_VENUES={
 
 const GROUP_DATES={
   A:['Jun 11', 'Jun 11', 'Jun 17', 'Jun 17', 'Jun 26', 'Jun 26'],
-  B:['Jun 12', 'Jun 12', 'Jun 18', 'Jun 18', 'Jun 26', 'Jun 26'],
+  B:['Jun 12', 'Jun 13', 'Jun 18', 'Jun 18', 'Jun 26', 'Jun 26'],
   C:['Jun 13', 'Jun 13', 'Jun 19', 'Jun 19', 'Jun 27', 'Jun 27'],
-  D:['Jun 12', 'Jun 12', 'Jun 19', 'Jun 19', 'Jun 25', 'Jun 25'],
+  D:['Jun 12', 'Jun 14', 'Jun 19', 'Jun 19', 'Jun 25', 'Jun 25'],
   E:['Jun 14', 'Jun 14', 'Jun 20', 'Jun 20', 'Jun 25', 'Jun 25'],
   F:['Jun 14', 'Jun 14', 'Jun 20', 'Jun 20', 'Jun 27', 'Jun 27'],
   G:['Jun 15', 'Jun 15', 'Jun 21', 'Jun 21', 'Jun 27', 'Jun 27'],
   H:['Jun 15', 'Jun 15', 'Jun 21', 'Jun 21', 'Jun 27', 'Jun 27'],
   I:['Jun 16', 'Jun 16', 'Jun 22', 'Jun 22', 'Jun 26', 'Jun 26'],
-  J:['Jun 16', 'Jun 16', 'Jun 22', 'Jun 22', 'Jun 26', 'Jun 26'],
+  J:['Jun 16', 'Jun 17', 'Jun 22', 'Jun 22', 'Jun 26', 'Jun 26'],
   K:['Jun 17', 'Jun 17', 'Jun 23', 'Jun 23', 'Jun 27', 'Jun 27'],
   L:['Jun 17', 'Jun 17', 'Jun 23', 'Jun 23', 'Jun 27', 'Jun 27'],
 };
