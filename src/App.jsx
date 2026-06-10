@@ -1247,6 +1247,7 @@ export default function App(){
   const [koPicks,setKoPicks]=useState({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
   const [leagueStep,setLeagueStep]=useState("overview");
   const [leagueCode,setLeagueCode]=useState("");
+  const [leagueJoinError,setLeagueJoinError]=useState(null);
   const [leagueName,setLeagueName]=useState("");
   const [joinedLeagues,setJoinedLeagues]=useState([]);
   const [activeLeague,setActiveLeague]=useState(null);
