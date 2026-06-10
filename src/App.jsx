@@ -1251,6 +1251,7 @@ export default function App(){
   const [joinedLeagues,setJoinedLeagues]=useState([]);
   const [activeLeague,setActiveLeague]=useState(null);
   const [viewingUser,setViewingUser]=useState(null);
+  const [viewingUserBreakdown,setViewingUserBreakdown]=useState({match:0,ko:0,bonus:0,total:0});
   const [createdCode]=useState("MND26-"+Math.random().toString(36).substring(2,7).toUpperCase());
   const countdown=useCountdown();
 
@@ -3144,7 +3145,7 @@ export default function App(){
                 )}
               </div>
               <div style={{marginTop:"0.75rem",background:"var(--color-background-secondary)",borderRadius:8,display:"flex"}}>
-                {viewingUserBreakdown?(
+                {viewingUserBreakdown&&(
                   <>
                     <div style={{flex:1,textAlign:"center",padding:"10px 8px",borderRight:"0.5px solid var(--color-border-tertiary)"}}>
                       <div style={{fontSize:16,fontWeight:600,color:"var(--color-text-primary)",fontFamily:"monospace"}}>{viewingUserBreakdown.match}</div>
@@ -3247,7 +3248,7 @@ export default function App(){
                   {tournamentStarted()&&<span style={{fontSize:12,fontWeight:500,color:"var(--color-text-secondary)",width:80,textAlign:"center",flexShrink:0}}>Champion</span>}
                 </div>
                 {leagueMembers.map((m,i)=>(
-                  <div key={i} onClick={()=>setViewingUser(m)}
+                  <div key={i} onClick={()=>{setViewingUser(m);setViewingUserBreakdown({match:0,ko:0,bonus:0,total:0});loadUserBreakdown(m.id);}}
                     style={{padding:"12px 16px",borderBottom:i<leagueMembers.length-1?"0.5px solid var(--color-border-tertiary)":"none",
                       display:"flex",alignItems:"center",gap:12,cursor:"pointer",
                       background:m.name===(user?.name||"You")?C.blueLt:"transparent"}}>
