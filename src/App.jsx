@@ -3351,18 +3351,23 @@ export default function App(){
               </div>
               <input value={leagueCode} onChange={e=>setLeagueCode(e.target.value.toUpperCase())} placeholder="MND26-XXXXX"
                 style={{...inp,fontFamily:"monospace",letterSpacing:"0.05em",marginBottom:10}}/>
+              {leagueJoinError&&<div style={{fontSize:12,color:"#ef4444",marginBottom:8,padding:"8px 10px",background:"#fef2f2",borderRadius:6}}>⚠️ {leagueJoinError}</div>}
               <button onClick={async()=>{
-                if(!leagueCode.trim())return;
+                const code=leagueCode.trim().toUpperCase();
+                if(!code)return;
+                setLeagueJoinError(null);
                 showSaving();
-                // Find league by invite code
-                const {data:league,error}=await supabase.from("leagues").select("*").eq("invite_code",leagueCode).single();
-                if(error||!league){showError();alert("League not found. Check the code and try again.");return;}
-                // Join league
-                await supabase.from("league_members").upsert({league_id:league.id,user_id:user.id,total_points:0},{onConflict:"league_id,user_id"});
-                const nl={id:league.id,name:league.name,members:0,rank:1,code:leagueCode};
-                setJoinedLeagues(p=>[...p.filter(l=>l.id!==league.id),nl]);
-                setActiveLeague(nl);setLeagueStep("overview");
-                showSaved();
+                try{
+                  const {data:league,error}=await supabase.from("leagues").select("*").eq("invite_code",code).single();
+                  if(error||!league){showError();setLeagueJoinError("League not found — double check the code and try again.");return;}
+                  const {error:joinError}=await supabase.from("league_members").upsert({league_id:league.id,user_id:user.id,total_points:0},{onConflict:"league_id,user_id"});
+                  if(joinError){showError();setLeagueJoinError("Failed to join league — please try again.");return;}
+                  const nl={id:league.id,name:league.name,members:0,rank:1,code:code};
+                  setJoinedLeagues(p=>[...p.filter(l=>l.id!==league.id),nl]);
+                  setActiveLeague(nl);setLeagueStep("overview");
+                  setLeagueJoinError(null);
+                  showSaved();
+                }catch(e){showError();setLeagueJoinError("Something went wrong — please try again.");}
               }} style={{width:"100%",padding:"11px",background:C.blue,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:500,cursor:"pointer"}}>Join league →</button>
             </div>
           )}
