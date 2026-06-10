@@ -1667,8 +1667,10 @@ export default function App(){
         if(profile){
           setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name?.[0]?.toUpperCase()||"?",id:uid});
           setJoinedLeagues([{id:"global",name:"Global League",members:leagueMembers.length||memberCount||0,rank:1,code:null}]);
-          sessionLoadedRef.current=true;
-          loadUserData(uid);loadActualResults();loadJoinedLeagues(uid);
+          if(!sessionLoadedRef.current){
+            sessionLoadedRef.current=true;
+            loadUserData(uid);loadActualResults();loadJoinedLeagues(uid);
+          }
           setPage("predict");
         } else if(meta?.full_name||session.user.email){
           setGoogleSession(session);
