@@ -1303,14 +1303,13 @@ export default function App(){
     setGroupMatches(prev=>{
       const u=[...prev[group]];
       u[idx]={...u[idx],[side]:val};
-      const updated={...prev,[group]:u};
-      // Auto-save when both scores are filled
-      const m=u[idx];
-      const home=side==="homeScore"?val:m.homeScore;
-      const away=side==="awayScore"?val:m.awayScore;
-      if(home!==""&&away!=="")saveGroupPick(group,idx,home,away);
-      return updated;
+      return {...prev,[group]:u};
     });
+    // Auto-save outside state updater to avoid React double-invoke side effects
+    const m=groupMatches[group][idx];
+    const home=side==="homeScore"?val:m.homeScore;
+    const away=side==="awayScore"?val:m.awayScore;
+    if(home!==""&&away!=="")saveGroupPick(group,idx,home,away);
   };
   const setDouble=(rk,gk,idx)=>{
     const id=`${gk}-${idx}`;
