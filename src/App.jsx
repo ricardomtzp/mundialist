@@ -3144,7 +3144,9 @@ export default function App(){
                   </div>
                 )}
               </div>
-              <div style={{marginTop:"0.75rem",background:"var(--color-background-secondary)",borderRadius:8,display:"flex"}}>
+              <div style={{marginTop:"0.75rem",background:"var(--color-background-primary)",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,overflow:"hidden"}}>
+                <div style={{padding:"8px 12px",background:"var(--color-background-secondary)",borderBottom:"0.5px solid var(--color-border-tertiary)"}}><span style={{fontSize:11,fontWeight:500,color:"var(--color-text-secondary)"}}>📊 Points breakdown</span></div>
+                <div style={{display:"flex"}}>
                 {viewingUserBreakdown?(
                   <>
                     <div style={{flex:1,textAlign:"center",padding:"10px 8px",borderRight:"0.5px solid var(--color-border-tertiary)"}}>
@@ -3176,6 +3178,7 @@ export default function App(){
                     </div>
                   </>
                 )}
+                </div>
               </div>
             </div>
           )}
