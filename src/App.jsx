@@ -2594,6 +2594,41 @@ export default function App(){
                   ))}
                 </tbody>
               </table>
+              {(()=>{
+                const teams=GROUPS[activeGroup]||[];
+                const groupActual=Object.values(actualResults).filter(r=>r.status==='finished'&&r.group_name===activeGroup);
+                if(groupActual.length<6)return null;
+                const ap={};teams.forEach(t=>{ap[t]={pts:0,gd:0,gf:0};});
+                groupActual.forEach(r=>{
+                  const h=r.actual_home,a=r.actual_away;
+                  if(h>a){ap[r.home_team].pts+=3;}else if(h<a){ap[r.away_team].pts+=3;}else{ap[r.home_team].pts+=1;ap[r.away_team].pts+=1;}
+                  ap[r.home_team].gd+=h-a;ap[r.away_team].gd+=a-h;
+                });
+                const actualStandings=teams.slice().sort((a,b)=>ap[b].pts-ap[a].pts||ap[b].gd-ap[a].gd);
+                const userStandings=allStandings[activeGroup]?.map(r=>r.team)||[];
+                const a1=actualStandings[0],a2=actualStandings[1],u1=userStandings[0],u2=userStandings[1];
+                const correct=u1===a1&&u2===a2;
+                const swapped=u1===a2&&u2===a1;
+                const thirdCorrect=userStandings[2]&&actualStandings[2]&&userStandings[2]===actualStandings[2];
+                const thirdQualified=Object.values(actualResults).some(r=>r.stage==='r32'&&(r.home_team===actualStandings[2]||r.away_team===actualStandings[2]));
+                const standingsPts=(correct?5:swapped?3:0)+(thirdCorrect&&thirdQualified?2:0);
+                if(standingsPts===0)return null;
+                const isGreen=correct||(thirdCorrect&&thirdQualified&&!swapped);
+                const label=correct&&thirdCorrect&&thirdQualified?`Winner & runner-up correct, right order · ${actualStandings[2]} qualified`:
+                             correct?'Winner & runner-up correct, right order':
+                             swapped&&thirdCorrect&&thirdQualified?`Both correct, positions swapped · ${actualStandings[2]} qualified`:
+                             swapped?'Both correct, positions swapped':
+                             `${actualStandings[2]} qualified`;
+                return(
+                  <div style={{padding:"8px 12px",background:isGreen?"#EAF3DE":"#FEF9EC",borderTop:`0.5px solid ${isGreen?"#3B6D11":"#F59E0B"}`,display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+                    <div>
+                      <div style={{fontSize:11,fontWeight:500,color:isGreen?"#3B6D11":"#92400E"}}>Group standings bonus</div>
+                      <div style={{fontSize:10,color:isGreen?"#3B6D11":"#92400E",marginTop:2}}>{label}</div>
+                    </div>
+                    <span style={{fontSize:12,fontFamily:"monospace",fontWeight:600,color:isGreen?"#3B6D11":"#92400E",background:isGreen?"#D4EDBA":"#FEF3C7",padding:"2px 10px",borderRadius:99,flexShrink:0}}>+{standingsPts} pts</span>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
