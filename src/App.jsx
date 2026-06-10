@@ -3334,7 +3334,7 @@ export default function App(){
               {label:"Correct result only",val:"6",c:C.blue},
               {label:"Wrong result",note:"No negative scoring",val:"0",c:"#888"},
             ]},
-            {title:"Group tables",accent:C.purple,note:"Auto-calculated from your match scores — no separate pick needed.",items:[
+            {title:"Group standings bonus",accent:C.purple,note:"Auto-calculated from your match scores — no separate pick needed.",items:[
               {label:"Winner & runner-up correct, right order",val:"5",c:C.purple},
               {label:"Both correct, positions swapped",val:"3",c:C.purple},
               {label:"Correct 3rd place team qualifies from group",val:"2",c:C.purple},
