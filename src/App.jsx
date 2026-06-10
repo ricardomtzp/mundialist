@@ -1248,6 +1248,7 @@ export default function App(){
   const [leagueStep,setLeagueStep]=useState("overview");
   const [leagueCode,setLeagueCode]=useState("");
   const [leagueJoinError,setLeagueJoinError]=useState(null);
+  const [leagueJoinError,setLeagueJoinError]=useState(null);
   const [leagueName,setLeagueName]=useState("");
   const [joinedLeagues,setJoinedLeagues]=useState([]);
   const [activeLeague,setActiveLeague]=useState(null);
@@ -1445,8 +1446,10 @@ export default function App(){
       if(profile){
         setUser({name:profile.name,handle:"@"+profile.handle,email:profile.email,avatar:profile.avatar_letter||profile.name[0].toUpperCase(),id:data.user.id});
         setJoinedLeagues([{id:"global",name:"Global League",members:leagueMembers.length||memberCount||0,rank:1,code:null}]);
+        sessionLoadedRef.current=true;
         loadUserData(data.user.id);
         loadActualResults();
+        loadJoinedLeagues(data.user.id);
         setPage("predict");setTimeout(()=>window.scrollTo({top:0,behavior:"instant"}),100);
       }
     } catch(err){
