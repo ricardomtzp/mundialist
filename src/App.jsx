@@ -1496,10 +1496,11 @@ export default function App(){
   };
 
   const saveBonusPicks=async(updates)=>{
-    if(!user?.id)return;
+    const uid=userIdRef.current||user?.id;
+    if(!uid)return;
     showSaving();
     const {error}=await supabase.from('bonus_picks').upsert({
-      user_id:user.id,
+      user_id:uid,
       ...updates,
     },{onConflict:'user_id'});
     if(error){console.error('saveBonusPicks error:',error);showError();}
