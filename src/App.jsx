@@ -1470,11 +1470,10 @@ export default function App(){
   const showError=()=>{setSaveStatus('error');setTimeout(()=>setSaveStatus(null),3000);};
 
   const saveGroupPick=async(group,idx,homeScore,awayScore)=>{
-    const uid=userIdRef.current||user?.id;
-    if(!uid)return;
+    if(!user?.id)return;
     showSaving();
     const {error}=await supabase.from('predictions').upsert({
-      user_id:uid,
+      user_id:user.id,
       match_id:`GS-${group}-${idx}`,
       home_score:parseInt(homeScore)||0,
       away_score:parseInt(awayScore)||0,
@@ -1484,11 +1483,10 @@ export default function App(){
   };
 
   const saveKOPick=async(round,id,team)=>{
-    const uid=userIdRef.current||user?.id;
-    if(!uid)return;
+    if(!user?.id)return;
     showSaving();
     const {error}=await supabase.from('predictions').upsert({
-      user_id:uid,
+      user_id:user.id,
       match_id:`KO-${round}-${id}`,
       advancing_team:team,
     },{onConflict:'user_id,match_id'});
@@ -1497,11 +1495,10 @@ export default function App(){
   };
 
   const saveBonusPicks=async(updates)=>{
-    const uid=userIdRef.current||user?.id;
-    if(!uid)return;
+    if(!user?.id)return;
     showSaving();
     const {error}=await supabase.from('bonus_picks').upsert({
-      user_id:uid,
+      user_id:user.id,
       ...updates,
     },{onConflict:'user_id'});
     if(error){console.error('saveBonusPicks error:',error);showError();}
