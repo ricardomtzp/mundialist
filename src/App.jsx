@@ -1395,6 +1395,7 @@ export default function App(){
         // Auto-join global league
         await supabase.from("league_members").upsert({league_id:"00000000-0000-0000-0000-000000000001",user_id:data.user.id,total_points:0},{onConflict:"league_id,user_id"});
       }
+      sessionLoadedRef.current=true;
       setUser({name:formName,handle:"@"+formHandle.replace("@",""),email:formEmail,avatar:formName[0].toUpperCase(),id:data.user?.id});
       setJoinedLeagues([{id:"global",name:"Global League",members:leagueMembers.length||memberCount||0,rank:1,code:null}]);
       setPage("predict");window.scrollTo(0,0);
