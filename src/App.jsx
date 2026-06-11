@@ -1306,7 +1306,8 @@ export default function App(){
       return {...prev,[group]:u};
     });
     // Auto-save outside state updater to avoid React double-invoke side effects
-    const m=groupMatches[group][idx];
+    const m=groupMatches[group]?.[idx];
+    if(!m)return;
     const home=side==="homeScore"?val:m.homeScore;
     const away=side==="awayScore"?val:m.awayScore;
     if(home!==""&&away!=="")saveGroupPick(group,idx,home,away);
