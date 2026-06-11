@@ -1132,7 +1132,7 @@ function getKORoundFromId(matchId){
 }
 
 function useCountdown(){
-  const target=new Date("2026-06-11T18:00:00Z").getTime();
+  const target=new Date("2026-06-11T19:00:00Z").getTime();
   const calc=()=>{
     const diff=Math.max(0,target-Date.now());
     return{d:Math.floor(diff/86400000),h:Math.floor((diff%86400000)/3600000),m:Math.floor((diff%3600000)/60000),s:Math.floor((diff%60000)/1000)};
@@ -1146,7 +1146,7 @@ const card={background:"var(--color-background-primary)",border:"0.5px solid var
 const inp={width:"100%",boxSizing:"border-box",padding:"10px 12px",border:"0.5px solid var(--color-border-tertiary)",borderRadius:8,fontSize:14,background:"var(--color-background-primary)",color:"var(--color-text-primary)",outline:"none"};
 
 function AdSlot(){return(<div style={{width:"100%",height:72,background:"var(--color-background-secondary)",border:"0.5px dashed var(--color-border-tertiary)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:"1.5rem"}}><span style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Advertisement — sponsor@mundialist.com</span></div>);}
-function LockBanner(){return(<div style={{display:"flex",gap:10,padding:"11px 14px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:10,marginBottom:"1.25rem",fontSize:13,color:"#7a5c10",lineHeight:1.5}}><span>🔒</span><div><strong>All predictions lock at tournament kickoff — June 11, 2026.</strong></div></div>);}
+function LockBanner(){return(<div style={{display:"flex",gap:10,padding:"11px 14px",background:C.goldLt,border:`0.5px solid ${C.gold}`,borderRadius:10,marginBottom:"1.25rem",fontSize:13,color:"#7a5c10",lineHeight:1.5}}><span>🔒</span><div><strong>All predictions lock at tournament kickoff — June 11, 2026 at 3PM ET / 7PM GMT.</strong></div></div>);}
 
 function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,locked,setLocked,emoji,actualWinner=null}){
   const isCorrect=actualWinner&&pick?.name===actualWinner;
