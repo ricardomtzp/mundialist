@@ -2536,12 +2536,14 @@ export default function App(){
                             </div>
                           ):(
                             <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
-                              <input type="number" min="0" max="9" value={match.homeScore} onChange={e=>{const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"homeScore",v);}}
+                              <input type="number" min="0" max="9" value={match.homeScore} onChange={e=>{if(tournamentStarted())return;const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"homeScore",v);}}
                                 onClick={e=>e.target.select()}
+                                readOnly={tournamentStarted()}
                                 style={{width:38,textAlign:"center",padding:"7px 0",border:`1.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:7,fontSize:18,fontWeight:600,background:isMyDouble?C.goldLt:"#f0f0f0",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace",boxShadow:"inset 0 1px 3px rgba(0,0,0,0.08)"}}/>
                               <span style={{fontSize:13,color:"var(--color-text-tertiary)"}}>–</span>
-                              <input type="number" min="0" max="9" value={match.awayScore} onChange={e=>{const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"awayScore",v);}}
+                              <input type="number" min="0" max="9" value={match.awayScore} onChange={e=>{if(tournamentStarted())return;const v=e.target.value.slice(-1);updateScore(activeGroup,idx,"awayScore",v);}}
                                 onClick={e=>e.target.select()}
+                                readOnly={tournamentStarted()}
                                 style={{width:38,textAlign:"center",padding:"7px 0",border:`1.5px solid ${isMyDouble?C.gold:"var(--color-border-tertiary)"}`,borderRadius:7,fontSize:18,fontWeight:600,background:isMyDouble?C.goldLt:"#f0f0f0",color:"var(--color-text-primary)",outline:"none",fontFamily:"monospace",boxShadow:"inset 0 1px 3px rgba(0,0,0,0.08)"}}/>
                             </div>
                           )}
