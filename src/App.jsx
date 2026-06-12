@@ -24,7 +24,7 @@ const GROUPS = {
   L:["England","Croatia","Ghana","Panama"],
 };
 
-const TOURNAMENT_START=new Date('2026-06-11T19:00:00Z');
+const TOURNAMENT_START=new Date('2026-06-12T19:00:00Z');
 const tournamentStarted=()=>Date.now()>=TOURNAMENT_START.getTime();
 
 const SEEDED=new Set(["Mexico","USA","Brazil","Germany","Spain","France","England","Portugal","Belgium","Netherlands","Argentina"]);
