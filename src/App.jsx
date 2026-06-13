@@ -1007,6 +1007,19 @@ function normTeam(s){
     .replace(/^turkiye$/,'turkey');
 }
 
+async function fetchAllPredictions(cols, memberIds){
+  const pageSize=1000;
+  let all=[], from=0;
+  while(true){
+    const {data,error}=await supabase.from('predictions').select(cols).in('user_id',memberIds).order('id').range(from,from+pageSize-1);
+    if(error){console.error('fetchAllPredictions error:',error);break;}
+    all=all.concat(data||[]);
+    if(!data||data.length<pageSize)break;
+    from+=pageSize;
+  }
+  return {data:all};
+}
+
 function generateGroupMatches(teams){
   return [
     {home:teams[0],away:teams[1],homeScore:"",awayScore:""},
@@ -1803,8 +1816,7 @@ export default function App(){
       // Get all predictions for these members
       const [{data:profiles},{data:preds}]=await Promise.all([
         supabase.from('users').select('id,name,handle,avatar_letter').in('id',memberIds),
-        supabase.from('predictions').select('user_id,match_id,home_score,away_score,is_double_down')
-          .in('user_id',memberIds),
+        fetchAllPredictions('user_id,match_id,home_score,away_score,is_double_down', memberIds),
       ]);
 
       const profileMap={};
@@ -1878,7 +1890,7 @@ export default function App(){
       const [{data:profiles},{data:bonuses},{data:preds}]=await Promise.all([
         supabase.from('users').select('id,name,handle,avatar_letter').in('id',memberIds),
         supabase.from('bonus_picks').select('user_id,golden_boot_player,top_assist_player,golden_glove_player,ko_picks').in('user_id',memberIds),
-        supabase.from('predictions').select('user_id,match_id,home_score,away_score,is_double_down,advancing_team').in('user_id',memberIds),
+        fetchAllPredictions('user_id,match_id,home_score,away_score,is_double_down,advancing_team', memberIds),
       ]);
 
       const profileMap={};
