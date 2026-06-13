@@ -1801,7 +1801,7 @@ export default function App(){
       const memberIds=members.map(m=>m.user_id);
 
       // Get today's matches from DB
-      const today=new Date().toISOString().split('T')[0];
+      const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});
       const {data:todayMatches}=await supabase.from('matches')
         .select('id,home_team,away_team,actual_home,actual_away,status,stage,group_name,venue,city,kickoff')
         .eq('stage','group')
