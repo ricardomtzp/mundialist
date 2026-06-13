@@ -1020,6 +1020,11 @@ async function fetchAllPredictions(cols, memberIds){
   return {data:all};
 }
 
+function findActualResult(resultsArr, home, away){
+  const nh=normTeam(home), na=normTeam(away);
+  return (resultsArr||[]).find(r=>r.status==='finished'&&normTeam(r.home_team)===nh&&normTeam(r.away_team)===na);
+}
+
 function generateGroupMatches(teams){
   return [
     {home:teams[0],away:teams[1],homeScore:"",awayScore:""},
@@ -1555,7 +1560,7 @@ export default function App(){
     Object.entries(GROUPS).forEach(([g])=>{
       const matches=groupMatchesData[g]||[];
       matches.forEach((m,idx)=>{
-        const actual=actualArr.find(r=>r.home_team===m.home&&r.away_team===m.away&&r.status==='finished');
+        const actual=findActualResult(actualArr, m.home, m.away);
         if(!actual)return;
         let pts=calcMatchPoints(m.homeScore,m.awayScore,actual.actual_home,actual.actual_away);
         const doubleId=`${g}-${idx}`;
@@ -1923,9 +1928,7 @@ export default function App(){
             if(!teams)return;
             const matchDef=generateGroupMatches(teams)[idx];
             if(!matchDef)return;
-            const actual=Object.values(actualResults).find(r=>
-              r.home_team===matchDef.home&&r.away_team===matchDef.away&&r.status==='finished'
-            );
+            const actual=findActualResult(Object.values(actualResults), matchDef.home, matchDef.away);
             if(actual){
               let matchPts=calcMatchPoints(p.home_score,p.away_score,actual.actual_home,actual.actual_away);
               if(p.is_double_down)matchPts*=2;
@@ -2536,7 +2539,7 @@ export default function App(){
                   const groupHasPicks=groupMatches[activeGroup]?.some(m=>m.homeScore!==""&&m.awayScore!=="");
                   const homeQualifies=groupHasPicks&&allStandings[activeGroup]?.slice(0,2).some(r=>r.team===match.home);
                   const awayQualifies=groupHasPicks&&allStandings[activeGroup]?.slice(0,2).some(r=>r.team===match.away);
-                  const actual=Object.values(actualResults).find(r=>(r.home_team===match.home||r.home_team===match.away)&&(r.away_team===match.away||r.away_team===match.home)&&r.status==="finished");
+                  const actual=findActualResult(Object.values(actualResults), match.home, match.away);
                   const pts=actual?calcMatchPoints(match.homeScore,match.awayScore,actual.actual_home,actual.actual_away)*(isMyDouble?2:1):null;
                   const ptCol=pts===null?C.gold:pts>=10?C.green:pts>=6?C.blue:pts>0?C.gold:"#888";
                   return(
@@ -3054,7 +3057,7 @@ export default function App(){
                     {eligible.map(m=>{
                       const mid=`${m.g}-${m.idx}`;const sel=val===mid;const other=val&&val!==mid;
                       if(m.hasSeeded) return null;
-                      const actual=Object.values(actualResults).find(r=>r.home_team===m.home&&r.away_team===m.away&&r.status==="finished");
+                      const actual=findActualResult(Object.values(actualResults), m.home, m.away);
                       const ddPts=actual&&sel?calcMatchPoints(m.homeScore,m.awayScore,actual.actual_home,actual.actual_away)*2:null;
                       const ddCol=ddPts===null?C.gold:ddPts>0?C.green:"#ef4444";
                       return(<button key={mid} onClick={()=>!actual&&setDouble(rk,m.g,m.idx)} disabled={false}
