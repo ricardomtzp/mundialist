@@ -1000,6 +1000,13 @@ function simulateKnockout(r32Bracket, style){
   return newKO;
 }
 
+function normTeam(s){
+  return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/&/g,'and').replace(/[^a-z]/g,'')
+    .replace(/^czechrepublic$/,'czechia')
+    .replace(/^turkiye$/,'turkey');
+}
+
 function generateGroupMatches(teams){
   return [
     {home:teams[0],away:teams[1],homeScore:"",awayScore:""},
@@ -1817,7 +1824,10 @@ export default function App(){
           const grp=m.group_name;
           const teams=GROUPS[grp]||[];
           const gMatches=generateGroupMatches(teams);
-          const idx=gMatches.findIndex(gm=>gm.home===m.home_team&&gm.away===m.away_team);
+          const idx=gMatches.findIndex(gm=>{
+            const gh=normTeam(gm.home),ga=normTeam(gm.away),mh=normTeam(m.home_team),ma=normTeam(m.away_team);
+            return (gh===mh&&ga===ma)||(gh===ma&&ga===mh);
+          });
           const matchId=idx>=0?`GS-${grp}-${idx}`:null;
           picks[i]=matchId&&predMap[uid]?.[matchId]?predMap[uid][matchId]:null;
         });
