@@ -1509,6 +1509,7 @@ export default function App(){
 
   const saveKOPick=async(round,id,team)=>{
     if(!user?.id)return;
+    if(tournamentStarted())return;
     showSaving();
     const {error}=await supabase.from('predictions').upsert({
       user_id:user.id,
@@ -1521,6 +1522,7 @@ export default function App(){
 
   const saveBonusPicks=async(updates)=>{
     if(!user?.id)return;
+    if(tournamentStarted())return;
     showSaving();
     const {error}=await supabase.from('bonus_picks').upsert({
       user_id:user.id,
@@ -2008,6 +2010,7 @@ export default function App(){
   // ── Shared match card for knockout ──
   function KOCard({home,away,picked,onPick,label,gold=false,actualWinner=null,roundKey=null,venue=null,city=null}){
     const isFinished=actualWinner!==null;
+    const koLocked=tournamentStarted();
     const pickedCorrect=isFinished&&picked&&picked===actualWinner;
     const pickedWrong=isFinished&&picked&&picked!==actualWinner;
     const ptMap={r32:12,r16:14,qf:16,sf:18,final:25,third:12};
@@ -2023,9 +2026,9 @@ export default function App(){
           const isWinner=isFinished&&team===actualWinner;
           const isLoser=isFinished&&team!==actualWinner&&team!=="TBD";
           return(
-            <div key={ti} onClick={()=>!isFinished&&team!=="TBD"&&onPick&&onPick(team)}
+            <div key={ti} onClick={()=>!koLocked&&!isFinished&&team!=="TBD"&&onPick&&onPick(team)}
               style={{padding:"5px 7px",display:"flex",alignItems:"center",gap:5,
-                cursor:!isFinished&&team!=="TBD"&&onPick?"pointer":"default",
+                cursor:!koLocked&&!isFinished&&team!=="TBD"&&onPick?"pointer":"default",
                 background:picked===team?(gold?C.goldLt:C.blueLt):"transparent",
                 borderBottom:ti===0?"0.5px solid var(--color-border-tertiary)":"none",
                 opacity:isLoser?0.45:1}}>
