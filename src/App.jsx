@@ -1176,7 +1176,8 @@ function LockBanner(){return(<div style={{display:"flex",gap:10,padding:"11px 14
 function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,locked,setLocked,emoji,actualWinner=null}){
   const isCorrect=actualWinner&&pick?.name===actualWinner;
   const isWrong=actualWinner&&pick?.name!==actualWinner;
-  if(locked){
+  const hardLocked=Date.now()>=TOURNAMENT_START.getTime();
+  if(locked||hardLocked){
     const borderCol=isCorrect?C.green:isWrong?"#ef4444":color;
     const bgCol=isCorrect?C.greenLt:isWrong?"#fef2f2":color+"11";
     return(
@@ -1195,7 +1196,7 @@ function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,lo
             <div style={{fontSize:12,color}}>{pts} pts if correct</div>
           )}
         </div>
-        {!actualWinner&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
+        {!actualWinner&&!hardLocked&&<button onClick={()=>setLocked(false)} style={{padding:"4px 10px",background:"none",border:`0.5px solid ${color}`,borderRadius:6,fontSize:11,color,cursor:"pointer"}}>Change</button>}
       </div>
     );
   }
@@ -3063,10 +3064,10 @@ export default function App(){
                       const actual=findActualResult(Object.values(actualResults), m.home, m.away);
                       const ddPts=actual&&sel?calcMatchPoints(m.homeScore,m.awayScore,actual.actual_home,actual.actual_away)*2:null;
                       const ddCol=ddPts===null?C.gold:ddPts>0?C.green:"#ef4444";
-                      return(<button key={mid} onClick={()=>!actual&&setDouble(rk,m.g,m.idx)} disabled={false}
+                      return(<button key={mid} onClick={()=>!tournamentStarted()&&!actual&&setDouble(rk,m.g,m.idx)} disabled={false}
                         style={{padding:"9px 12px",border:`0.5px solid ${sel?ddCol:"var(--color-border-tertiary)"}`,borderRadius:8,
                           background:sel?(ddPts>0?C.greenLt:ddPts===0?"#fef2f2":C.goldLt):"var(--color-background-secondary)",
-                          cursor:other||actual?"not-allowed":"pointer",
+                          cursor:tournamentStarted()||other||actual?"not-allowed":"pointer",
                           display:"flex",alignItems:"center",gap:10,opacity:other?0.4:1,textAlign:"left"}}>
                         <span style={{fontSize:16}}>{FLAGS[m.home]||"❓"}</span>
                         <span style={{fontSize:13,color:"var(--color-text-primary)",flex:1,fontWeight:500}}>{m.home}</span>
