@@ -25,7 +25,10 @@ const GROUPS = {
 };
 
 const TOURNAMENT_START=new Date('2026-06-12T19:00:00Z');
-const tournamentStarted=()=>Date.now()>=TOURNAMENT_START.getTime();
+const UNLOCKED_USERS=['4b96c154-1500-4e5d-8ca4-d7344272b31e','f3e27809-46ff-40d6-aba1-1de260e01f41','c7ca32a0-b122-41bc-ad0b-c9c5d87712e5','4b6a129f-9f2a-4a61-bdcc-443266290279','1ab61bca-8937-4e62-a7c2-f6a16f81d813','267be517-bfd7-415b-ac3c-0bff003fd408','0311601f-a450-427c-b2c3-49794956aa27','af8265b3-8c06-426b-b79d-d45f2e3b9402','2d88bfb4-f0bc-49d3-81d1-7ed3b264da7d','18cab2bd-b5e1-4bd7-90a5-b8f6bb6277a6','a06a13bc-c19f-4d44-bd09-7d1740968f79'];
+const UNLOCK_UNTIL=new Date('2026-06-14T16:00:00Z');
+let CURRENT_USER_UNLOCKED=false;
+const tournamentStarted=()=>Date.now()>=TOURNAMENT_START.getTime()&&!CURRENT_USER_UNLOCKED;
 
 const SEEDED=new Set(["Mexico","USA","Brazil","Germany","Spain","France","England","Portugal","Belgium","Netherlands","Argentina"]);
 
@@ -1176,7 +1179,7 @@ function LockBanner(){return(<div style={{display:"flex",gap:10,padding:"11px 14
 function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,locked,setLocked,emoji,actualWinner=null}){
   const isCorrect=actualWinner&&pick?.name===actualWinner;
   const isWrong=actualWinner&&pick?.name!==actualWinner;
-  const hardLocked=Date.now()>=TOURNAMENT_START.getTime();
+  const hardLocked=Date.now()>=TOURNAMENT_START.getTime()&&!CURRENT_USER_UNLOCKED;
   if(locked||hardLocked){
     const borderCol=isCorrect?C.green:isWrong?"#ef4444":color;
     const bgCol=isCorrect?C.greenLt:isWrong?"#fef2f2":color+"11";
@@ -1230,6 +1233,7 @@ const NAV=[{label:"Home",page:"home"},{label:"Group Stage",page:"predict"},{labe
 export default function App(){
   const [page,setPage]=useState("home");
   const [user,setUser]=useState(null);
+  CURRENT_USER_UNLOCKED=UNLOCKED_USERS.includes(user?.id)&&Date.now()<UNLOCK_UNTIL.getTime();
   const [formName,setFormName]=useState("");
   const [formHandle,setFormHandle]=useState("");
   const [formEmail,setFormEmail]=useState("");
