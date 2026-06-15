@@ -25,10 +25,14 @@ const GROUPS = {
 };
 
 const TOURNAMENT_START=new Date('2026-06-12T19:00:00Z');
+<<<<<<< HEAD
 const UNLOCKED_USERS=['4b96c154-1500-4e5d-8ca4-d7344272b31e','f3e27809-46ff-40d6-aba1-1de260e01f41','c7ca32a0-b122-41bc-ad0b-c9c5d87712e5','4b6a129f-9f2a-4a61-bdcc-443266290279','1ab61bca-8937-4e62-a7c2-f6a16f81d813','267be517-bfd7-415b-ac3c-0bff003fd408','0311601f-a450-427c-b2c3-49794956aa27','af8265b3-8c06-426b-b79d-d45f2e3b9402','2d88bfb4-f0bc-49d3-81d1-7ed3b264da7d','18cab2bd-b5e1-4bd7-90a5-b8f6bb6277a6','a06a13bc-c19f-4d44-bd09-7d1740968f79'];
 const UNLOCK_UNTIL=new Date('2026-06-15T16:00:00Z');
 let CURRENT_USER_UNLOCKED=false;
 const tournamentStarted=()=>Date.now()>=TOURNAMENT_START.getTime()&&!CURRENT_USER_UNLOCKED;
+=======
+const tournamentStarted=()=>Date.now()>=TOURNAMENT_START.getTime();
+>>>>>>> parent of 5f4cae3 (Temporary time-boxed unlock for 11 users until noon EDT Jun 14 (fail-closed, auto-relock))
 
 const SEEDED=new Set(["Mexico","USA","Brazil","Germany","Spain","France","England","Portugal","Belgium","Netherlands","Argentina"]);
 
@@ -1159,6 +1163,100 @@ function getKORoundFromId(matchId){
   return null;
 }
 
+function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
+  userPreds=userPreds||[]; bonusRow=bonusRow||{}; actualArr=actualArr||[]; tournamentAwards=tournamentAwards||{};
+  let match=0, ko=0, bonus=0;
+  const doubleIds=[bonusRow.double_down_r1,bonusRow.double_down_r2,bonusRow.double_down_r3].filter(Boolean);
+  // Reconstruct this user's group scores from GS- predictions
+  const gm={};
+  Object.entries(GROUPS).forEach(([g,teams])=>{ gm[g]=generateGroupMatches(teams); });
+  userPreds.forEach(p=>{
+    if(p.match_id&&p.match_id.indexOf('GS-')===0){
+      const parts=p.match_id.split('-'); const g=parts[1]; const idx=parseInt(parts[2]);
+      if(gm[g]&&gm[g][idx]){
+        gm[g][idx].homeScore=p.home_score==null?'':String(p.home_score);
+        gm[g][idx].awayScore=p.away_score==null?'':String(p.away_score);
+      }
+    }
+  });
+  // 1. Group match points (x2 double-down via authoritative bonus columns)
+  Object.entries(GROUPS).forEach(([g])=>{
+    (gm[g]||[]).forEach((m,idx)=>{
+      if(m.homeScore===''||m.awayScore==='')return;
+      const actual=findActualResult(actualArr,m.home,m.away);
+      if(!actual)return;
+      let pts=calcMatchPoints(m.homeScore,m.awayScore,actual.actual_home,actual.actual_away);
+      if(doubleIds.indexOf(g+'-'+idx)!==-1)pts*=2;
+      match+=pts;
+    });
+  });
+  // 2. Group standings (only once all 6 group matches finished): 5/3 top-2, 2 for 3rd qualifier
+  Object.entries(GROUPS).forEach(([g,teams])=>{
+    const groupActual=actualArr.filter(r=>r.status==='finished'&&r.group_name===g);
+    if(groupActual.length<6)return;
+    const ap={};teams.forEach(t=>{ap[t]={pts:0,gd:0,gf:0};});
+    groupActual.forEach(r=>{
+      const h=r.actual_home,a=r.actual_away;
+      if(h>a)ap[r.home_team].pts+=3;else if(h<a)ap[r.away_team].pts+=3;else{ap[r.home_team].pts+=1;ap[r.away_team].pts+=1;}
+      ap[r.home_team].gd+=h-a;ap[r.away_team].gd+=a-h;ap[r.home_team].gf+=h;ap[r.away_team].gf+=a;
+    });
+    const aStand=teams.slice().sort((x,y)=>ap[y].pts-ap[x].pts||ap[y].gd-ap[x].gd||ap[y].gf-ap[x].gf);
+    const up={};teams.forEach(t=>{up[t]={pts:0,gd:0,gf:0};});
+    (gm[g]||[]).forEach(m=>{
+      if(m.homeScore===''||m.awayScore==='')return;
+      const h=parseInt(m.homeScore),a=parseInt(m.awayScore);
+      if(h>a)up[m.home].pts+=3;else if(h<a)up[m.away].pts+=3;else{up[m.home].pts+=1;up[m.away].pts+=1;}
+      up[m.home].gd+=h-a;up[m.away].gd+=a-h;up[m.home].gf+=h;up[m.away].gf+=a;
+    });
+    const uStand=teams.slice().sort((x,y)=>up[y].pts-up[x].pts||up[y].gd-up[x].gd||up[y].gf-up[x].gf);
+    if(uStand[0]===aStand[0]&&uStand[1]===aStand[1])match+=5;
+    else if(uStand[0]===aStand[1]&&uStand[1]===aStand[0])match+=3;
+    if(uStand[2]&&aStand[2]&&uStand[2]===aStand[2]){
+      const qualified=actualArr.some(r=>r.stage==='r32'&&r.status==='finished'&&(r.home_team===aStand[2]||r.away_team===aStand[2]));
+      if(qualified)match+=2;
+    }
+  });
+  // Reconstruct KO picks from KO- predictions
+  const koP={r32:{},r16:{},qf:{},sf:{},final:{},third:null};
+  userPreds.forEach(p=>{
+    if(!p.match_id||p.match_id.indexOf('KO-')!==0)return;
+    const parts=p.match_id.split('-'); const round=parts[1]; const id=parts[2];
+    if(round==='third')koP.third=p.advancing_team;
+    else if(koP[round]&&id!==undefined)koP[round][id]=p.advancing_team;
+  });
+  // 3. KO rounds r32..sf
+  ['r32','r16','qf','sf'].forEach(round=>{
+    Object.keys(koP[round]||{}).forEach(k=>{
+      const team=koP[round][k]; if(!team)return;
+      const actual=actualArr.find(r=>r.status==='finished'&&r.stage==='knockout'&&getKORoundFromId(r.id)===round&&(r.home_team===team||r.away_team===team));
+      if(!actual)return;
+      const winner=actual.actual_home>actual.actual_away?actual.home_team:actual.away_team;
+      if(team===winner)ko+=calcKOPoints(round,team,winner,!SEEDED.has(team));
+    });
+  });
+  // Final (champion 25 via calc, runner-up 20)
+  const finalActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='final');
+  if(finalActual){
+    const champion=finalActual.actual_home>finalActual.actual_away?finalActual.home_team:finalActual.away_team;
+    const runnerUp=champion===finalActual.home_team?finalActual.away_team:finalActual.home_team;
+    if(koP.final&&koP.final['0']===champion)ko+=calcKOPoints('final',champion,champion,!SEEDED.has(champion));
+    const sfWinners=Object.keys(koP.sf||{}).map(k=>koP.sf[k]);
+    const pickedRU=sfWinners.find(t=>t!==(koP.final&&koP.final['0']))||null;
+    if(pickedRU===runnerUp)ko+=20;
+  }
+  // Third place
+  const thirdActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='third');
+  if(thirdActual&&koP.third){
+    const tw=thirdActual.actual_home>thirdActual.actual_away?thirdActual.home_team:thirdActual.away_team;
+    if(koP.third===tw)ko+=calcKOPoints('third',koP.third,tw,!SEEDED.has(koP.third));
+  }
+  // 4. Bonus awards (15 each)
+  if(tournamentAwards.golden_boot&&bonusRow.golden_boot_player===tournamentAwards.golden_boot)bonus+=15;
+  if(tournamentAwards.top_assist&&bonusRow.top_assist_player===tournamentAwards.top_assist)bonus+=15;
+  if(tournamentAwards.golden_glove&&bonusRow.golden_glove_player===tournamentAwards.golden_glove)bonus+=15;
+  return {match:match,ko:ko,bonus:bonus,total:match+ko+bonus};
+}
+
 function useCountdown(){
   const target=new Date("2026-06-11T19:00:00Z").getTime();
   const calc=()=>{
@@ -1179,7 +1277,7 @@ function LockBanner(){return(<div style={{display:"flex",gap:10,padding:"11px 14
 function PlayerSearch({search,setSearch,pick,setPick,filtered,label,pts,color,locked,setLocked,emoji,actualWinner=null}){
   const isCorrect=actualWinner&&pick?.name===actualWinner;
   const isWrong=actualWinner&&pick?.name!==actualWinner;
-  const hardLocked=Date.now()>=TOURNAMENT_START.getTime()&&!CURRENT_USER_UNLOCKED;
+  const hardLocked=Date.now()>=TOURNAMENT_START.getTime();
   if(locked||hardLocked){
     const borderCol=isCorrect?C.green:isWrong?"#ef4444":color;
     const bgCol=isCorrect?C.greenLt:isWrong?"#fef2f2":color+"11";
@@ -1233,7 +1331,6 @@ const NAV=[{label:"Home",page:"home"},{label:"Group Stage",page:"predict"},{labe
 export default function App(){
   const [page,setPage]=useState("home");
   const [user,setUser]=useState(null);
-  CURRENT_USER_UNLOCKED=UNLOCKED_USERS.includes(user?.id)&&Date.now()<UNLOCK_UNTIL.getTime();
   const [formName,setFormName]=useState("");
   const [formHandle,setFormHandle]=useState("");
   const [formEmail,setFormEmail]=useState("");
@@ -1887,6 +1984,18 @@ export default function App(){
   const [leagueMembers,setLeagueMembers]=useState([]);
   const [leagueMembersLoading,setLeagueMembersLoading]=useState(false);
 
+  const loadUserBreakdown=async(userId)=>{
+    try{
+      const [{data:preds},{data:bonusRows}]=await Promise.all([
+        fetchAllPredictions('user_id,match_id,home_score,away_score,advancing_team', [userId]),
+        supabase.from('bonus_picks').select('golden_boot_player,top_assist_player,golden_glove_player,double_down_r1,double_down_r2,double_down_r3').eq('user_id',userId),
+      ]);
+      const bonusRow=(bonusRows&&bonusRows[0])||{};
+      const bd=computeUserPoints(preds||[], bonusRow, Object.values(actualResults), tournamentAwards);
+      setViewingUserBreakdown(bd);
+    }catch(e){console.error('loadUserBreakdown error:',e);setViewingUserBreakdown({match:0,ko:0,bonus:0,total:0});}
+  };
+
   const loadLeagueMembers=async(leagueId)=>{
     setLeagueMembersLoading(true);
     try{
@@ -1901,7 +2010,7 @@ export default function App(){
       const memberIds=members.map(m=>m.user_id);
       const [{data:profiles},{data:bonuses},{data:preds}]=await Promise.all([
         supabase.from('users').select('id,name,handle,avatar_letter').in('id',memberIds),
-        supabase.from('bonus_picks').select('user_id,golden_boot_player,top_assist_player,golden_glove_player,ko_picks').in('user_id',memberIds),
+        supabase.from('bonus_picks').select('user_id,golden_boot_player,top_assist_player,golden_glove_player,ko_picks,double_down_r1,double_down_r2,double_down_r3').in('user_id',memberIds),
         fetchAllPredictions('user_id,match_id,home_score,away_score,is_double_down,advancing_team', memberIds),
       ]);
 
@@ -1924,25 +2033,9 @@ export default function App(){
         // Count group picks
         const groupDone=userPreds.filter(p=>p.match_id?.startsWith('GS-')&&p.home_score!==null).length;
 
-        // Calculate points from predictions vs actual results
-        let pts=0;
-        userPreds.forEach(p=>{
-          if(p.match_id?.startsWith('GS-')){
-            const parts=p.match_id.split('-');
-            const grp=parts[1];
-            const idx=parseInt(parts[2]);
-            const teams=GROUPS[grp];
-            if(!teams)return;
-            const matchDef=generateGroupMatches(teams)[idx];
-            if(!matchDef)return;
-            const actual=findActualResult(Object.values(actualResults), matchDef.home, matchDef.away);
-            if(actual){
-              let matchPts=calcMatchPoints(p.home_score,p.away_score,actual.actual_home,actual.actual_away);
-              if(p.is_double_down)matchPts*=2;
-              pts+=matchPts;
-            }
-          }
-        });
+        // Unified scoring (group match+standings, KO, bonus) - single source of truth
+        const _bd=computeUserPoints(userPreds, bonus, Object.values(actualResults), tournamentAwards);
+        const pts=_bd.total;
 
         // Get champion pick from predictions (KO-final-0)
         const finalPred=userPreds.find(p=>p.match_id==='KO-final-0');
