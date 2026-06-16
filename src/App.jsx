@@ -1227,15 +1227,14 @@ function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
       if(team===winner)ko+=calcKOPoints(round,team,winner,!SEEDED.has(team));
     });
   });
-  // Final (champion 25 via calc, runner-up 20)
+  // Final: champion (25, x1.5 dark horse) + Finalist (20 each correct finalist, x1.5 dark horse)
   const finalActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='final');
   if(finalActual){
     const champion=finalActual.actual_home>finalActual.actual_away?finalActual.home_team:finalActual.away_team;
-    const runnerUp=champion===finalActual.home_team?finalActual.away_team:finalActual.home_team;
+    const actualFinalists=[finalActual.home_team,finalActual.away_team];
     if(koP.final&&koP.final['0']===champion)ko+=calcKOPoints('final',champion,champion,!SEEDED.has(champion));
-    const sfWinners=Object.keys(koP.sf||{}).map(k=>koP.sf[k]);
-    const pickedRU=sfWinners.find(t=>t!==(koP.final&&koP.final['0']))||null;
-    if(pickedRU===runnerUp)ko+=20;
+    const userFinalists=Object.keys(koP.sf||{}).map(k=>koP.sf[k]).filter(Boolean);
+    userFinalists.forEach(t=>{ if(actualFinalists.indexOf(t)!==-1)ko+=(!SEEDED.has(t)?Math.round(20*1.5):20); });
   }
   // Third place
   const thirdActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='third');
@@ -1716,15 +1715,14 @@ export default function App(){
       });
     });
 
-    // Final - champion (25pts) and runner-up (20pts)
+    // Final: champion (25, x1.5 dark horse) + Finalist (20 each correct finalist, x1.5 dark horse)
     const finalActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='final');
     if(finalActual){
       const champion=finalActual.actual_home>finalActual.actual_away?finalActual.home_team:finalActual.away_team;
-      const runnerUp=champion===finalActual.home_team?finalActual.away_team:finalActual.home_team;
+      const actualFinalists=[finalActual.home_team,finalActual.away_team];
       if(koPicked.final?.[0]===champion)total+=calcKOPoints('final',champion,champion,!SEEDED.has(champion));
-      const sfWinners=Object.values(koPicked.sf||{});
-      const pickedRunnerUp=sfWinners.find(t=>t!==koPicked.final?.[0])||null;
-      if(pickedRunnerUp===runnerUp)total+=20;
+      const userFinalists=Object.values(koPicked.sf||{}).filter(Boolean);
+      userFinalists.forEach(t=>{ if(actualFinalists.indexOf(t)!==-1)total+=(!SEEDED.has(t)?Math.round(20*1.5):20); });
     }
 
     // Third place match
@@ -3255,7 +3253,7 @@ export default function App(){
               <div style={card}>
                 {[
                   {label:"Champion",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.champion:null,emoji:"🏆",pts:"25 pts"},
-                  {label:"Runner-up",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.runnerUp:null,emoji:"🥈",pts:"20 pts"},
+                  {label:"Finalist",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.runnerUp:null,emoji:"🥈",pts:"20 pts"},
                   {label:"3rd place",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.thirdPlace:null,emoji:"🥉",pts:"12 pts"},
                   {label:"Golden Boot",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.goldenBoot:null,emoji:"⚽",pts:"15 pts"},
                   {label:"Top Assist",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.topAssist:null,emoji:"🎯",pts:"15 pts"},
@@ -3574,7 +3572,7 @@ export default function App(){
               {label:"R16 correct advancing team",val:"14",c:C.green},
               {label:"QF correct advancing team",val:"16",c:C.green},
               {label:"SF correct advancing team",val:"18",c:C.green},
-              {label:"Runner-up",val:"20",c:C.green},
+              {label:"Finalist \u2014 each correct finalist",val:"20",c:C.green},
               {label:"Tournament champion",val:"25",c:C.gold},
               {label:"Third place match",val:"12",c:C.green},
             ]},
