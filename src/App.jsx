@@ -1916,9 +1916,10 @@ export default function App(){
         Object.values(actualResults).filter(r=>r.stage==='group').slice(0,4);
 
       // Get all predictions for these members
-      const [{data:profiles},{data:preds}]=await Promise.all([
+      const [{data:profiles},{data:preds},{data:bonusRows}]=await Promise.all([
         supabase.from('users').select('id,name,handle,avatar_letter').in('id',memberIds),
         fetchAllPredictions('user_id,match_id,home_score,away_score,is_double_down', memberIds),
+        supabase.from('bonus_picks').select('user_id,double_down_r1,double_down_r2,double_down_r3').in('user_id',memberIds),
       ]);
 
       const profileMap={};
@@ -1927,6 +1928,10 @@ export default function App(){
       (preds||[]).forEach(p=>{
         if(!predMap[p.user_id])predMap[p.user_id]={};
         predMap[p.user_id][p.match_id]={home:p.home_score,away:p.away_score,dd:p.is_double_down};
+      });
+      const doubledMap={};
+      (bonusRows||[]).forEach(b=>{
+        doubledMap[b.user_id]=new Set([b.double_down_r1,b.double_down_r2,b.double_down_r3].filter(Boolean));
       });
 
       // Build member rows with their picks for today's matches
@@ -1943,7 +1948,8 @@ export default function App(){
             return (gh===mh&&ga===ma)||(gh===ma&&ga===mh);
           });
           const matchId=idx>=0?`GS-${grp}-${idx}`:null;
-          picks[i]=matchId&&predMap[uid]?.[matchId]?predMap[uid][matchId]:null;
+          const base=matchId&&predMap[uid]?.[matchId]?predMap[uid][matchId]:null;
+          picks[i]=base?{home:base.home,away:base.away,dd:doubledMap[uid]?doubledMap[uid].has(`${grp}-${idx}`):false}:null;
         });
         return{
           id:uid,
