@@ -1878,12 +1878,24 @@ export default function App(){
         .in('league_id',leagueIds);
       const countMap={};
       (counts||[]).forEach(r=>{countMap[r.league_id]=(countMap[r.league_id]||0)+1;});
+      // Real rank + daily delta from daily_ranks snapshots (latest two per league)
+      const {data:rankRows}=await supabase
+        .from('daily_ranks')
+        .select('league_id,snapshot_date,rank')
+        .eq('user_id',userId)
+        .order('snapshot_date',{ascending:false});
+      const rankMap={};
+      (rankRows||[]).forEach(r=>{
+        if(!rankMap[r.league_id])rankMap[r.league_id]={rank:r.rank,delta:null,_prev:false};
+        else if(!rankMap[r.league_id]._prev){rankMap[r.league_id].delta=r.rank-rankMap[r.league_id].rank;rankMap[r.league_id]._prev=true;}
+      });
       const leagues=data.map(d=>({
         id:d.leagues.id,
         name:d.leagues.name,
         code:d.leagues.invite_code==='MND26-GLOBAL'?null:d.leagues.invite_code,
         members:countMap[d.leagues.id]||0,
-        rank:1,
+        rank:rankMap[d.leagues.id]?rankMap[d.leagues.id].rank:1,
+        rankDelta:rankMap[d.leagues.id]?rankMap[d.leagues.id].delta:null,
       }));
       // Always put global first
       const global=leagues.find(l=>l.id==='00000000-0000-0000-0000-000000000001');
@@ -3339,7 +3351,7 @@ export default function App(){
                 style={{...card,padding:"14px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12,width:"100%",background:"var(--color-background-primary)"}}>
                 <div style={{width:38,height:38,borderRadius:9,background:league.id==="global"?C.blueLt:C.purpleLt,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{league.id==="global"?"🌍":"🏆"}</div>
                 <div style={{flex:1}}><div style={{fontSize:14,fontWeight:500,color:"var(--color-text-primary)"}}>{league.name}</div><div style={{fontSize:12,color:"var(--color-text-secondary)"}}>{league.members?.toLocaleString()} members</div></div>
-                <div style={{textAlign:"right",flexShrink:0}}><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Your rank</div><div style={{fontSize:18,fontWeight:600,color:C.blue,fontFamily:"monospace"}}>#{league.rank||1}</div></div>
+                <div style={{textAlign:"right",flexShrink:0}}><div style={{fontSize:11,color:"var(--color-text-tertiary)"}}>Your rank</div><div style={{fontSize:18,fontWeight:600,color:C.blue,fontFamily:"monospace"}}>#{league.rank||1}</div>{league.rankDelta!=null&&(league.rankDelta>0?<div style={{fontSize:11,fontWeight:600,color:C.green,display:"flex",alignItems:"center",justifyContent:"flex-end",gap:2}}><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke={C.green} strokeWidth="2"><path d="M2 8 L6 4 L10 8"/></svg>{league.rankDelta}</div>:league.rankDelta<0?<div style={{fontSize:11,fontWeight:600,color:C.red,display:"flex",alignItems:"center",justifyContent:"flex-end",gap:2}}><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke={C.red} strokeWidth="2"><path d="M2 4 L6 8 L10 4"/></svg>{Math.abs(league.rankDelta)}</div>:<div style={{fontSize:11,fontWeight:600,color:"var(--color-text-tertiary)"}}>–</div>)}</div>
                 <span style={{color:"var(--color-text-tertiary)",fontSize:18}}>›</span>
               </button>))}
               {joinedLeagues.length>0&&<button onClick={()=>setLeagueStep("join")} style={{padding:"12px",border:"0.5px dashed var(--color-border-tertiary)",borderRadius:12,background:"transparent",cursor:"pointer",fontSize:13,color:"var(--color-text-secondary)"}}>+ Join another league</button>}
