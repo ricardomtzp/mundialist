@@ -1444,6 +1444,7 @@ export default function App(){
     });
   };
   const simulateAll=async()=>{
+    if(tournamentStarted())return;
     const simMatches=simulateAllMatches(simulateStyle);
     setGroupMatches(simMatches);
     setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
@@ -1590,6 +1591,7 @@ export default function App(){
 
   const saveGroupPick=async(group,idx,homeScore,awayScore)=>{
     if(!user?.id)return;
+    if(tournamentStarted())return;
     showSaving();
     const {error}=await supabase.from('predictions').upsert({
       user_id:user.id,
@@ -2865,6 +2867,7 @@ export default function App(){
               </div>
               <div style={{display:"flex",gap:6,alignItems:"center",justifyContent:"flex-start"}}>
                 <button onClick={async()=>{
+                  if(tournamentStarted())return;
                   const simKO=simulateKnockout(r32Bracket,simulateStyle);
                   setKoPicks(simKO);
                   // Save all simulated KO picks to Supabase
