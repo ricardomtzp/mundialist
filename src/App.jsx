@@ -1955,13 +1955,15 @@ export default function App(){
           const grp=m.group_name;
           const teams=GROUPS[grp]||[];
           const gMatches=generateGroupMatches(teams);
-          const idx=gMatches.findIndex(gm=>{
-            const gh=normTeam(gm.home),ga=normTeam(gm.away),mh=normTeam(m.home_team),ma=normTeam(m.away_team);
-            return (gh===mh&&ga===ma)||(gh===ma&&ga===mh);
-          });
+          let idx=-1,reversed=false;
+          for(let gi=0;gi<gMatches.length;gi++){
+            const gh=normTeam(gMatches[gi].home),ga=normTeam(gMatches[gi].away),mh=normTeam(m.home_team),ma=normTeam(m.away_team);
+            if(gh===mh&&ga===ma){idx=gi;reversed=false;break;}
+            if(gh===ma&&ga===mh){idx=gi;reversed=true;break;}
+          }
           const matchId=idx>=0?`GS-${grp}-${idx}`:null;
           const base=matchId&&predMap[uid]?.[matchId]?predMap[uid][matchId]:null;
-          picks[i]=base?{home:base.home,away:base.away,dd:doubledMap[uid]?doubledMap[uid].has(`${grp}-${idx}`):false}:null;
+          picks[i]=base?{home:reversed?base.away:base.home,away:reversed?base.home:base.away,dd:doubledMap[uid]?doubledMap[uid].has(`${grp}-${idx}`):false}:null;
         });
         return{
           id:uid,
