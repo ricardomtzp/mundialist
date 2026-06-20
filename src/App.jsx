@@ -1179,8 +1179,8 @@ function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
       const actual=findActualResult(actualArr,m.home,m.away);
       if(!actual)return;
       let pts=calcMatchPoints(m.homeScore,m.awayScore,actual.actual_home,actual.actual_away);
-      if(doubleIds.indexOf(g+'-'+idx)!==-1)pts*=2;
       match+=pts;
+      if(doubleIds.indexOf(g+'-'+idx)!==-1)bonus+=pts;
     });
   });
   // 2. Group standings (only once all 6 group matches finished): 5/3 top-2, 2 for 3rd qualifier
@@ -1202,11 +1202,11 @@ function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
       up[m.home].gd+=h-a;up[m.away].gd+=a-h;up[m.home].gf+=h;up[m.away].gf+=a;
     });
     const uStand=teams.slice().sort((x,y)=>up[y].pts-up[x].pts||up[y].gd-up[x].gd||up[y].gf-up[x].gf);
-    if(uStand[0]===aStand[0]&&uStand[1]===aStand[1])match+=5;
-    else if(uStand[0]===aStand[1]&&uStand[1]===aStand[0])match+=3;
+    if(uStand[0]===aStand[0]&&uStand[1]===aStand[1])bonus+=5;
+    else if(uStand[0]===aStand[1]&&uStand[1]===aStand[0])bonus+=3;
     if(uStand[2]&&aStand[2]&&uStand[2]===aStand[2]){
       const qualified=actualArr.some(r=>r.stage==='r32'&&r.status==='finished'&&(r.home_team===aStand[2]||r.away_team===aStand[2]));
-      if(qualified)match+=2;
+      if(qualified)bonus+=2;
     }
   });
   // Reconstruct KO picks from KO- predictions
