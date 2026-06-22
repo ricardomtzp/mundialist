@@ -1919,23 +1919,26 @@ export default function App(){
       if(!members?.length){setMatchdayData([]);return;}
       const memberIds=members.map(m=>m.user_id);
 
-      // Get today's matches from DB
+      // Get today's matches from DB (group OR knockout)
       const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});
       const {data:todayMatches}=await supabase.from('matches')
         .select('id,home_team,away_team,actual_home,actual_away,status,stage,group_name,venue,city,kickoff')
-        .eq('stage','group')
         .gte('kickoff',today+'T00:00:00Z')
         .lte('kickoff',today+'T23:59:59Z')
         .order('kickoff');
 
-      // Fallback: if no matches today use all group matches that are finished or upcoming
+      // Determine mode: if today's fixtures are knockout, render KO tick-grid.
+      const koToday=(todayMatches||[]).filter(m=>m.stage==='knockout');
+      const isKOMatchday=koToday.length>0 && (todayMatches||[]).every(m=>m.stage==='knockout');
+
+      // Fallback (group): if no matches today use all group matches that are finished or upcoming
       const matches=todayMatches?.length?todayMatches:
         Object.values(actualResults).filter(r=>r.stage==='group').slice(0,4);
 
       // Get all predictions for these members
       const [{data:profiles},{data:preds},{data:bonusRows}]=await Promise.all([
         supabase.from('users').select('id,name,handle,avatar_letter').in('id',memberIds),
-        fetchAllPredictions('user_id,match_id,home_score,away_score,is_double_down', memberIds),
+        fetchAllPredictions('user_id,match_id,home_score,away_score,is_double_down,advancing_team', memberIds),
         supabase.from('bonus_picks').select('user_id,double_down_r1,double_down_r2,double_down_r3').in('user_id',memberIds),
       ]);
 
@@ -1944,12 +1947,77 @@ export default function App(){
       const predMap={};
       (preds||[]).forEach(p=>{
         if(!predMap[p.user_id])predMap[p.user_id]={};
-        predMap[p.user_id][p.match_id]={home:p.home_score,away:p.away_score,dd:p.is_double_down};
+        predMap[p.user_id][p.match_id]={home:p.home_score,away:p.away_score,dd:p.is_double_down,advancing:p.advancing_team};
       });
       const doubledMap={};
       (bonusRows||[]).forEach(b=>{
         doubledMap[b.user_id]=new Set([b.double_down_r1,b.double_down_r2,b.double_down_r3].filter(Boolean));
       });
+
+      // ── KNOCKOUT matchday branch (v61) ───────────────────────────────────
+      // KO picks store the advancing team NAME in advancing_team (no scores).
+      // Columns = the two resolved teams of each KO fixture; a member is
+      // "ticked" under a team if they picked it to advance in that round.
+      // A member may have BOTH teams ticked (different bracket paths) — by design.
+      if(isKOMatchday){
+        // Resolve each KO fixture to its two real team names.
+        // R32: map fixture's placeholder codes -> R32_FIXED slot index -> resolved
+        //      teams via buildR32Bracket(actual standings from real results).
+        const actualStandings={};
+        Object.keys(GROUPS).forEach(g=>{
+          const gms=generateGroupMatches(GROUPS[g]).map(m=>{
+            const ar=findActualResult(Object.values(actualResults),m.home,m.away);
+            return ar?{...m,homeScore:ar.actual_home,awayScore:ar.actual_away}:{...m,homeScore:"",awayScore:""};
+          });
+          actualStandings[g]=getGroupStandings(GROUPS[g],gms);
+        });
+        const resolvedR32=buildR32Bracket(actualStandings); // [{matchId,home,away}] by slot 0..15
+
+        // Build KO column descriptors for today's fixtures.
+        const koCols=koToday.map(m=>{
+          const round=getKORoundFromId(m.id);
+          let home=m.home_team, away=m.away_team, slot=null;
+          if(round==='r32'){
+            // match fixture's winner/home code (e.g. "1E","2A") to R32_FIXED slot
+            const fi=R32_FIXED.findIndex(f=>f.home===m.home_team || (f.away===m.away_team && f.home===m.home_team));
+            const byHome=R32_FIXED.findIndex(f=>f.home===m.home_team);
+            slot=byHome>=0?byHome:fi;
+            if(slot>=0&&resolvedR32[slot]){home=resolvedR32[slot].home;away=resolvedR32[slot].away;}
+          }
+          // For later rounds the matches table may already carry resolved names.
+          return {raw:m, round, slot, home, away};
+        });
+
+        const rows=memberIds.map(uid=>{
+          const profile=profileMap[uid]||{};
+          const picks={};
+          koCols.forEach((col,i)=>{
+            // gather this member's advancing_team picks for this round
+            const roundKey=col.round; // 'r32','r16',...
+            const myPicks=[];
+            Object.entries(predMap[uid]||{}).forEach(([mid,val])=>{
+              if(mid.indexOf('KO-'+roundKey+'-')===0 && val.advancing){myPicks.push(val.advancing);}
+            });
+            const pickedHome=col.home&&myPicks.some(t=>normTeam(t)===normTeam(col.home));
+            const pickedAway=col.away&&myPicks.some(t=>normTeam(t)===normTeam(col.away));
+            picks[i]={ko:true,pickedHome,pickedAway};
+          });
+          return{
+            id:uid,
+            name:profile.name||'Unknown',
+            handle:'@'+(profile.handle||'?'),
+            avatar:profile.avatar_letter||profile.name?.[0]?.toUpperCase()||'?',
+            isMe:uid===user?.id,
+            picks,
+          };
+        }).sort((a,b)=>a.isMe?-1:b.isMe?1:0);
+
+        const koMatches=koCols.map(c=>({
+          ...c.raw, home_team:c.home, away_team:c.away, _ko:true,
+        }));
+        setMatchdayData({matches:koMatches,rows,koMode:true});
+        return;
+      }
 
       // Build member rows with their picks for today's matches
       const rows=memberIds.map(uid=>{
@@ -3474,6 +3542,23 @@ export default function App(){
                             </td>
                             {(matchdayData.matches||[]).map((m,i)=>{
                               const pick=row.picks[i];
+                              if(pick&&pick.ko){
+                                const tick=(on)=>on?<span style={{color:C.green,fontWeight:600,fontSize:15}}>✓</span>:<span style={{color:"var(--color-text-tertiary)",fontSize:11}}>·</span>;
+                                return(
+                                  <td key={i} style={{padding:"10px",textAlign:"center",borderLeft:"0.5px solid var(--color-border-tertiary)"}}>
+                                    <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:14}}>
+                                      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
+                                        <span style={{fontSize:13}}>{FLAGS[m.home_team]||""}</span>
+                                        {tick(pick.pickedHome)}
+                                      </div>
+                                      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
+                                        <span style={{fontSize:13}}>{FLAGS[m.away_team]||""}</span>
+                                        {tick(pick.pickedAway)}
+                                      </div>
+                                    </div>
+                                  </td>
+                                );
+                              }
                               const isFinished=m.status==="finished"&&m.actual_home!==null;
                               const pts=isFinished&&pick?calcMatchPoints(pick.home,pick.away,m.actual_home,m.actual_away)*(pick.dd?2:1):null;
                               const bgCol=pts===null?"transparent":pts>=10?C.greenLt:pts>=6?"#EEF4FF":pts>0?C.goldLt:"#fef2f2";

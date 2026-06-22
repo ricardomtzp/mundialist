@@ -1022,7 +1022,12 @@ async function fetchAllPredictions(cols, memberIds){
 
 function findActualResult(resultsArr, home, away){
   const nh=normTeam(home), na=normTeam(away);
-  return (resultsArr||[]).find(r=>r.status==='finished'&&normTeam(r.home_team)===nh&&normTeam(r.away_team)===na);
+  const arr=resultsArr||[];
+  let r=arr.find(x=>x.status==='finished'&&normTeam(x.home_team)===nh&&normTeam(x.away_team)===na);
+  if(r)return r;
+  r=arr.find(x=>x.status==='finished'&&normTeam(x.home_team)===na&&normTeam(x.away_team)===nh);
+  if(r)return {...r, home_team:r.away_team, away_team:r.home_team, actual_home:r.actual_away, actual_away:r.actual_home};
+  return undefined;
 }
 
 function generateGroupMatches(teams){
