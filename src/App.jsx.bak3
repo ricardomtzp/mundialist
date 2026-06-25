@@ -2865,34 +2865,20 @@ export default function App(){
                 const thirdCorrect=userStandings[2]&&actualStandings[2]&&userStandings[2]===actualStandings[2];
                 const thirdQualified=Object.values(actualResults).some(r=>r.stage==='r32'&&(r.home_team===actualStandings[2]||r.away_team===actualStandings[2]));
                 const standingsPts=(correct?5:swapped?3:0)+(thirdCorrect&&thirdQualified?2:0);
-                // third-place bonus still live: predicted 3rd == actual 3rd, but that team's R32 not yet resolved
-                const thirdPending=thirdCorrect&&!thirdQualified;
-                // STATE: grey = finished, definitively zero (no W/RU bonus and 3rd not pending/earned)
-                const isZero=standingsPts===0&&!thirdPending;
-                // STATE: blue = finished, +0 so far, but +2 third-place still possible once knockouts resolve
-                const isPendingOnly=standingsPts===0&&thirdPending;
+                if(standingsPts===0)return null;
                 const isGreen=correct||(thirdCorrect&&thirdQualified&&!swapped);
-                const pendNote=thirdPending?` · 3rd place pending`:'';
                 const label=correct&&thirdCorrect&&thirdQualified?`Winner & runner-up correct, right order · ${actualStandings[2]} qualified`:
-                             correct?`Winner & runner-up correct, right order${pendNote}`:
+                             correct?'Winner & runner-up correct, right order':
                              swapped&&thirdCorrect&&thirdQualified?`Both correct, positions swapped · ${actualStandings[2]} qualified`:
-                             swapped?`Both correct, positions swapped${pendNote}`:
-                             thirdCorrect&&thirdQualified?`${actualStandings[2]} qualified`:
-                             isPendingOnly?`Group finished · 3rd-place bonus pending knockouts`:
-                             `Group finished · no bonus earned`;
-                // color set per state
-                const cBg=isZero?"#F1EFE8":isPendingOnly?"#E6F1FB":isGreen?"#EAF3DE":"#FEF9EC";
-                const cBorder=isZero?"#B4B2A9":isPendingOnly?"#185FA5":isGreen?"#3B6D11":"#F59E0B";
-                const cText=isZero?"#5F5E5A":isPendingOnly?"#0C447C":isGreen?"#3B6D11":"#92400E";
-                const cPill=isZero?"#D3D1C7":isPendingOnly?"#B5D4F4":isGreen?"#D4EDBA":"#FEF3C7";
-                const pillText=isZero?`+0 pts`:isPendingOnly?`+0 so far`:`+${standingsPts} pts`;
+                             swapped?'Both correct, positions swapped':
+                             `${actualStandings[2]} qualified`;
                 return(
-                  <div style={{padding:"8px 12px",background:cBg,borderTop:`0.5px solid ${cBorder}`,display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+                  <div style={{padding:"8px 12px",background:isGreen?"#EAF3DE":"#FEF9EC",borderTop:`0.5px solid ${isGreen?"#3B6D11":"#F59E0B"}`,display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
                     <div>
-                      <div style={{fontSize:11,fontWeight:500,color:cText}}>Group standings bonus</div>
-                      <div style={{fontSize:10,color:cText,marginTop:2}}>{label}</div>
+                      <div style={{fontSize:11,fontWeight:500,color:isGreen?"#3B6D11":"#92400E"}}>Group standings bonus</div>
+                      <div style={{fontSize:10,color:isGreen?"#3B6D11":"#92400E",marginTop:2}}>{label}</div>
                     </div>
-                    <span style={{fontSize:12,fontFamily:"monospace",fontWeight:600,color:cText,background:cPill,padding:"2px 10px",borderRadius:99,flexShrink:0}}>{pillText}</span>
+                    <span style={{fontSize:12,fontFamily:"monospace",fontWeight:600,color:isGreen?"#3B6D11":"#92400E",background:isGreen?"#D4EDBA":"#FEF3C7",padding:"2px 10px",borderRadius:99,flexShrink:0}}>+{standingsPts} pts</span>
                   </div>
                 );
               })()}
