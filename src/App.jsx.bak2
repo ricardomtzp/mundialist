@@ -1193,13 +1193,10 @@ function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
     const groupActual=actualArr.filter(r=>r.status==='finished'&&r.group_name===g);
     if(groupActual.length<6)return;
     const ap={};teams.forEach(t=>{ap[t]={pts:0,gd:0,gf:0};});
-    const RT1=(nm)=>teams.find(t=>normTeam(t)===normTeam(nm));
     groupActual.forEach(r=>{
       const h=r.actual_home,a=r.actual_away;
-      const HT=RT1(r.home_team),AT=RT1(r.away_team);
-      if(!HT||!AT)return;
-      if(h>a)ap[HT].pts+=3;else if(h<a)ap[AT].pts+=3;else{ap[HT].pts+=1;ap[AT].pts+=1;}
-      ap[HT].gd+=h-a;ap[AT].gd+=a-h;ap[HT].gf+=h;ap[AT].gf+=a;
+      if(h>a)ap[r.home_team].pts+=3;else if(h<a)ap[r.away_team].pts+=3;else{ap[r.home_team].pts+=1;ap[r.away_team].pts+=1;}
+      ap[r.home_team].gd+=h-a;ap[r.away_team].gd+=a-h;ap[r.home_team].gf+=h;ap[r.away_team].gf+=a;
     });
     const aStand=teams.slice().sort((x,y)=>ap[y].pts-ap[x].pts||ap[y].gd-ap[x].gd||ap[y].gf-ap[x].gf);
     const up={};teams.forEach(t=>{up[t]={pts:0,gd:0,gf:0};});
@@ -1681,14 +1678,11 @@ export default function App(){
       if(groupActual.length<6)return;
       // Build actual standings
       const ap={};teams.forEach(t=>{ap[t]={pts:0,gd:0,gf:0};});
-      const RT2=(nm)=>teams.find(t=>normTeam(t)===normTeam(nm));
       groupActual.forEach(r=>{
         const h=r.actual_home,a=r.actual_away;
-        const HT=RT2(r.home_team),AT=RT2(r.away_team);
-        if(!HT||!AT)return;
-        if(h>a){ap[HT].pts+=3;}else if(h<a){ap[AT].pts+=3;}else{ap[HT].pts+=1;ap[AT].pts+=1;}
-        ap[HT].gd+=h-a;ap[AT].gd+=a-h;
-        ap[HT].gf+=h;ap[AT].gf+=a;
+        if(h>a){ap[r.home_team].pts+=3;}else if(h<a){ap[r.away_team].pts+=3;}else{ap[r.home_team].pts+=1;ap[r.away_team].pts+=1;}
+        ap[r.home_team].gd+=h-a;ap[r.away_team].gd+=a-h;
+        ap[r.home_team].gf+=h;ap[r.away_team].gf+=a;
       });
       const actualStandings=teams.slice().sort((a,b)=>ap[b].pts-ap[a].pts||ap[b].gd-ap[a].gd||ap[b].gf-ap[a].gf);
       // Build user predicted standings
@@ -2849,13 +2843,10 @@ export default function App(){
                 const groupActual=Object.values(actualResults).filter(r=>r.status==='finished'&&r.group_name===activeGroup);
                 if(groupActual.length<6)return null;
                 const ap={};teams.forEach(t=>{ap[t]={pts:0,gd:0,gf:0};});
-                const RT3=(nm)=>teams.find(t=>normTeam(t)===normTeam(nm));
                 groupActual.forEach(r=>{
                   const h=r.actual_home,a=r.actual_away;
-                  const HT=RT3(r.home_team),AT=RT3(r.away_team);
-                  if(!HT||!AT)return;
-                  if(h>a){ap[HT].pts+=3;}else if(h<a){ap[AT].pts+=3;}else{ap[HT].pts+=1;ap[AT].pts+=1;}
-                  ap[HT].gd+=h-a;ap[AT].gd+=a-h;
+                  if(h>a){ap[r.home_team].pts+=3;}else if(h<a){ap[r.away_team].pts+=3;}else{ap[r.home_team].pts+=1;ap[r.away_team].pts+=1;}
+                  ap[r.home_team].gd+=h-a;ap[r.away_team].gd+=a-h;
                 });
                 const actualStandings=teams.slice().sort((a,b)=>ap[b].pts-ap[a].pts||ap[b].gd-ap[a].gd);
                 const userStandings=allStandings[activeGroup]?.map(r=>r.team)||[];
