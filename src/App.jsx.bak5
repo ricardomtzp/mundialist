@@ -2360,7 +2360,6 @@ export default function App(){
           <div style={{fontSize:12,fontWeight:500,color:"#92400E",marginBottom:8}}>⚠️ Group standings changed — your knockout bracket may be affected.</div>
           <div style={{display:"flex",gap:6}}>
             <button onClick={async()=>{
-              if(tournamentStarted()){setShowBracketChanged(false);return;}
               setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
               setShowBracketChanged(false);
               showSaving();
