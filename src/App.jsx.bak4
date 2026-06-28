@@ -1476,7 +1476,6 @@ export default function App(){
   const bracketInitializedRef=useRef(false);
   const sessionLoadedRef=useRef(false);
   const clearKO=async()=>{
-    if(tournamentStarted())return;
     setKoPicks({r32:{},r16:{},qf:{},sf:{},final:{},third:null});
     setShowClearKOConfirm(false);
     showSaving();
@@ -1484,7 +1483,6 @@ export default function App(){
     showSaved();
   };
   const clearAll=async()=>{
-    if(tournamentStarted())return;
     const all={};Object.entries(GROUPS).forEach(([g,teams])=>{all[g]=generateGroupMatches(teams);});
     setGroupMatches(all);
     setDoubleDown({r1:null,r2:null,r3:null});
