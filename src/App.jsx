@@ -3573,13 +3573,10 @@ export default function App(){
                             {(matchdayData.matches||[]).map((m,i)=>{
                               const pick=row.picks[i];
                               if(pick&&pick.ko){
-                                const winner=getKOWinner(m.home_team,m.away_team);
-                                const resolved=!!winner;
-                                const mark=(won)=>resolved?(won?<span style={{color:C.green,fontWeight:600,fontSize:15}}>✓</span>:<span style={{color:"#ef4444",fontWeight:600,fontSize:15}}>✓</span>):<span style={{color:"var(--color-text-tertiary)",fontSize:11}}>·</span>;
                                 const koCell=(team,picked)=>picked?(
                                   <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
                                     <span style={{fontSize:13}}>{FLAGS[team]||""}</span>
-                                    {mark(winner===team)}
+                                    {<span style={{color:C.green,fontWeight:600,fontSize:15}}>✓</span>}
                                   </div>
                                 ):<div style={{width:18}}/>;
                                 return(
