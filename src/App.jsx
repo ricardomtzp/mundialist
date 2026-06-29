@@ -3555,8 +3555,12 @@ export default function App(){
                         </tr>
                       </thead>
                       <tbody>
-                        {(matchdayData.rows||[]).map((row,ri)=>(
-                          <tr key={row.id} style={{borderBottom:"0.5px solid var(--color-border-tertiary)",background:row.isMe?C.blueLt:"transparent"}}>
+                        {(matchdayData.rows||[]).map((row,ri)=>{
+                          const koStake=(matchdayData.matches||[]).some((m,i)=>{const pk=row.picks[i];return pk&&pk.ko&&(pk.pickedHome||pk.pickedAway);});
+                          const anyKO=(matchdayData.matches||[]).some((m,i)=>{const pk=row.picks[i];return pk&&pk.ko;});
+                          const dim=anyKO&&!koStake;
+                          return(
+                          <tr key={row.id} style={{borderBottom:"0.5px solid var(--color-border-tertiary)",background:row.isMe?C.blueLt:"transparent",opacity:dim?0.55:1}}>
                             <td style={{padding:"10px 12px",borderRight:"0.5px solid var(--color-border-tertiary)"}}>
                               <div style={{display:"flex",alignItems:"center",gap:6}}>
                                 <div style={{width:24,height:24,borderRadius:"50%",background:[C.blue,C.red,C.green,C.gold,C.purple][ri%5],display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:500,color:"#fff",flexShrink:0}}>{row.avatar}</div>
@@ -3569,18 +3573,20 @@ export default function App(){
                             {(matchdayData.matches||[]).map((m,i)=>{
                               const pick=row.picks[i];
                               if(pick&&pick.ko){
-                                const tick=(on)=>on?<span style={{color:C.green,fontWeight:600,fontSize:15}}>✓</span>:<span style={{color:"var(--color-text-tertiary)",fontSize:11}}>·</span>;
+                                const winner=getKOWinner(m.home_team,m.away_team);
+                                const resolved=!!winner;
+                                const mark=(won)=>resolved?(won?<span style={{color:C.green,fontWeight:600,fontSize:15}}>✓</span>:<span style={{color:"#ef4444",fontWeight:600,fontSize:15}}>✓</span>):<span style={{color:"var(--color-text-tertiary)",fontSize:11}}>·</span>;
+                                const koCell=(team,picked)=>picked?(
+                                  <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
+                                    <span style={{fontSize:13}}>{FLAGS[team]||""}</span>
+                                    {mark(winner===team)}
+                                  </div>
+                                ):<div style={{width:18}}/>;
                                 return(
                                   <td key={i} style={{padding:"10px",textAlign:"center",borderLeft:"0.5px solid var(--color-border-tertiary)"}}>
                                     <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:14}}>
-                                      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
-                                        <span style={{fontSize:13}}>{FLAGS[m.home_team]||""}</span>
-                                        {tick(pick.pickedHome)}
-                                      </div>
-                                      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
-                                        <span style={{fontSize:13}}>{FLAGS[m.away_team]||""}</span>
-                                        {tick(pick.pickedAway)}
-                                      </div>
+                                      {koCell(m.home_team,pick.pickedHome)}
+                                      {koCell(m.away_team,pick.pickedAway)}
                                     </div>
                                   </td>
                                 );
@@ -3604,7 +3610,7 @@ export default function App(){
                               );
                             })}
                           </tr>
-                        ))}
+                        )})}
                       </tbody>
                     </table>
                   </div>
