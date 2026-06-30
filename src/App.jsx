@@ -1161,6 +1161,13 @@ function getKORoundFromId(matchId){
   return null;
 }
 
+function koWinnerOf(rec){
+  if(!rec||rec.actual_home==null||rec.actual_away==null)return null;
+  if(rec.actual_home>rec.actual_away)return rec.home_team;
+  if(rec.actual_away>rec.actual_home)return rec.away_team;
+  return rec.ko_winner||null;
+}
+
 function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
   userPreds=userPreds||[]; bonusRow=bonusRow||{}; actualArr=actualArr||[]; tournamentAwards=tournamentAwards||{};
   let match=0, ko=0, bonus=0;
@@ -1231,14 +1238,14 @@ function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
       const team=koP[round][k]; if(!team)return;
       const actual=actualArr.find(r=>r.status==='finished'&&r.stage==='knockout'&&getKORoundFromId(r.id)===round&&(r.home_team===team||r.away_team===team));
       if(!actual)return;
-      const winner=actual.actual_home>actual.actual_away?actual.home_team:actual.away_team;
+      const winner=koWinnerOf(actual);
       if(team===winner)ko+=calcKOPoints(round,team,winner,!SEEDED.has(team));
     });
   });
   // Final: champion (25, x1.5 dark horse) + Finalist (20 each correct finalist, x1.5 dark horse)
   const finalActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='final');
   if(finalActual){
-    const champion=finalActual.actual_home>finalActual.actual_away?finalActual.home_team:finalActual.away_team;
+    const champion=koWinnerOf(finalActual);
     const actualFinalists=[finalActual.home_team,finalActual.away_team];
     if(koP.final&&koP.final['0']===champion)ko+=calcKOPoints('final',champion,champion,!SEEDED.has(champion));
     const userFinalists=Object.keys(koP.sf||{}).map(k=>koP.sf[k]).filter(Boolean);
@@ -1247,7 +1254,7 @@ function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
   // Third place
   const thirdActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='third');
   if(thirdActual&&koP.third){
-    const tw=thirdActual.actual_home>thirdActual.actual_away?thirdActual.home_team:thirdActual.away_team;
+    const tw=koWinnerOf(thirdActual);
     if(koP.third===tw)ko+=calcKOPoints('third',koP.third,tw,!SEEDED.has(koP.third));
   }
   // 4. Bonus awards (15 each)
@@ -1725,7 +1732,7 @@ export default function App(){
           return roundFromId===round&&(r.home_team===team||r.away_team===team);
         });
         if(!actual)return;
-        const winner=actual.actual_home>actual.actual_away?actual.home_team:actual.away_team;
+        const winner=koWinnerOf(actual);
         if(team===winner)total+=calcKOPoints(round,team,winner,!SEEDED.has(team));
       });
     });
@@ -1733,7 +1740,7 @@ export default function App(){
     // Final: champion (25, x1.5 dark horse) + Finalist (20 each correct finalist, x1.5 dark horse)
     const finalActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='final');
     if(finalActual){
-      const champion=finalActual.actual_home>finalActual.actual_away?finalActual.home_team:finalActual.away_team;
+      const champion=koWinnerOf(finalActual);
       const actualFinalists=[finalActual.home_team,finalActual.away_team];
       if(koPicked.final?.[0]===champion)total+=calcKOPoints('final',champion,champion,!SEEDED.has(champion));
       const userFinalists=Object.values(koPicked.sf||{}).filter(Boolean);
@@ -1743,7 +1750,7 @@ export default function App(){
     // Third place match
     const thirdActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='third');
     if(thirdActual&&koPicked.third){
-      const thirdWinner=thirdActual.actual_home>thirdActual.actual_away?thirdActual.home_team:thirdActual.away_team;
+      const thirdWinner=koWinnerOf(thirdActual);
       if(koPicked.third===thirdWinner)total+=calcKOPoints('third',koPicked.third,thirdWinner,!SEEDED.has(koPicked.third));
     }
 
