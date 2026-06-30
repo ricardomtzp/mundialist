@@ -2213,7 +2213,7 @@ export default function App(){
     const pickedCorrect=isFinished&&picked&&picked===actualWinner;
     const pickedWrong=isFinished&&picked&&picked!==actualWinner;
     const ptMap={r32:12,r16:14,qf:16,sf:18,final:25,third:12};
-    const ptsEarned=pickedCorrect?(ptMap[roundKey]||0):0;
+    const ptsEarned=pickedCorrect?calcKOPoints(roundKey,picked,actualWinner,!SEEDED.has(picked)):0;
     const borderColor=pickedCorrect?C.green:pickedWrong?"#ef4444":picked?C.blue:gold?C.gold:"var(--color-border-tertiary)";
     return(
       <div style={{background:"var(--color-background-primary)",border:`${gold?"2px":"1.5px"} solid ${borderColor}`,borderRadius:8,overflow:"hidden",width:"100%",boxShadow:"0 1px 3px rgba(0,0,0,0.06)"}}>
