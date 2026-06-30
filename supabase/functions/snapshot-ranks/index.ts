@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
       fetchAll(supabase, 'league_members', 'league_id,user_id'),
       fetchAll(supabase, 'predictions', 'user_id,match_id,home_score,away_score,advancing_team'),
       fetchAll(supabase, 'bonus_picks', 'user_id,golden_boot_player,top_assist_player,golden_glove_player,double_down_r1,double_down_r2,double_down_r3'),
-      fetchAll(supabase, 'matches', 'id,stage,status,group_name,home_team,away_team,actual_home,actual_away'),
+      fetchAll(supabase, 'matches', 'id,stage,status,group_name,home_team,away_team,actual_home,actual_away,ko_winner'),
       supabase.from('tournament_awards').select('golden_boot,top_assist,golden_glove').eq('id', 'wc2026').maybeSingle(),
     ])
     const awards = awardsRes?.data ? { ...awardsRes.data } : {}

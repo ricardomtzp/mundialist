@@ -98,13 +98,6 @@ function getKORoundFromId(matchId){
 }
 
 // ---- computeUserPoints (App.jsx lines 1159-1250) ----
-function koWinnerOf(rec){
-  if(rec==null||rec.actual_home==null||rec.actual_away==null)return null;
-  if(rec.actual_home>rec.actual_away)return rec.home_team;
-  if(rec.actual_away>rec.actual_home)return rec.away_team;
-  return rec.ko_winner||null;
-}
-
 function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
   userPreds=userPreds||[]; bonusRow=bonusRow||{}; actualArr=actualArr||[]; tournamentAwards=tournamentAwards||{};
   let match=0, ko=0, bonus=0;
@@ -137,13 +130,10 @@ function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
     const groupActual=actualArr.filter(r=>r.status==='finished'&&r.group_name===g);
     if(groupActual.length<6)return;
     const ap={};teams.forEach(t=>{ap[t]={pts:0,gd:0,gf:0};});
-    const RTn=(nm)=>teams.find(t=>normTeam(t)===normTeam(nm));
     groupActual.forEach(r=>{
-      const HT=RTn(r.home_team),AT=RTn(r.away_team);
-      if(!HT||!AT)return;
       const h=r.actual_home,a=r.actual_away;
-      if(h>a)ap[HT].pts+=3;else if(h<a)ap[AT].pts+=3;else{ap[HT].pts+=1;ap[AT].pts+=1;}
-      ap[HT].gd+=h-a;ap[AT].gd+=a-h;ap[HT].gf+=h;ap[AT].gf+=a;
+      if(h>a)ap[r.home_team].pts+=3;else if(h<a)ap[r.away_team].pts+=3;else{ap[r.home_team].pts+=1;ap[r.away_team].pts+=1;}
+      ap[r.home_team].gd+=h-a;ap[r.away_team].gd+=a-h;ap[r.home_team].gf+=h;ap[r.away_team].gf+=a;
     });
     const aStand=teams.slice().sort((x,y)=>ap[y].pts-ap[x].pts||ap[y].gd-ap[x].gd||ap[y].gf-ap[x].gf);
     const up={};teams.forEach(t=>{up[t]={pts:0,gd:0,gf:0};});
@@ -175,14 +165,14 @@ function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
       const team=koP[round][k]; if(!team)return;
       const actual=actualArr.find(r=>r.status==='finished'&&r.stage==='knockout'&&getKORoundFromId(r.id)===round&&(r.home_team===team||r.away_team===team));
       if(!actual)return;
-      const winner=koWinnerOf(actual);
+      const winner=actual.actual_home>actual.actual_away?actual.home_team:actual.away_team;
       if(team===winner)ko+=calcKOPoints(round,team,winner,!SEEDED.has(team));
     });
   });
   // Final: champion (25, x1.5 dark horse) + Finalist (20 each correct finalist, x1.5 dark horse)
   const finalActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='final');
   if(finalActual){
-    const champion=koWinnerOf(finalActual);
+    const champion=finalActual.actual_home>finalActual.actual_away?finalActual.home_team:finalActual.away_team;
     const actualFinalists=[finalActual.home_team,finalActual.away_team];
     if(koP.final&&koP.final['0']===champion)ko+=calcKOPoints('final',champion,champion,!SEEDED.has(champion));
     const userFinalists=Object.keys(koP.sf||{}).map(k=>koP.sf[k]).filter(Boolean);
@@ -191,7 +181,7 @@ function computeUserPoints(userPreds, bonusRow, actualArr, tournamentAwards){
   // Third place
   const thirdActual=actualArr.find(r=>r.stage==='knockout'&&r.status==='finished'&&getKORoundFromId(r.id)==='third');
   if(thirdActual&&koP.third){
-    const tw=koWinnerOf(thirdActual);
+    const tw=thirdActual.actual_home>thirdActual.actual_away?thirdActual.home_team:thirdActual.away_team;
     if(koP.third===tw)ko+=calcKOPoints('third',koP.third,tw,!SEEDED.has(koP.third));
   }
   // 4. Bonus awards (15 each)
