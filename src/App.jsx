@@ -1651,7 +1651,7 @@ export default function App(){
   };
 
   const loadActualResults=async()=>{
-    const {data}=await supabase.from('matches').select('id,home_team,away_team,actual_home,actual_away,status,stage,group_name,match_day');
+    const {data}=await supabase.from('matches').select('id,home_team,away_team,actual_home,actual_away,status,stage,group_name,match_day,ko_winner');
     if(data){
       const map={};
       data.forEach(m=>{map[m.id]=m;});
