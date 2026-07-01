@@ -60,6 +60,14 @@ const FLAGS={
   Portugal:"🇵🇹","DR Congo":"🇨🇩",Uzbekistan:"🇺🇿",Colombia:"🇨🇴",
   England:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",Croatia:"🇭🇷",Ghana:"🇬🇭",Panama:"🇵🇦",TBD:"❓",
 };
+let FLAG_BY_NORM=null;
+const flagOf=(name)=>{
+  if(FLAG_BY_NORM===null){
+    FLAG_BY_NORM={};
+    for(const k in FLAGS){FLAG_BY_NORM[normTeam(k)]=FLAGS[k];}
+  }
+  return FLAG_BY_NORM[normTeam(name||"")]||null;
+};
 
 // ── GOLDEN BOOT — verified May 2026 from confirmed WC2026 squads ────────────
 // FIFA top 10: France, Spain, Argentina, England, Portugal, Brazil,
@@ -2246,7 +2254,7 @@ export default function App(){
                 background:picked===team?(gold?C.goldLt:C.blueLt):"transparent",
                 borderBottom:ti===0?"0.5px solid var(--color-border-tertiary)":"none",
                 opacity:isLoser?0.45:1}}>
-              <span style={{fontSize:13}}>{FLAGS[team]||"❓"}</span>
+              <span style={{fontSize:13}}>{flagOf(team)||"❓"}</span>
               <span style={{flex:1,fontSize:10,fontWeight:picked===team||isWinner?600:400,
                 textDecoration:isLoser?"line-through":"none",
                 color:isWinner?C.green:picked===team?(gold?"#7a5c10":C.blue):"var(--color-text-primary)",
@@ -2770,7 +2778,7 @@ export default function App(){
                         <div style={{display:"flex",alignItems:"center",gap:6}}>
                           {/* Home team column */}
                           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,flex:1,minWidth:0}}>
-                            <span style={{fontSize:24}}>{FLAGS[match.home]||"❓"}</span>
+                            <span style={{fontSize:24}}>{flagOf(match.home)||"❓"}</span>
                             <span style={{fontSize:10,fontWeight:500,color:"var(--color-text-primary)",textAlign:"center",whiteSpace:"nowrap"}}>{match.home}</span>
                           </div>
                           {/* Score centre */}
@@ -2795,14 +2803,14 @@ export default function App(){
                           )}
                           {/* Away team column */}
                           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,flex:1,minWidth:0}}>
-                            <span style={{fontSize:24}}>{FLAGS[match.away]||"❓"}</span>
+                            <span style={{fontSize:24}}>{flagOf(match.away)||"❓"}</span>
                             <span style={{fontSize:10,fontWeight:500,color:"var(--color-text-primary)",textAlign:"center",whiteSpace:"nowrap"}}>{match.away}</span>
                           </div>
                         </div>
                       ):(
                         /* Desktop inline layout */
                         <div style={{display:"flex",alignItems:"center",gap:8}}>
-                          <span style={{fontSize:20,flexShrink:0}}>{FLAGS[match.home]||"❓"}</span>
+                          <span style={{fontSize:20,flexShrink:0}}>{flagOf(match.home)||"❓"}</span>
                           <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500,flex:1}}>{match.home}</span>
                           {actual?(
                             <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
@@ -2824,7 +2832,7 @@ export default function App(){
                             </div>
                           )}
                           <span style={{fontSize:14,color:"var(--color-text-primary)",fontWeight:500,flex:1,textAlign:"right"}}>{match.away}</span>
-                          <span style={{fontSize:20,flexShrink:0}}>{FLAGS[match.away]||"❓"}</span>
+                          <span style={{fontSize:20,flexShrink:0}}>{flagOf(match.away)||"❓"}</span>
                           
                         </div>
                       )}
@@ -2860,7 +2868,7 @@ export default function App(){
                       <td style={{padding:"9px 12px",textAlign:"center",color:i<2?C.blue:"var(--color-text-tertiary)",fontWeight:i<2?500:400}}>{i+1}</td>
                       <td style={{padding:"9px 12px"}}>
                         <div style={{display:"flex",alignItems:"center",gap:6}}>
-                          <span style={{fontSize:18}}>{FLAGS[row.team]||"❓"}</span>
+                          <span style={{fontSize:18}}>{flagOf(row.team)||"❓"}</span>
                           <span style={{color:"var(--color-text-primary)",fontSize:14}}>{row.team}</span>
                           {SEEDED.has(row.team)&&<span style={{fontSize:9,background:C.goldLt,color:"#7a5c10",padding:"1px 6px",borderRadius:99}}>Seeded</span>}
 
@@ -3304,13 +3312,13 @@ export default function App(){
                           background:sel?(ddPts>0?C.greenLt:ddPts===0?"#fef2f2":C.goldLt):"var(--color-background-secondary)",
                           cursor:tournamentStarted()||other||actual?"not-allowed":"pointer",
                           display:"flex",alignItems:"center",gap:10,opacity:other?0.4:1,textAlign:"left"}}>
-                        <span style={{fontSize:16}}>{FLAGS[m.home]||"❓"}</span>
+                        <span style={{fontSize:16}}>{flagOf(m.home)||"❓"}</span>
                         <span style={{fontSize:13,color:"var(--color-text-primary)",flex:1,fontWeight:500}}>{m.home}</span>
                         {actual?<span style={{fontSize:12,fontFamily:"monospace",color:C.blue}}>{actual.actual_home}–{actual.actual_away}</span>:
                          m.homeScore&&m.awayScore?<span style={{fontSize:12,fontFamily:"monospace",color:"var(--color-text-secondary)"}}>{m.homeScore}–{m.awayScore}</span>:null}
                         <span style={{fontSize:12,color:"var(--color-text-tertiary)"}}>vs</span>
                         <span style={{fontSize:13,color:"var(--color-text-primary)",flex:1,textAlign:"right",fontWeight:500}}>{m.away}</span>
-                        <span style={{fontSize:16}}>{FLAGS[m.away]||"❓"}</span>
+                        <span style={{fontSize:16}}>{flagOf(m.away)||"❓"}</span>
                         {sel&&ddPts!==null&&<span style={{fontSize:12,fontWeight:600,color:ddCol,flexShrink:0}}>{ddPts>0?"+"+ddPts+" pts ✓":"0 pts ✗"}</span>}
                         {sel&&ddPts===null&&<span style={{fontSize:12,fontWeight:600,color:C.gold,flexShrink:0}}>×2 ⚡</span>}
                       </button>);
@@ -3401,7 +3409,7 @@ export default function App(){
                   {label:"Golden Glove",val:(tournamentStarted()||viewingUser.isMe)?viewingUser.picks.goldenGlove:null,emoji:"🧤",pts:"15 pts"},
                 ].map(({label,val,emoji,pts},i,arr)=>(
                   <div key={label} style={{padding:"10px 16px",borderBottom:i<arr.length-1?"0.5px solid var(--color-border-tertiary)":"none",display:"flex",alignItems:"center",gap:12}}>
-                    <span style={{fontSize:18}}>{val?FLAGS[val]||emoji:emoji}</span>
+                    <span style={{fontSize:18}}>{val?flagOf(val)||emoji:emoji}</span>
                     <div style={{flex:1}}>
                       <div style={{fontSize:11,color:"var(--color-text-tertiary)",marginBottom:1}}>{label}</div>
                       <div style={{fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>{val||"Not picked yet"}</div>
@@ -3541,7 +3549,7 @@ export default function App(){
                     </div>
                     <span style={{fontFamily:"monospace",fontWeight:600,fontSize:14,color:m.isMe?C.blue:"var(--color-text-primary)",width:50,textAlign:"right",flexShrink:0}}>{m.pts}</span>
                     {tournamentStarted()&&<div style={{width:70,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:3,flexShrink:0,marginLeft:8}}>
-                      <span style={{fontSize:14}}>{FLAGS[m.picks.champion]||"—"}</span>
+                      <span style={{fontSize:14}}>{flagOf(m.picks.champion)||"—"}</span>
                       <span style={{fontSize:10,color:"var(--color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:mobile?30:50}}>{m.picks.champion||""}</span>
                     </div>}
                     {!mobile&&tournamentStarted()&&<div style={{width:80,textAlign:"center",flexShrink:0}}>
@@ -3567,9 +3575,9 @@ export default function App(){
                             <th key={i} style={{padding:"8px 10px",textAlign:"center",borderBottom:"0.5px solid var(--color-border-tertiary)",minWidth:100,borderLeft:"0.5px solid var(--color-border-tertiary)"}}>
                               <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
                                 <div style={{display:"flex",alignItems:"center",gap:4}}>
-                                  <span style={{fontSize:14}}>{FLAGS[m.home_team]||"❓"}</span>
+                                  <span style={{fontSize:14}}>{flagOf(m.home_team)||"❓"}</span>
                                   <span style={{fontSize:9,color:"var(--color-text-tertiary)"}}>vs</span>
-                                  <span style={{fontSize:14}}>{FLAGS[m.away_team]||"❓"}</span>
+                                  <span style={{fontSize:14}}>{flagOf(m.away_team)||"❓"}</span>
                                 </div>
                                 <span style={{fontSize:10,fontWeight:500,color:"var(--color-text-primary)"}}>{m.home_team?.split(" ")[0]} v {m.away_team?.split(" ")[0]}</span>
                                 {m.status==="finished"&&m.actual_home!==null&&<span style={{fontSize:9,color:C.green,fontWeight:500}}>{m.actual_home}–{m.actual_away} FT</span>}
@@ -3600,7 +3608,7 @@ export default function App(){
                               if(pick&&pick.ko){
                                 const koCell=(team,picked)=>picked?(
                                   <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
-                                    <span style={{fontSize:13}}>{FLAGS[team]||""}</span>
+                                    <span style={{fontSize:13}}>{flagOf(team)||""}</span>
                                     {<span style={{color:C.green,fontWeight:600,fontSize:15}}>✓</span>}
                                   </div>
                                 ):<div style={{width:18}}/>;
