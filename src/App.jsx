@@ -2207,37 +2207,53 @@ export default function App(){
   };
 
   // ── Shared match card for knockout ──
+  const teamKOStatus=(team,roundKey)=>{
+    if(!team||team==="TBD")return "pending";
+    const rec=Object.values(actualResults).find(r=>
+      r.stage!=="group"&&r.status==="finished"
+      &&(roundKey?getKORoundFromId(r.id)===roundKey:true)
+      &&(r.home_team===team||r.away_team===team));
+    if(!rec)return "pending";
+    const w=koWinnerOf(rec);
+    if(w===team)return "advanced";
+    return "eliminated";
+  };
   function KOCard({home,away,picked,onPick,label,gold=false,actualWinner=null,roundKey=null,venue=null,city=null}){
-    const isFinished=actualWinner!==null;
     const koLocked=tournamentStarted();
-    const pickedCorrect=isFinished&&picked&&picked===actualWinner;
-    const pickedWrong=isFinished&&picked&&picked!==actualWinner;
-    const ptMap={r32:12,r16:14,qf:16,sf:18,final:25,third:12};
-    const ptsEarned=pickedCorrect?calcKOPoints(roundKey,picked,actualWinner,!SEEDED.has(picked)):0;
+    const homeStatus=teamKOStatus(home,roundKey);
+    const awayStatus=teamKOStatus(away,roundKey);
+    const statusOf=(t)=>t===home?homeStatus:t===away?awayStatus:"pending";
+    const pickStatus=picked?statusOf(picked):null;
+    const pickedCorrect=pickStatus==="advanced";
+    const pickedWrong=pickStatus==="eliminated";
+    const ptsEarned=pickedCorrect?calcKOPoints(roundKey,picked,picked,!SEEDED.has(picked)):0;
+    const showLabel=picked&&(pickedCorrect||pickedWrong);
     const borderColor=pickedCorrect?C.green:pickedWrong?"#ef4444":picked?C.blue:gold?C.gold:"var(--color-border-tertiary)";
     return(
       <div style={{background:"var(--color-background-primary)",border:`${gold?"2px":"1.5px"} solid ${borderColor}`,borderRadius:8,overflow:"hidden",width:"100%",boxShadow:"0 1px 3px rgba(0,0,0,0.06)"}}>
         {label&&<div style={{padding:"3px 8px",background:pickedCorrect?C.greenLt:pickedWrong?"#fef2f2":"var(--color-background-secondary)",borderBottom:"0.5px solid var(--color-border-tertiary)",fontSize:9,color:pickedCorrect?C.green:pickedWrong?"#ef4444":"var(--color-text-tertiary)",fontWeight:500,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <span>{label}{venue?` · ${venue}, ${city}`:""}</span>
-          {isFinished&&picked&&<span style={{fontWeight:600}}>{pickedCorrect?"+"+ptsEarned+" pts ✓":"0 pts ✗"}</span>}
+          {showLabel&&<span style={{fontWeight:600}}>{pickedCorrect?"+"+ptsEarned+" pts ✓":"0 pts ✗"}</span>}
         </div>}
         {[home,away].map((team,ti)=>{
-          const isWinner=isFinished&&team===actualWinner;
-          const isLoser=isFinished&&team!==actualWinner&&team!=="TBD";
+          const st=statusOf(team);
+          const isWinner=st==="advanced";
+          const isLoser=st==="eliminated"&&team!=="TBD";
           return(
-            <div key={ti} onClick={()=>!koLocked&&!isFinished&&team!=="TBD"&&onPick&&onPick(team)}
+            <div key={ti} onClick={()=>!koLocked&&team!=="TBD"&&onPick&&onPick(team)}
               style={{padding:"5px 7px",display:"flex",alignItems:"center",gap:5,
-                cursor:!koLocked&&!isFinished&&team!=="TBD"&&onPick?"pointer":"default",
+                cursor:!koLocked&&team!=="TBD"&&onPick?"pointer":"default",
                 background:picked===team?(gold?C.goldLt:C.blueLt):"transparent",
                 borderBottom:ti===0?"0.5px solid var(--color-border-tertiary)":"none",
                 opacity:isLoser?0.45:1}}>
               <span style={{fontSize:13}}>{FLAGS[team]||"❓"}</span>
               <span style={{flex:1,fontSize:10,fontWeight:picked===team||isWinner?600:400,
+                textDecoration:isLoser?"line-through":"none",
                 color:isWinner?C.green:picked===team?(gold?"#7a5c10":C.blue):"var(--color-text-primary)",
                 overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{team}</span>
               {isWinner&&<span style={{fontSize:9,color:C.green,fontWeight:700}}>✓</span>}
-              {!isFinished&&!SEEDED.has(team)&&team!=="TBD"&&roundKey!=="r32"&&<span style={{fontSize:8,color:C.gold}}>★</span>}
-              {picked===team&&!isFinished&&<span style={{fontSize:9,color:gold?"#7a5c10":C.blue,fontWeight:700}}>✓</span>}
+              {st==="pending"&&!SEEDED.has(team)&&team!=="TBD"&&roundKey!=="r32"&&<span style={{fontSize:8,color:C.gold}}>★</span>}
+              {picked===team&&st==="pending"&&<span style={{fontSize:9,color:gold?"#7a5c10":C.blue,fontWeight:700}}>✓</span>}
             </div>
           );
         })}
